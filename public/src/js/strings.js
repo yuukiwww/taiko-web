@@ -1070,6 +1070,7 @@ var translations = {
 		verifyPassword: {
 			ja: null,
 			en: "Verify password to delete this account",
+			tw: "請確認您的密碼以刪除帳號"
 		}
 	},
 	serverError: {
@@ -1086,6 +1087,7 @@ var translations = {
 		username_in_use: {
 			ja: null,
 			en: "A user already exists with that username",
+			tw: "已有一位相同名稱的使用者"
 		},
 		invalid_password: {
 			ja: null,
@@ -1104,19 +1106,23 @@ var translations = {
 		},
 		invalid_don: {
 			ja: null,
-			en: "Could not save your custom Don"
+			en: "Could not save your custom Don",
+			tw: "無法儲存小咚"
 		},
 		current_password_invalid: {
 			ja: null,
 			en: "Current password does not match",
+			tw: "目前密碼不符合"
 		},
 		invalid_new_password: {
 			ja: null,
 			en: "Cannot use this password, please check that your new password is at least 6 characters long",
+			tw: "無法使用此密碼，請確認您的新密碼的長度大於 6 個字"
 		},
 		verify_password_invalid: {
 			ja: null,
 			en: "Verification password does not match",
+			tw: "確認密碼不符合"
 		},
 		invalid_csrf: {
 			ja: null,
@@ -1191,6 +1197,9 @@ var translations = {
 			cn: [
 				"请选择一个含有太鼓谱面文件（TJA格式）的文件夹，以用于在自定义歌单中游玩。"
 			],
+			tw: [
+				"請選擇包含太鼓譜面檔案 (TJA格式) 的資料夾，即可在自訂歌單中遊玩。"
+			],
 		},
 		localFolder: {
 			ja: "ローカルフォルダ...",
@@ -1263,7 +1272,8 @@ var translations = {
 			tw: "驗證錯誤：%s"
 		},
 		cookieError: {
-			en: "This function requires third party cookies."
+			en: "This function requires third party cookies.",
+			tw: "此功能需要第三方 cookies。"
 		}
 	}
 }
