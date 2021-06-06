@@ -826,7 +826,7 @@ var translations = {
 		title: {
 			ja: null,
 			en: "Latency Calibration",
-			tw: "延遲校準"
+			tw: "延遲校正"
 		},
 		ms: {
 			ja: null,
@@ -856,6 +856,8 @@ var translations = {
 			title: {
 				ja: null,
 				en: "Audio Latency Calibration",
+				tw: "聲音延遲校正"
+				
 			},
 			content: {
 				ja: null,
@@ -869,11 +871,13 @@ var translations = {
 		audioComplete: {
 			ja: null,
 			en: "Audio Latency Calibration completed!",
+			tw: "聲音延遲校正完成！"
 		},
 		videoHelp: {
 			title: {
 				ja: null,
 				en: "Video Latency Calibration",
+				tw: "畫面延遲校正"
 			},
 			content: {
 				ja: null,
@@ -883,16 +887,18 @@ var translations = {
 		videoComplete: {
 			ja: null,
 			en: "Video Latency Calibration completed!",
+			tw: "畫面延遲校正完成！"
 		},
 		results: {
 			title: {
 				ja: null,
 				en: "Latency Calibration Results",
-				tw: "延遲校準結果"
+				tw: "延遲校正結果"
 			},
 			content: {
 				ja: null,
 				en: "Audio latency: %s\nVideo latency: %s\n\nYou can configure these latency values in the settings.",
+				tw: "聲音延遲 :%s\n畫面延遲: %s\n\n您可以在設定中調整這些數值。"
 			}
 		}
 	},
