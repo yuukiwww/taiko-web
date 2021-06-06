@@ -1092,7 +1092,7 @@ var translations = {
 		invalid_password: {
 			ja: null,
 			en: "Cannot use this password, please check that your password is at least 6 characters long",
-			tw: "無法使用此密碼，密碼至少要 6 個字。"
+			tw: "無法使用此密碼，密碼長度至少要 6 個字。"
 		},
 		invalid_username_password: {
 			ja: null,
@@ -1117,7 +1117,7 @@ var translations = {
 		invalid_new_password: {
 			ja: null,
 			en: "Cannot use this password, please check that your new password is at least 6 characters long",
-			tw: "無法使用此密碼，請確認您的新密碼的長度大於 6 個字"
+			tw: "無法使用此密碼，您的新密碼長度至少要 6 個字"
 		},
 		verify_password_invalid: {
 			ja: null,
