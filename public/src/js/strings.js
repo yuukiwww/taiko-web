@@ -202,7 +202,8 @@ var translations = {
 	},
 	scoreSaveFailed: {
 		ja: null,
-		en: "Could not connect to the server, your score has not been saved.\n\nPlease log in or refresh the page to try saving the score again."
+		en: "Could not connect to the server, your score has not been saved.\n\nPlease log in or refresh the page to try saving the score again.",
+		tw: "無法連接至伺服器，你的成績未能儲存。若要儲存成績，請登入或重新載入頁面。"
 	},
 	loadSongError: {
 		ja: null,
@@ -426,7 +427,8 @@ var translations = {
 	
 	errorOccured: {
 		ja: "エラーが発生しました。再読み込みしてください。",
-		en: "An error occurred, please refresh"
+		en: "An error occurred, please refresh",
+		tw: "發生錯誤，請重新載入頁面。"
 	},
 	tutorial: {
 		basics: {
@@ -489,9 +491,9 @@ var translations = {
 			],
 			tw: [
 				"%s暫停遊戲",
-				'%s and %s while selecting song \u2014 navigate categories',
-				"選擇難度時按住%s以啟用自動模式",
-				"選擇難度時按住%s以啟用網上對打模式"
+				'選擇歌曲時，按下 %s 或 %s 以快速切換類別',
+				"選擇難度時，按住 %s 以啟用自動模式",
+				"選擇難度時，按住 %s 以啟用網上對打模式"
 			],
 			ko: [
 				"%s \u2014 게임을 일시 중지합니다",
@@ -552,6 +554,11 @@ var translations = {
 				"您可以向我们报告在游戏中出现的任何bug，",
 				"可以通过我们的Github仓库或发送电子邮件来报告错误。"
 			],
+			tw: [
+				"此模擬器仍處於開發階段，",
+				"請回報任何你遇到的 bug。",
+				"你可以透過 Github 或電子郵件回報。"
+			],
 			ko: [
 				"이 시뮬레이터는 아직 개발 중입니다.",
 				"버그를 찾으시면 신고해주시기 바랍니다.",
@@ -562,11 +569,13 @@ var translations = {
 			ja: "以下の端末診断情報も併せて報告してください！",
 			en: "Be sure to include the following diagnostic data!",
 			cn: "请确保您的报告包括以下诊断数据!",
+			tw: "記得附上下方的診斷資料！"
 			ko: "신고하실 때 반드시 다음 진단 정보를 포함해주시기 바랍니다!"
 		},
 		issueTemplate: {
 			ja: "###### 下記の問題を説明してください。 スクリーンショットと診断情報を含めてください。",
 			en: "###### Describe the problem you are having below. Please include a screenshot and the diagnostic information.",
+			tw: "###### 在下方說明您遇到的問題。請一併傳送截圖及診斷資料。"
 		},
 		issues: {
 			ja: "課題",
@@ -674,14 +683,14 @@ var translations = {
 				ja: "面(左)",
 				en: "Left Surface",
 				cn: "表面（左）",
-				tw: "表面（左）",
+				tw: "鼓面（左）",
 				ko: "북 면 (왼쪽)"
 			},
 			don_r: {
 				ja: "面(右)",
 				en: "Right Surface",
 				cn: "表面（右）",
-				tw: "表面（右）",
+				tw: "鼓面（右）",
 				ko: "북 면 (오른쪽)"
 			},
 			ka_r: {
@@ -727,36 +736,42 @@ var translations = {
 				ja: null,
 				en: "Latency",
 				cn: "延迟校准",
+				tw: "延遲校準",
 				ko: "레이턴시"
 			},
 			value: {
 				ja: null,
 				en: "Audio: %s, Video: %s",
 				cn: "音频: %s, 视频: %s",
+				tw: "聲音: %s, 畫面: %s",
 				ko: "오디오: %s, 비디오: %s"
 			},
 			calibration: {
 				ja: null,
 				en: "Latency Calibration",
 				cn: "自动辅助校准",
+				tw: "自動延遲校準",
 				ko: "레이턴시 조절"
 			},
 			audio: {
 				ja: null,
 				en: "Audio",
 				cn: "音频",
+				tw: "聲音",
 				ko: "오디오"
 			},
 			video: {
 				ja: null,
 				en: "Video",
 				cn: "视频",
+				tw: "畫面",
 				ko: "비디오"
 			},
 			drumSounds: {
 				ja: null,
 				en: "Drum Sounds",
 				cn: "鼓声",
+				tw: "鼓聲",
 				ko: "북 소리"
 			}
 		},
@@ -774,6 +789,7 @@ var translations = {
 				ja: "歌詞の表示",
 				en: "Show Lyrics",
 				cn: "显示歌词",
+				tw: "顯示歌詞",
 				ko: "가사 표시하기"
 			}
 		},
@@ -810,6 +826,7 @@ var translations = {
 		title: {
 			ja: null,
 			en: "Latency Calibration",
+			tw: "延遲校準"
 		},
 		ms: {
 			ja: null,
@@ -818,18 +835,22 @@ var translations = {
 		back: {
 			ja: null,
 			en: "Back to Settings",
+			tw: "返回設定"
 		},
 		retryPrevious: {
 			ja: null,
 			en: "Retry Previous",
+			tw: "重試"
 		},
 		start: {
 			ja: null,
 			en: "Start",
+			tw: "開始"
 		},
 		finish: {
 			ja: null,
 			en: "Finish",
+			tw: "完成"
 		},
 		audioHelp: {
 			title: {
@@ -867,6 +888,7 @@ var translations = {
 			title: {
 				ja: null,
 				en: "Latency Calibration Results",
+				tw: "延遲校準結果"
 			},
 			content: {
 				ja: null,
@@ -914,7 +936,7 @@ var translations = {
 			ja: "ログイン状態を保持する",
 			en: "Remember me",
 			cn: "记住登录",
-			tw: "記住登錄",
+			tw: "記住我",
 			ko: "자동 로그인"
 		},
 		login: {
@@ -949,7 +971,7 @@ var translations = {
 			ja: "パスワードが一致しません",
 			en: "Passwords do not match",
 			cn: "密码不匹配",
-			tw: "密碼不匹配",
+			tw: "密碼不符合",
 			ko: "비밀번호가 일치하지 않습니다"
 		},
 		newPasswordsDoNotMatch: {
@@ -987,10 +1009,12 @@ var translations = {
 		cancel: {
 			ja: null,
 			en: "Cancel",
+			tw: "取消"
 		},
 		save: {
 			ja: null,
 			en: "Save",
+			tw: "儲存"
 		},
 		displayName: {
 			ja: null,
@@ -1000,19 +1024,23 @@ var translations = {
 			bodyFill: {
 				ja: null,
 				en: "Body",
+				tw: "身體"
 			},
 			faceFill: {
 				ja: null,
 				en: "Face",
+				tw: "臉"
 			},
 			reset: {
 				ja: null,
 				en: "Reset",
+				tw: "重設"
 			}
 		},
 		changePassword: {
 			ja: null,
 			en: "Change Password",
+			tw: "更改密碼"
 		},
 		currentNewRepeat: {
 			ja: null,
@@ -1021,10 +1049,16 @@ var translations = {
 				"New Password",
 				"Repeat New Password"
 			],
+			tw: [
+				"目前密碼",
+				"新密碼",
+				"重複新密碼"
+			]
 		},
 		deleteAccount: {
 			ja: null,
 			en: "Delete Account",
+			tw: "刪除帳號"
 		},
 		verifyPassword: {
 			ja: null,
@@ -1035,6 +1069,7 @@ var translations = {
 		not_logged_in: {
 			ja: null,
 			en: "Not logged in",
+			tw: "未登入"
 		},
 		invalid_username: {
 			ja: null,
@@ -1051,10 +1086,12 @@ var translations = {
 		invalid_username_password: {
 			ja: null,
 			en: "Invalid Username or Password",
+			tw: "無效的使用者名稱或密碼"
 		},
 		invalid_display_name: {
 			ja: null,
 			en: "Cannot use this name, please check that your new name is at most 25 characters long",
+			tw: "不能使用此名稱。名稱最多不能超過 25 個字。"
 		},
 		invalid_don: {
 			ja: null,
@@ -1130,7 +1167,7 @@ var translations = {
 			ja: "デフォルト曲リスト",
 			en: "Default Song List",
 			cn: "默认歌曲列表",
-			tw: "默認歌曲列表",
+			tw: "預設歌曲列表",
 			ko: "기본 노래 목록"
 		},
 		description: {
@@ -1145,14 +1182,14 @@ var translations = {
 			ja: "ローカルフォルダ...",
 			en: "Local Folder...",
 			cn: "本地文件夹...",
-			tw: "本地文件夾...",
+			tw: "本機資料夾...",
 			ko: "로컬 폴더..."
 		},
 		gdriveFolder: {
 			ja: "Google ドライブ...",
 			en: "Google Drive...",
 			cn: "Google云端硬盘...",
-			tw: "Google雲端硬碟...",
+			tw: "Google 雲端硬碟...",
 			ko: "구글 드라이브..."
 		},
 		gdriveAccount: {
@@ -1170,10 +1207,12 @@ var translations = {
 			ko: "파일을 여기에 드롭하세요"
 		},
 		importError: {
-			en: "Import Error"
+			en: "Import Error",
+			tw: "匯入失敗"
 		},
 		noSongs: {
-			en: "No Taiko chart files have been found in the provided folder."
+			en: "No Taiko chart files have been found in the provided folder.",
+			tw: "在你選擇的資料夾中找不到譜面檔案。"
 		}
 	},
 	gpicker: {
@@ -1206,7 +1245,8 @@ var translations = {
 			ko: "공유 문서함"
 		},
 		authError: {
-			en: "Auth error: %s"
+			en: "Auth error: %s",
+			tw: "驗證失敗：%s"
 		},
 		cookieError: {
 			en: "This function requires third party cookies."
