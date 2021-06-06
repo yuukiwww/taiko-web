@@ -983,6 +983,7 @@ var translations = {
 		newPasswordsDoNotMatch: {
 			ja: null,
 			en: "New passwords do not match",
+			tw: "新密碼不符合"
 		},
 		cannotBeEmpty: {
 			ja: "%sは空にできません",
@@ -1080,6 +1081,7 @@ var translations = {
 		invalid_username: {
 			ja: null,
 			en: "Invalid username, a username can only contain letters, numbers, and underscores, and must be between 3 and 20 characters long",
+			tw: "使用者名稱無效，使用者名稱只能由字母、數字、及底線組成，且長度必須介於 3 到 20 個字之間"
 		},
 		username_in_use: {
 			ja: null,
@@ -1088,6 +1090,7 @@ var translations = {
 		invalid_password: {
 			ja: null,
 			en: "Cannot use this password, please check that your password is at least 6 characters long",
+			tw: "無法使用此密碼，密碼至少要 6 個字。"
 		},
 		invalid_username_password: {
 			ja: null,
@@ -1097,7 +1100,7 @@ var translations = {
 		invalid_display_name: {
 			ja: null,
 			en: "Cannot use this name, please check that your new name is at most 25 characters long",
-			tw: "不能使用此名稱。名稱最多不能超過 25 個字。"
+			tw: "無法使用此名稱。名稱最多不能超過 25 個字。"
 		},
 		invalid_don: {
 			ja: null,
@@ -1117,25 +1120,30 @@ var translations = {
 		},
 		invalid_csrf: {
 			ja: null,
-			en: "Security token expired. Please refresh the page."
+			en: "Security token expired. Please refresh the page.",
+			tw: "安全權杖過期。請重新載入頁面。"
 		}
 	},
 	browserSupport: {
 		browserWarning: {
 			ja: "サポートされていないブラウザを実行しています (%s)",
 			en: "You are running an unsupported browser (%s)",
+			tw: "您正在使用不支援的瀏覽器 (%s)"
 		},
 		details: {
 			ja: "詳しく",
 			en: "Details...",
+			tw: "詳細資料"
 		},
 		failedTests: {
 			ja: "このテストは失敗しました：",
 			en: "The following tests have failed:",
+			tw: "以下的測試未通過："
 		},
 		supportedBrowser: {
 			ja: "%sなどのサポートされているブラウザを使用してください",
 			en: "Please use a supported browser such as %s",
+			tw: "請使用支援的瀏覽器，例如：%s"
 		}
 	},
 	creative: {
