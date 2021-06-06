@@ -569,7 +569,7 @@ var translations = {
 			ja: "以下の端末診断情報も併せて報告してください！",
 			en: "Be sure to include the following diagnostic data!",
 			cn: "请确保您的报告包括以下诊断数据!",
-			tw: "記得附上下方的診斷資料！"
+			tw: "記得附上下方的診斷資料！",
 			ko: "신고하실 때 반드시 다음 진단 정보를 포함해주시기 바랍니다!"
 		},
 		issueTemplate: {
