@@ -736,7 +736,7 @@ var translations = {
 				ja: null,
 				en: "Latency",
 				cn: "延迟校准",
-				tw: "延遲校準",
+				tw: "延遲",
 				ko: "레이턴시"
 			},
 			value: {
@@ -750,7 +750,7 @@ var translations = {
 				ja: null,
 				en: "Latency Calibration",
 				cn: "自动辅助校准",
-				tw: "自動延遲校準",
+				tw: "自動延遲校正",
 				ko: "레이턴시 조절"
 			},
 			audio: {
@@ -1246,7 +1246,7 @@ var translations = {
 		},
 		authError: {
 			en: "Auth error: %s",
-			tw: "驗證失敗：%s"
+			tw: "驗證錯誤：%s"
 		},
 		cookieError: {
 			en: "This function requires third party cookies."
