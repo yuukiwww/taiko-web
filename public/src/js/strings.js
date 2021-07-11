@@ -40,7 +40,7 @@ var translations = {
 		ja: "この非公式シミュレーターはバンダイナムコとは関係がありません。",
 		en: "This unofficial simulator is unaffiliated with BANDAI NAMCO.",
 		cn: "这款非官方模拟器与BANDAI NAMCO无关。",
-		tw: "這款非官方模擬器與BANDAI NAMCO無關。",
+		tw: "這款非官方模擬器與 BANDAI NAMCO 無關。",
 		ko: "이 비공식 시뮬레이터는 반다이 남코와 관련이 없습니다."
 	},
 	titleCopyright: {
@@ -190,7 +190,7 @@ var translations = {
 		ja: "オンラインセッションを開始する！",
 		en: "Begin an Online Session!",
 		cn: "开始在线会话！",
-		tw: "開始多人模式!",
+		tw: "開始多人模式！",
 		ko: "온라인 세션 시작!"
 	},
 	sessionEnd: {
@@ -597,7 +597,7 @@ var translations = {
 			ja: null,
 			en: "Share this link with your friend to start playing together! Do not leave this screen while they join.",
 			cn: "复制下方地址，给你的朋友即可开始一起游戏！当他们与您联系之前，请不要离开此页面。",
-			tw: "複製下方地址，給你的朋友即可開始一起遊戲！當他們與您聯繫之前，請不要離開此頁面。",
+			tw: "分享下方網址給你的朋友即可開始一起遊戲！在他們加入時，請不要離開此頁面。",
 			ko: "링크를 공유하여 친구와 플레이하세요! 친구가 입장하기 전에 페이지를 나가지 말아주세요."
 		},
 		cancel: {
@@ -623,7 +623,7 @@ var translations = {
 				ja: "ゲームの解像度",
 				en: "Game Resolution",
 				cn: "游戏分辨率",
-				tw: "遊戲分辨率",
+				tw: "遊戲解析度",
 				ko: "게임 해상도"
 			},
 			high: {
@@ -713,21 +713,21 @@ var translations = {
 				ja: "タイプA",
 				en: "Type A",
 				cn: "类型A",
-				tw: "類型A",
+				tw: "類型 A",
 				ko: "타입 A"
 			},
 			b: {
 				ja: "タイプB",
 				en: "Type B",
 				cn: "类型B",
-				tw: "類型B",
+				tw: "類型 B",
 				ko: "타입 B"
 			},
 			c: {
 				ja: "タイプC",
 				en: "Type C",
 				cn: "类型C",
-				tw: "類型C",
+				tw: "類型 C",
 				ko: "타입 C"
 			}
 		},
@@ -811,7 +811,7 @@ var translations = {
 			ja: "既定値にリセット",
 			en: "Reset to Defaults",
 			cn: "重置为默认值",
-			tw: "重置為默認值",
+			tw: "重置為預設值",
 			ko: "기본값으로 재설정"
 		},
 		ok: {
@@ -862,10 +862,12 @@ var translations = {
 			content: {
 				ja: null,
 				en: "Listen to a sound playing in the background.\n\nHit the surface of the drum (%s or %s) as you hear it!",
+				tw: "仔細聆聽背景播放的音效。\n\n聽到音效就敲打鼓面 (%s 或 %s)！"
 			},
 			contentAlt: {
 				ja: null,
 				en: "Listen to a sound playing in the background.\n\nHit the surface of the drum as you hear it!",
+				tw: "仔細聆聽背景播放的音效。\n\n聽到音效就敲打鼓面！"
 			}
 		},
 		audioComplete: {
@@ -882,6 +884,7 @@ var translations = {
 			content: {
 				ja: null,
 				en: "This time there will be no sounds.\n\nInstead, watch for notes blinking on the circle-shaped frame, hit the drum as they appear!",
+				tw: "這次不會有音效。\n\n請注意正在閃爍音符的圓形框框，當音符出現時就敲打鼓面！"
 			}
 		},
 		videoComplete: {
