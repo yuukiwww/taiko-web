@@ -736,7 +736,7 @@ var translations = {
 				ja: null,
 				en: "Latency",
 				cn: "延迟校准",
-				tw: "延遲",
+				tw: "延遲校準",
 				ko: "레이턴시"
 			},
 			value: {
