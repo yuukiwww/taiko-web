@@ -1,5 +1,8 @@
 class Account{
-	constructor(touchEnabled){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(touchEnabled){
 		this.touchEnabled = touchEnabled
 		cancelTouch = false
 		this.locked = false

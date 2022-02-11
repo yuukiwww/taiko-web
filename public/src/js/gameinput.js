@@ -1,5 +1,8 @@
 class GameInput{
-	constructor(controller){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(controller){
 		this.controller = controller
 		this.game = this.controller.game
 		

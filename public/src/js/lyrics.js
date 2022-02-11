@@ -1,5 +1,8 @@
 class Lyrics{
-	constructor(file, songOffset, div, parsed){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(file, songOffset, div, parsed){
 		this.div = div
 		this.stroke = document.createElement("div")
 		this.stroke.classList.add("stroke")

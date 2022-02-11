@@ -1,5 +1,8 @@
 class LoadSong{
-	constructor(selectedSong, autoPlayEnabled, multiplayer, touchEnabled){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(selectedSong, autoPlayEnabled, multiplayer, touchEnabled){
 		this.selectedSong = selectedSong
 		this.autoPlayEnabled = autoPlayEnabled
 		this.multiplayer = multiplayer

@@ -1,5 +1,8 @@
 ﻿class View{
-	constructor(controller){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(controller){
 		this.controller = controller
 		
 		this.canvas = document.getElementById("canvas")

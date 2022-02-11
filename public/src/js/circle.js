@@ -1,5 +1,8 @@
 class Circle{
-	constructor(config){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(config){
 		this.id = config.id
 		this.ms = config.start
 		this.originalMS = this.ms

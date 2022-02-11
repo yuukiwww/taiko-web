@@ -1,5 +1,8 @@
 class Mekadon{
-	constructor(controller, game){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(controller, game){
 		this.controller = controller
 		this.game = game
 		this.lr = false

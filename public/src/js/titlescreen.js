@@ -1,5 +1,8 @@
 class Titlescreen{
-	constructor(songId){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(songId){
 		this.songId = songId
 		db.getItem("customFolder").then(folder => this.customFolder = folder)
 		

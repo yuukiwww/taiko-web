@@ -1,5 +1,8 @@
 class Gamepad{
-	constructor(bindings, callback){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(bindings, callback){
 		this.bindings = bindings
 		this.callback = !!callback
 		this.b = {

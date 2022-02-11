@@ -1,5 +1,8 @@
 class P2Connection{
-	constructor(){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(){
 		this.closed = true
 		this.lastMessages = {}
 		this.otherConnected = false

@@ -1,5 +1,8 @@
 ﻿class ParseTja{
-	constructor(file, difficulty, stars, offset, metaOnly){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(file, difficulty, stars, offset, metaOnly){
 		this.data = []
 		for(let line of file){
 			var indexComment = line.indexOf("//")

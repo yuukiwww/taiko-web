@@ -1,5 +1,8 @@
 class ScoreStorage{
-	constructor(){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(){
 		this.scores = {}
 		this.scoresP2 = {}
 		this.requestP2 = new Set()

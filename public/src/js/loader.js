@@ -1,5 +1,8 @@
 class Loader{
-	constructor(callback){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(callback){
 		this.callback = callback
 		this.loadedAssets = 0
 		this.assetsDiv = document.getElementById("assets")
@@ -253,6 +256,7 @@ class Loader{
 			pageEvents.setKbd()
 			scoreStorage = new ScoreStorage()
 			db = new IDB("taiko", "store")
+			plugins = new Plugins()
 			
 			Promise.all(this.promises).then(() => {
 				if(this.error){

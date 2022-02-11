@@ -1,5 +1,8 @@
 class ViewAssets{
-	constructor(view){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(view){
 		this.view = view
 		this.controller = this.view.controller
 		this.allAssets = []

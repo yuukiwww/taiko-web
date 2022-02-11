@@ -1,5 +1,8 @@
 class Gpicker{
-	constructor(){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(){
 		this.apiKey = gameConfig.google_credentials.api_key
 		this.oauthClientId = gameConfig.google_credentials.oauth_client_id
 		this.projectNumber = gameConfig.google_credentials.project_number

@@ -1,5 +1,8 @@
 ﻿class About{
-	constructor(touchEnabled){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(touchEnabled){
 		this.touchEnabled = touchEnabled
 		loader.changePage("about", true)
 		cancelTouch = false

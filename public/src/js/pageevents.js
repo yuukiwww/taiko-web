@@ -1,5 +1,8 @@
 class PageEvents{
-	constructor(){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(){
 		this.allEvents = new Map()
 		this.keyListeners = new Map()
 		this.mouseListeners = new Map()

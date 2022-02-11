@@ -1,5 +1,8 @@
 class Game{
-	constructor(controller, selectedSong, songData){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(controller, selectedSong, songData){
 		this.controller = controller
 		this.selectedSong = selectedSong
 		this.songData = songData

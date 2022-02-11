@@ -1,12 +1,19 @@
 ﻿class ImportSongs{
-	constructor(limited, otherFiles){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(limited, otherFiles, noPlugins, pluginAmount){
 		this.limited = limited
 		this.tjaFiles = []
 		this.osuFiles = []
 		this.assetFiles = {}
+		this.pluginFiles = []
 		this.otherFiles = otherFiles || {}
+		this.noPlugins = noPlugins
+		this.pluginAmount = pluginAmount
 		this.songs = []
 		this.stylesheet = []
+		this.plugins = []
 		this.songTitle = this.otherFiles.songTitle || {}
 		this.uraRegex = /\s*[\(（]裏[\)）]$/
 		this.courseTypes = {
@@ -77,9 +84,46 @@
 				if(!(name in this.assetFiles)){
 					this.assetFiles[name] = file
 				}
+			}else if(name.endsWith(".taikoweb.js")){
+				this.pluginFiles.push({
+					file: file,
+					index: i
+				})
 			}else{
 				this.otherFiles[path] = file
 			}
+		}
+		
+		if(!this.noPlugins && this.pluginFiles.length){
+			var pluginPromises = []
+			this.pluginFiles.forEach(fileObj => {
+				pluginPromises.push(this.addPlugin(fileObj).catch(e => console.warn(e)))
+			})
+			return Promise.all(pluginPromises).then(() => {
+				var startPromises = []
+				var pluginAmount = 0
+				if(this.plugins.length && confirm(strings.plugins.warning.replace("%s",
+					strings.plugins.plugin[strings.plural.select(this.plugins.length)].replace("%s",
+						this.plugins.length.toString()
+					)
+				))){
+					this.plugins.forEach(obj => {
+						var plugin = plugins.add(obj.data, obj.name)
+						if(plugin){
+							pluginAmount++
+							plugins.imported.push({
+								name: plugin.name,
+								plugin: plugin
+							})
+							startPromises.push(plugin.start())
+						}
+					})
+				}
+				return Promise.all(startPromises).then(() => {
+					var importSongs = new ImportSongs(this.limited, this.otherFiles, true, pluginAmount)
+					return importSongs.load(files)
+				})
+			})
 		}
 		
 		var metaPromises = []
@@ -468,6 +512,18 @@
 		return name.slice(0, name.lastIndexOf("."))
 	}
 	
+	addPlugin(fileObj){
+		var file = fileObj.file
+		var filePromise = file.read()
+		return filePromise.then(dataRaw => {
+			var name = file.name.slice(0, file.name.lastIndexOf(".taikoweb.js"))
+			this.plugins.push({
+				name: name,
+				data: dataRaw
+			})
+		})
+	}
+	
 	getCategory(file, exclude){
 		var path = file.path.toLowerCase().split("/")
 		for(var i = path.length - 2; i >= 0; i--){
@@ -543,10 +599,12 @@
 				assets.otherFiles.songTitle = this.songTitle
 			}
 			return Promise.resolve(this.songs)
-		}else if(Object.keys(this.assetFiles).length){
-			return Promise.resolve()
 		}else{
-			return Promise.reject("nosongs")
+			if(this.noPlugins && this.pluginAmount || Object.keys(this.assetFiles).length){
+				return Promise.resolve()
+			}else{
+				return Promise.reject("nosongs")
+			}
 		}
 		this.clean()
 	}
