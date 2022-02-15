@@ -208,13 +208,13 @@ var translations = {
 		ko: "온라인 세션 끝내기"
 	},
 	scoreSaveFailed: {
-		ja: null,
+		ja: "サーバーに接続できませんでした。スコアは保存されていません。\n\nログインするか、ページを更新して、再度スコアの保存をお試しください。",
 		en: "Could not connect to the server, your score has not been saved.\n\nPlease log in or refresh the page to try saving the score again.",
 		tw: "無法連接至伺服器，你的成績未能儲存。若要儲存成績，請登入或重新載入頁面。"
 	},
 	loadSongError: {
-		ja: null,
-		en: "Could not load song %s with id %s.\n\n%s"
+		ja: "曲「%s」を読み込むことができませんでした。（ID：%s）\n\n%s",
+		en: "Could not load song %s with ID %s.\n\n%s"
 	},
 	loading: {
 		ja: "ロード中...",
@@ -601,7 +601,7 @@ var translations = {
 			ko: "멀티플레이어 세션"
 		},
 		linkTutorial: {
-			ja: null,
+			ja: "このリンクをお友達とシェアして、一緒にプレイを始めて。相手が参加するまで、この画面を離れないでください。",
 			en: "Share this link with your friend to start playing together! Do not leave this screen while they join.",
 			cn: "复制下方地址，给你的朋友即可开始一起游戏！当他们与您联系之前，请不要离开此页面。",
 			tw: "分享下方網址給你的朋友即可開始一起遊戲！在他們加入時，請不要離開此頁面。",
@@ -740,42 +740,42 @@ var translations = {
 		},
 		latency: {
 			name: {
-				ja: null,
+				ja: "レイテンシー",
 				en: "Latency",
 				cn: "延迟校准",
 				tw: "延遲校準",
 				ko: "레이턴시"
 			},
 			value: {
-				ja: null,
+				ja: "オーディオ: %s, ビデオ: %s",
 				en: "Audio: %s, Video: %s",
 				cn: "音频: %s, 视频: %s",
 				tw: "聲音: %s, 畫面: %s",
 				ko: "오디오: %s, 비디오: %s"
 			},
 			calibration: {
-				ja: null,
+				ja: "レイテンシー較正",
 				en: "Latency Calibration",
 				cn: "自动辅助校准",
 				tw: "自動延遲校正",
 				ko: "레이턴시 조절"
 			},
 			audio: {
-				ja: null,
+				ja: "オーディオ",
 				en: "Audio",
 				cn: "音频",
 				tw: "聲音",
 				ko: "오디오"
 			},
 			video: {
-				ja: null,
+				ja: "ビデオ",
 				en: "Video",
 				cn: "视频",
 				tw: "畫面",
 				ko: "비디오"
 			},
 			drumSounds: {
-				ja: null,
+				ja: "太鼓の音",
 				en: "Drum Sounds",
 				cn: "鼓声",
 				tw: "鼓聲",
@@ -831,82 +831,82 @@ var translations = {
 	},
 	calibration: {
 		title: {
-			ja: null,
+			ja: "レイテンシー・キャリブレーション",
 			en: "Latency Calibration",
 			tw: "延遲校正"
 		},
 		ms: {
-			ja: null,
+			ja: "%sms",
 			en: "%sms",
 		},
 		back: {
-			ja: null,
+			ja: "「ゲーム設定」に戻る",
 			en: "Back to Settings",
 			tw: "返回設定"
 		},
 		retryPrevious: {
-			ja: null,
+			ja: "前回のリトライ",
 			en: "Retry Previous",
 			tw: "重試"
 		},
 		start: {
-			ja: null,
+			ja: "スタート",
 			en: "Start",
 			tw: "開始"
 		},
 		finish: {
-			ja: null,
+			ja: "終了する",
 			en: "Finish",
 			tw: "完成"
 		},
 		audioHelp: {
 			title: {
-				ja: null,
+				ja: "オーディオ・レイテンシー・キャリブレーション",
 				en: "Audio Latency Calibration",
 				tw: "聲音延遲校正"
 				
 			},
 			content: {
-				ja: null,
+				ja: "背景で鳴っている音を聴いてみましょう。\n\n音が聞こえたら、太鼓の面（%sまたは%s）をたたこう！",
 				en: "Listen to a sound playing in the background.\n\nHit the surface of the drum (%s or %s) as you hear it!",
 				tw: "仔細聆聽背景播放的音效。\n\n聽到音效就敲打鼓面 (%s 或 %s)！"
 			},
 			contentAlt: {
-				ja: null,
+				ja: "背景で鳴っている音を聴いてみましょう。\n\n音が聞こえたら、太鼓の面をたたこう！",
 				en: "Listen to a sound playing in the background.\n\nHit the surface of the drum as you hear it!",
 				tw: "仔細聆聽背景播放的音效。\n\n聽到音效就敲打鼓面！"
 			}
 		},
 		audioComplete: {
-			ja: null,
+			ja: "オーディオ・レイテンシー・キャリブレーション完了！",
 			en: "Audio Latency Calibration completed!",
 			tw: "聲音延遲校正完成！"
 		},
 		videoHelp: {
 			title: {
-				ja: null,
+				ja: "ビデオ・レイテンシー・キャリブレーション",
 				en: "Video Latency Calibration",
 				tw: "畫面延遲校正"
 			},
 			content: {
-				ja: null,
+				ja: "今回は音が出ません。\n\n代わりに、丸い枠の中で音符が点滅しているのを見て、音符が現れたら太鼓をたたこう！",
 				en: "This time there will be no sounds.\n\nInstead, watch for notes blinking on the circle-shaped frame, hit the drum as they appear!",
 				tw: "這次不會有音效。\n\n請注意正在閃爍音符的圓形框框，當音符出現時就敲打鼓面！"
 			}
 		},
 		videoComplete: {
-			ja: null,
+			ja: "ビデオ・レイテンシー・キャリブレーション完了！",
 			en: "Video Latency Calibration completed!",
 			tw: "畫面延遲校正完成！"
 		},
 		results: {
 			title: {
-				ja: null,
+				ja: "レイテンシー・キャリブレーション結果",
 				en: "Latency Calibration Results",
 				tw: "延遲校正結果"
 			},
 			content: {
-				ja: null,
+				ja: "オーディオ・レイテンシー: %s\nビデオ・レイテンシ: %s\n\nこれらのレイテンシーの値は、設定で設定することができます。",
 				en: "Audio latency: %s\nVideo latency: %s\n\nYou can configure these latency values in the settings.",
 				tw: "聲音延遲 :%s\n畫面延遲: %s\n\n您可以在設定中調整這些數值。"
 			}
@@ -991,7 +991,7 @@ var translations = {
 			ko: "비밀번호가 일치하지 않습니다"
 		},
 		newPasswordsDoNotMatch: {
-			ja: null,
+			ja: "新しいパスワードが一致しない",
 			en: "New passwords do not match",
 			tw: "新密碼不符合"
 		},
@@ -1024,43 +1024,47 @@ var translations = {
 			ko: "돌아가기"
 		},
 		cancel: {
-			ja: null,
+			ja: "キャンセル",
 			en: "Cancel",
 			tw: "取消"
 		},
 		save: {
-			ja: null,
+			ja: "保存する",
 			en: "Save",
 			tw: "儲存"
 		},
 		displayName: {
-			ja: null,
+			ja: "表示名",
 			en: "Displayed Name",
 		},
 		customdon: {
 			bodyFill: {
-				ja: null,
+				ja: "どう",
 				en: "Body",
 				tw: "身體"
 			},
 			faceFill: {
-				ja: null,
+				ja: "かお",
 				en: "Face",
 				tw: "臉"
 			},
 			reset: {
-				ja: null,
+				ja: "リセット",
 				en: "Reset",
 				tw: "重設"
 			}
 		},
 		changePassword: {
-			ja: null,
+			ja: "パスワードの変更",
 			en: "Change Password",
 			tw: "更改密碼"
 		},
 		currentNewRepeat: {
-			ja: null,
+			ja: [
+				"現在のパスワード",
+				"新しいパスワード",
+				"新しいパスワードの繰り返し"
+			],
 			en: [
 				"Current Password",
 				"New Password",
@@ -1073,69 +1077,69 @@ var translations = {
 			]
 		},
 		deleteAccount: {
-			ja: null,
+			ja: "アカウント削除",
 			en: "Delete Account",
 			tw: "刪除帳號"
 		},
 		verifyPassword: {
-			ja: null,
+			ja: "削除するパスワードの確認",
 			en: "Verify password to delete this account",
 			tw: "請確認您的密碼以刪除帳號"
 		}
 	},
 	serverError: {
 		not_logged_in: {
-			ja: null,
+			ja: "ログインしていない",
 			en: "Not logged in",
 			tw: "未登入"
 		},
 		invalid_username: {
-			ja: null,
+			ja: "ユーザー名が無効です。ユーザー名には、文字、数字、アンダースコアのみを使用でき、3文字以上20文字以下である必要があります。",
 			en: "Invalid username, a username can only contain letters, numbers, and underscores, and must be between 3 and 20 characters long",
 			tw: "使用者名稱無效，使用者名稱只能由字母、數字、及底線組成，且長度必須介於 3 到 20 個字之間"
 		},
 		username_in_use: {
-			ja: null,
+			ja: "そのユーザ名で既にユーザが存在する",
 			en: "A user already exists with that username",
 			tw: "已有一位相同名稱的使用者"
 		},
 		invalid_password: {
-			ja: null,
+			ja: "このパスワードは使用できません。パスワードの長さが6文字以上であることを確認してください",
 			en: "Cannot use this password, please check that your password is at least 6 characters long",
 			tw: "無法使用此密碼，密碼長度至少要 6 個字。"
 		},
 		invalid_username_password: {
-			ja: null,
+			ja: "ユーザー名またはパスワードが無効",
 			en: "Invalid Username or Password",
 			tw: "無效的使用者名稱或密碼"
 		},
 		invalid_display_name: {
-			ja: null,
+			ja: "この名前は使用できません。新しい名前が25文字以下であることを確認してください",
 			en: "Cannot use this name, please check that your new name is at most 25 characters long",
 			tw: "無法使用此名稱。名稱最多不能超過 25 個字。"
 		},
 		invalid_don: {
-			ja: null,
+			ja: "マイどんを保存できませんでした",
 			en: "Could not save your custom Don",
 			tw: "無法儲存小咚"
 		},
 		current_password_invalid: {
-			ja: null,
+			ja: "現在のパスワードが一致しません",
 			en: "Current password does not match",
 			tw: "目前密碼不符合"
 		},
 		invalid_new_password: {
-			ja: null,
+			ja: "このパスワードは使用できません。新しいパスワードが6文字以上であることを確認してください",
 			en: "Cannot use this password, please check that your new password is at least 6 characters long",
 			tw: "無法使用此密碼，您的新密碼長度至少要 6 個字"
 		},
 		verify_password_invalid: {
-			ja: null,
+			ja: "確認用パスワードが一致しない",
 			en: "Verification password does not match",
 			tw: "確認密碼不符合"
 		},
 		invalid_csrf: {
-			ja: null,
+			ja: "セキュリティトークンの期限が切れました。ページを更新してください。",
 			en: "Security token expired. Please refresh the page.",
 			tw: "安全權杖過期。請重新載入頁面。"
 		}
@@ -1201,6 +1205,9 @@ var translations = {
 			ko: "기본 노래 목록"
 		},
 		description: {
+			ja: [
+				"TJA形式の太鼓譜面ファイルが入ったフォルダを選んで、カスタム曲リストで演奏しよう!"
+			],
 			en: [
 				"Pick a folder with Taiko chart files in TJA format to play on a custom song list!"
 			],
@@ -1240,10 +1247,12 @@ var translations = {
 			ko: "파일을 여기에 드롭하세요"
 		},
 		importError: {
+			ja: "インポートエラー",
 			en: "Import Error",
 			tw: "匯入失敗"
 		},
 		noSongs: {
+			ja: "提供されたフォルダーに太鼓譜面ファイルは見つかりませんでした。",
 			en: "No Taiko chart files have been found in the provided folder.",
 			tw: "在你選擇的資料夾中找不到譜面檔案。"
 		}
@@ -1278,29 +1287,34 @@ var translations = {
 			ko: "공유 문서함"
 		},
 		authError: {
+			ja: "認証エラー: %s",
 			en: "Auth error: %s",
 			tw: "驗證錯誤：%s"
 		},
 		cookieError: {
+			ja: "この機能には、サードパーティのクッキーが必要です。",
 			en: "This function requires third party cookies.",
 			tw: "此功能需要第三方 cookies。"
 		}
 	},
 	plugins: {
 		title: {
-			ja: null,
+			ja: "プラグイン",
 			en: "Plugins"
 		},
 		unloadAll: {
-			ja: null,
+			ja: "すべて無効にする",
 			en: "Unload All"
 		},
 		warning: {
-			ja: null,
+			ja: "%sを読み込もうとしています。プラグインは信頼できる場合のみ読み込むようにしてください。続行しますか？",
 			en: "You are about to load %s. Plugins should only be loaded if you trust them. Continue?"
 		},
 		plugin: {
-			ja: null,
+			ja: {
+				one: "%sつのプラグイン",
+				other: "%sつのプラグイン"
+			},
 			en: {
 				one: "%s plugin",
 				other: "%s plugins"
