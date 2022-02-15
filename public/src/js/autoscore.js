@@ -1,5 +1,8 @@
 class AutoScore { 
-	constructor(difficulty, level, scoremode, circles) {
+	constructor(...args){
+		this.init(...args)
+	}
+	init(difficulty, level, scoremode, circles) {
 		this.scoremode = scoremode;
 		this.circles = circles;
 		this.basic_max_score_list = {

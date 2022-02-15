@@ -1,5 +1,8 @@
 ﻿class CanvasDraw{
-	constructor(noSmoothing){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(noSmoothing){
 		this.diffStarPath = new Path2D(vectors.diffStar)
 		this.longVowelMark = new Path2D(vectors.longVowelMark)
 		

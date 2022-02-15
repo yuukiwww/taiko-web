@@ -1,5 +1,8 @@
 class Scoresheet{
-	constructor(controller, results, multiplayer, touchEnabled){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(controller, results, multiplayer, touchEnabled){
 		this.controller = controller
 		this.resultsObj = results
 		this.player = [multiplayer ? (p2.player === 1 ? 0 : 1) : 0]

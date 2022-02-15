@@ -1,5 +1,8 @@
 ﻿class SoundBuffer{
-	constructor(){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(){
 		var AudioContext = window.AudioContext || window.webkitAudioContext
 		this.context = new AudioContext()
 		this.audioDecoder = this.context.decodeAudioData.bind(this.context)

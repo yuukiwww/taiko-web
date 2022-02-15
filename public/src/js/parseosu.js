@@ -1,5 +1,8 @@
 class ParseOsu{
-	constructor(fileContent, difficulty, stars, offset, metaOnly){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(fileContent, difficulty, stars, offset, metaOnly){
 		this.osu = {
 			OFFSET: 0,
 			MSPERBEAT: 1,

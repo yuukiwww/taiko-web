@@ -1,5 +1,8 @@
 class CanvasTest{
-	constructor(){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(){
 		this.canvas = document.createElement("canvas")
 		var pixelRatio = window.devicePixelRatio || 1
 		var width = innerWidth * pixelRatio

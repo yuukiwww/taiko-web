@@ -1,5 +1,8 @@
 ﻿class Logo{
-	constructor(){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(){
 		this.canvas = document.getElementById("logo")
 		this.ctx = this.canvas.getContext("2d")
 		this.pathSvg = failedTests.indexOf("Path2D SVG") === -1 && vectors.logo1

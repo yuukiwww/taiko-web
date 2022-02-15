@@ -1,5 +1,8 @@
 class Debug{
-	constructor(){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(){
 		if(!assets.pages["debug"]){
 			return
 		}
@@ -329,7 +332,10 @@ class Debug{
 	}
 }
 class InputSlider{
-	constructor(sliderDiv, min, max, fixedPoint){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(sliderDiv, min, max, fixedPoint){
 		this.fixedPoint = fixedPoint
 		this.mul = Math.pow(10, fixedPoint)
 		this.min = min * this.mul

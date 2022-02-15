@@ -1,5 +1,8 @@
 class Tutorial{
-	constructor(fromSongSel, songId){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(fromSongSel, songId){
 		this.fromSongSel = fromSongSel
 		this.songId = songId
 		loader.changePage("tutorial", true)

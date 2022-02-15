@@ -1,5 +1,8 @@
 class CustomSongs{
-	constructor(touchEnabled, noPage){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(touchEnabled, noPage){
 		this.loaderDiv = document.createElement("div")
 		this.loaderDiv.innerHTML = assets.pages["loadsong"]
 		var loadingText = this.loaderDiv.querySelector("#loading-text")
@@ -151,8 +154,10 @@ class CustomSongs{
 		this.changeSelected(this.linkLocalFolder)
 		if(typeof showDirectoryPicker === "function"){
 			return showDirectoryPicker().then(file => {
-				this.walkFilesystem(file).then(files => this.importLocal(files)).then(e => {
-					db.setItem("customFolder", [file])
+				this.walkFilesystem(file).then(files => this.importLocal(files)).then(input => {
+					if(input){
+						db.setItem("customFolder", [file])
+					}
 				}).catch(e => {
 					if(e !== "cancel"){
 						return Promise.reject(e)
@@ -217,8 +222,8 @@ class CustomSongs{
 				}))
 			}
 		}
-		Promise.all(dropPromises).then(() => this.importLocal(allFiles)).then(() => {
-			if(dbItems.length){
+		Promise.all(dropPromises).then(() => this.importLocal(allFiles)).then(input => {
+			if(input && dbItems.length){
 				db.setItem("customFolder", dbItems)
 			}
 		})
@@ -265,6 +270,7 @@ class CustomSongs{
 			}else if(e !== "cancel"){
 				return Promise.reject(e)
 			}
+			return false
 		})
 	}
 	gdriveFolder(event){
@@ -387,6 +393,7 @@ class CustomSongs{
 			new SongSelect("customSongs", false, this.touchEnabled)
 			pageEvents.send("import-songs", length)
 		}, 500)
+		return songs && songs.length
 	}
 	keyPressed(pressed, name){
 		if(!pressed || this.locked){

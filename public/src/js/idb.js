@@ -1,9 +1,12 @@
 class IDB{
-	constructor(name, store){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(name, store){
 		this.name = name
 		this.store = store
 	}
-	init(){
+	start(){
 		if(this.db){
 			return Promise.resolve(this.db)
 		}
@@ -31,7 +34,7 @@ class IDB{
 		})
 	}
 	transaction(method, ...args){
-		return this.init().then(db =>
+		return this.start().then(db =>
 			db.transaction(this.store, "readwrite").objectStore(this.store)[method](...args)
 		).then(this.promise.bind(this))
 	}

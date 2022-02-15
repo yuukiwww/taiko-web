@@ -20,7 +20,10 @@ function filePermission(file){
 	})
 }
 class RemoteFile{
-	constructor(url){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(url){
 		this.url = url
 		try{
 			this.path = new URL(url).pathname
@@ -53,7 +56,10 @@ class RemoteFile{
 	}
 }
 class LocalFile{
-	constructor(file, path){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(file, path){
 		this.file = file
 		this.path = path || file.webkitRelativePath
 		this.url = this.path
@@ -70,7 +76,10 @@ class LocalFile{
 	}
 }
 class FilesystemFile{
-	constructor(file, path){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(file, path){
 		this.file = file
 		this.path = path
 		this.url = this.path
@@ -87,7 +96,10 @@ class FilesystemFile{
 	}
 }
 class GdriveFile{
-	constructor(fileObj){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(fileObj){
 		this.path = fileObj.path
 		this.name = fileObj.name
 		this.id = fileObj.id
@@ -108,7 +120,10 @@ class GdriveFile{
 	}
 }
 class CachedFile{
-	constructor(contents, oldFile){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(contents, oldFile){
 		this.contents = contents
 		this.oldFile = oldFile
 		this.path = oldFile.path

@@ -1,5 +1,8 @@
 class Controller{
-	constructor(selectedSong, songData, autoPlayEnabled, multiplayer, touchEnabled){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(selectedSong, songData, autoPlayEnabled, multiplayer, touchEnabled){
 		this.selectedSong = selectedSong
 		this.songData = songData
 		this.autoPlayEnabled = autoPlayEnabled

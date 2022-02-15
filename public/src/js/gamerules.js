@@ -1,5 +1,8 @@
 class GameRules{
-	constructor(game){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(game){
 		this.difficulty = game.controller.selectedSong.difficulty
 		var frame = 1000 / 60
 		

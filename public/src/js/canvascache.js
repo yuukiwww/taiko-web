@@ -1,5 +1,8 @@
 class CanvasCache{
-	constructor(noSmoothing, w, h, scale){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(noSmoothing, w, h, scale){
 		this.noSmoothing = noSmoothing
 		if(w){
 			this.resize(w, h, scale)

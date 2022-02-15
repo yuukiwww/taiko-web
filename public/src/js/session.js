@@ -1,5 +1,8 @@
 class Session{
-	constructor(touchEnabled){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(touchEnabled){
 		this.touchEnabled = touchEnabled
 		loader.changePage("session", true)
 		this.endButton = this.getElement("view-end-button")

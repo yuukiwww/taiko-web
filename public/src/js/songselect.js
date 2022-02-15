@@ -1,5 +1,8 @@
 class SongSelect{
-	constructor(fromTutorial, fadeIn, touchEnabled, songId, showWarning){
+	constructor(...args){
+		this.init(...args)
+	}
+	init(fromTutorial, fadeIn, touchEnabled, songId, showWarning){
 		this.touchEnabled = touchEnabled
 		
 		loader.changePage("songselect", false)
@@ -54,6 +57,12 @@ class SongSelect{
 				background: "#fab5d3",
 				border: ["#ffe7ef", "#d36aa2"],
 				outline: "#d36aa2"
+			},
+			"plugins": {
+				sort: 0,
+				background: "#f6bba1",
+				border: ["#fde9df", "#ce7553"],
+				outline: "#ce7553"
 			},
 			"default": {
 				sort: null,
@@ -150,6 +159,14 @@ class SongSelect{
 				category: strings.random
 			})
 		}
+		if(plugins.allPlugins.length){
+			this.songs.push({
+				title: strings.plugins.title,
+				skin: this.songSkin.plugins,
+				action: "plugins",
+				category: strings.random
+			})
+		}
 		
 		this.songs.push({
 			title: strings.back,
@@ -218,8 +235,12 @@ class SongSelect{
 		this.playedSounds = {}
 		
 		var songIdIndex = -1
+		var newSelected = -1
 		if(fromTutorial){
-			this.selectedSong = this.songs.findIndex(song => song.action === fromTutorial)
+			newSelected = this.songs.findIndex(song => song.action === fromTutorial)
+		}
+		if(newSelected !== -1){
+			this.selectedSong = newSelected
 			this.playBgm(true)
 		}else{
 			if(songId){
@@ -481,18 +502,6 @@ class SongSelect{
 	}
 	touchEnd(event){
 		event.preventDefault()
-		if(this.state.screen === "song" && this.redrawRunning){
-			var currentSong = this.songs[this.selectedSong]
-			if(currentSong.action === "customSongs"){
-				var x = event.changedTouches[0].pageX - this.canvas.offsetLeft
-				var y = event.changedTouches[0].pageY - this.canvas.offsetTop
-				var mouse = this.mouseOffset(x, y)
-				var moveBy = this.songSelMouse(mouse.x, mouse.y)
-				if(moveBy === 0){
-					this.toCustomSongs()
-				}
-			}
-		}
 	}
 	mouseMove(event){
 		var mouse = this.mouseOffset(event.offsetX, event.offsetY)
@@ -565,8 +574,8 @@ class SongSelect{
 	}
 	diffSelMouse(x, y){
 		if(this.state.locked === 0){
-			if(223 < x && x < 367 && 132 < y && y < 436){
-				return Math.floor((x - 223) / ((367 - 223) / 2))
+			if(223 < x && x < 223 + 72 * this.diffOptions.length && 132 < y && y < 436){
+				return Math.floor((x - 223) / 72)
 			}else if(this.songs[this.selectedSong].maker && this.songs[this.selectedSong].maker.id > 0 && this.songs[this.selectedSong].maker.url && x > 230 && x < 485 && y > 446 && y < 533) {
 				return "maker"
 			}else if(550 < x && x < 1050 && 109 < y && y < 538){
@@ -706,6 +715,8 @@ class SongSelect{
 				this.toSettings()
 			}else if(currentSong.action === "customSongs"){
 				this.toCustomSongs()
+			}else if(currentSong.action === "plugins"){
+				this.toPlugins()
 			}
 		}
 		this.pointer(false)
@@ -863,6 +874,13 @@ class SongSelect{
 				new CustomSongs(this.touchEnabled)
 			}, 500)
 		}
+	}
+	toPlugins(){
+		this.playSound("se_don")
+		this.clean()
+		setTimeout(() => {
+			new SettingsView(this.touchEnabled, false, undefined, undefined, plugins.getSettings())
+		}, 500)
 	}
 	
 	redraw(){

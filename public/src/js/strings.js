@@ -21,6 +21,13 @@ var translations = {
 		tw: "Microsoft YaHei, sans-serif",
 		ko: "Microsoft YaHei, sans-serif"
 	},
+	intl: {
+		ja: "ja",
+		en: "en-GB",
+		cn: "zh-Hans",
+		tw: "zh-Hant",
+		ko: "ko"
+	},
 	
 	taikoWeb: {
 		ja: "たいこウェブ",
@@ -1277,6 +1284,27 @@ var translations = {
 		cookieError: {
 			en: "This function requires third party cookies.",
 			tw: "此功能需要第三方 cookies。"
+		}
+	},
+	plugins: {
+		title: {
+			ja: null,
+			en: "Plugins"
+		},
+		unloadAll: {
+			ja: null,
+			en: "Unload All"
+		},
+		warning: {
+			ja: null,
+			en: "You are about to load %s. Plugins should only be loaded if you trust them. Continue?"
+		},
+		plugin: {
+			ja: null,
+			en: {
+				one: "%s plugin",
+				other: "%s plugins"
+			}
 		}
 	}
 }
