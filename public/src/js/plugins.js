@@ -122,7 +122,7 @@ class Plugins{
 		var items = {}
 		for(var i = 0; i < this.allPlugins.length; i++){
 			var obj = this.allPlugins[i]
-			var plugin = obj.plugin
+			let plugin = obj.plugin
 			items[obj.name] = {
 				name: plugin.module.name || obj.name,
 				type: "toggle",
