@@ -689,4 +689,13 @@ def make_preview(song_id, song_type, song_ext, preview):
 
 
 if __name__ == '__main__':
+    from flask import send_from_directory
+    @app.route('/src/<path:path>')
+    def send_src(path):
+        return send_from_directory('public/src', path)
+
+    @app.route('/assets/<path:path>')
+    def send_assets(path):
+        return send_from_directory('public/assets', path)
+
     app.run(port=34801)
