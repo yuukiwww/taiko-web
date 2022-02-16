@@ -512,9 +512,9 @@ class SongSelect{
 			this.wheelTimer = this.getMS()
 
 			if(event.deltaY < 0) {
-				this.wheelScrolls++
-			}else if(event.deltaY > 0){
 				this.wheelScrolls--
+			}else if(event.deltaY > 0){
+				this.wheelScrolls++
 			}
 		}
 	}
@@ -918,7 +918,7 @@ class SongSelect{
 			this.moveToSong(this.wheelScrolls)
 			this.wheelScrolls -= this.wheelScrolls
 		}
-		
+
 		if(!this.redrawRunning){
 			return
 		}
