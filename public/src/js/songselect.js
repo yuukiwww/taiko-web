@@ -360,7 +360,7 @@ class SongSelect{
 	keyPress(pressed, name, event, repeat){
 		if(pressed){
 			if(!this.pressedKeys[name]){
-				this.pressedKeys[name] = this.getMS() + 300
+				this.pressedKeys[name] = this.getMS() + (name === "left" || name === "right" ? 150 : 300)
 			}
 		}else{
 			this.pressedKeys[name] = 0
