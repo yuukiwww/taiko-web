@@ -290,7 +290,7 @@ class SongSelect{
 			focused: true
 		}
 		this.songSelecting = {
-			speed: 200,
+			speed: 400,
 			resize: 0.3,
 			scrollDelay: 0.1
 		}
@@ -914,9 +914,9 @@ class SongSelect{
 			}
 		}
 
-		if(this.wheelScrolls !== 0 && ms >= this.wheelTimer + 20) {
+		if(this.wheelScrolls !== 0 && !this.state.locked && ms >= this.wheelTimer + 20) {
 			this.moveToSong(this.wheelScrolls)
-			this.wheelScrolls = 0
+			this.wheelScrolls -= this.wheelScrolls
 		}
 		
 		if(!this.redrawRunning){
@@ -2766,7 +2766,7 @@ class SongSelect{
 			}
 		})
 		pageEvents.remove(loader.screen, ["mousemove", "mouseleave", "mousedown", "touchstart"])
-		pageEvents.remove(this.canvas, "touchend")
+		pageEvents.remove(this.canvas, ["touchend", "wheel"])
 		pageEvents.remove(p2, "message")
 		if(this.touchEnabled && fullScreenSupported){
 			pageEvents.remove(this.touchFullBtn, "click")
