@@ -290,10 +290,12 @@ class SongSelect{
 			focused: true
 		}
 		this.songSelecting = {
-			speed: 800,
+			speed: 200,
 			resize: 0.3,
 			scrollDelay: 0.1
 		}
+		this.wheelScrolls = 0
+		this.wheelTimer = 0
 		
 		this.startPreview(true)
 		
@@ -339,7 +341,9 @@ class SongSelect{
 			this.touchFullBtn.style.display = "block"
 			pageEvents.add(this.touchFullBtn, "touchend", toggleFullscreen)
 		}
-		
+
+		pageEvents.add(this.canvas, "wheel", this.mouseWheel.bind(this))
+
 		this.selectable = document.getElementById("song-sel-selectable")
 		this.selectableText = ""
 		
@@ -502,6 +506,17 @@ class SongSelect{
 	}
 	touchEnd(event){
 		event.preventDefault()
+	}
+	mouseWheel(event){
+		if(this.state.screen === "song"){
+			this.wheelTimer = this.getMS()
+
+			if(event.deltaY < 0) {
+				this.wheelScrolls++
+			}else if(event.deltaY > 0){
+				this.wheelScrolls--
+			}
+		}
 	}
 	mouseMove(event){
 		var mouse = this.mouseOffset(event.offsetX, event.offsetY)
@@ -892,11 +907,16 @@ class SongSelect{
 		
 		for(var key in this.pressedKeys){
 			if(this.pressedKeys[key]){
-				if(ms >= this.pressedKeys[key] + 50){
+				if(ms >= this.pressedKeys[key] + (this.state.screen === "song" && (key === "right" || key === "left") ? 20 : 50)){
 					this.keyPress(true, key, null, true)
 					this.pressedKeys[key] = ms
 				}
 			}
+		}
+
+		if(this.wheelScrolls !== 0 && ms >= this.wheelTimer + 20) {
+			this.moveToSong(this.wheelScrolls)
+			this.wheelScrolls = 0
 		}
 		
 		if(!this.redrawRunning){
