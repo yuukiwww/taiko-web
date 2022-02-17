@@ -1033,10 +1033,14 @@ class SongSelect{
 		var selectedWidth = this.songAsset.width
 		
 		if(this.wheelScrolls !== 0 && !this.state.locked && ms >= this.wheelTimer + 20) {
-			this.state.move = this.wheelScrolls
-			this.state.waitPreview = ms + 400
+			if(p2.session){
+				this.moveToSong(this.wheelScrolls)
+			}else{
+				this.state.move = this.wheelScrolls
+				this.state.waitPreview = ms + 400
+				this.endPreview()
+			}
 			this.wheelScrolls = 0
-			this.endPreview()
 		}
 		
 		if(screen === "title" || screen === "titleFadeIn"){
