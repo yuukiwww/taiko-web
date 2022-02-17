@@ -20,7 +20,6 @@ class Tutorial{
 		this.setStrings()
 		
 		pageEvents.add(this.endButton, ["mousedown", "touchstart"], this.onEnd.bind(this))
-		pageEvents.add(this.formButton, ["mousedown", "touchstart"], this.linkButton.bind(this))
 		this.keyboard = new Keyboard({
 			confirm: ["enter", "space", "don_l", "don_r"],
 			previous: ["left", "up", "ka_l"],
@@ -52,10 +51,12 @@ class Tutorial{
 				assets.sounds["se_don"].play()
 			}
 		}else if(name === "previous" || name === "next"){
-			selected.classList.remove("selected")
-			this.selected = this.mod(this.items.length, this.selected + (name === "next" ? 1 : -1))
-			this.items[this.selected].classList.add("selected")
-			assets.sounds["se_ka"].play()
+			if(this.items.length >= 2){
+				selected.classList.remove("selected")
+				this.selected = this.mod(this.items.length, this.selected + (name === "next" ? 1 : -1))
+				this.items[this.selected].classList.add("selected")
+				assets.sounds["se_ka"].play()
+			}
 		}else if(name === "back"){
 			this.onEnd()
 		}
@@ -117,18 +118,6 @@ class Tutorial{
 			var kbd = document.createElement("kbd")
 			kbd.innerText = key[i]
 			parent.appendChild(kbd)
-		}
-	}
-	onEnd(pressed, name){
-		if(pressed){
-			this.clean()
-			assets.sounds["se_don"].play()
-			try{
-				localStorage.setItem("tutorial", "true")
-			}catch(e){}
-			setTimeout(() => {
-				new SongSelect(this.fromSongSel ? "tutorial" : false, false, this.touched, this.songId)
-			}, 500)
 		}
 	}
 	setStrings(){
