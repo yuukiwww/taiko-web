@@ -239,8 +239,8 @@ class LoadSong{
 				var canvas = document.createElement("canvas")
 				var w = Math.floor(img.width * scale)
 				var h = Math.floor(img.height * scale)
-				canvas.width = w
-				canvas.height = h
+				canvas.width = Math.max(1, w)
+				canvas.height = Math.max(1, h)
 				var ctx = canvas.getContext("2d")
 				ctx.drawImage(img, 0, 0, w, h)
 				var saveScaled = url => {

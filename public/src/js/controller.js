@@ -231,6 +231,9 @@ class Controller{
 		this.view.displayScore(score, notPlayed, bigNote)
 	}
 	songSelection(fadeIn, showWarning){
+		if(this.cleaned){
+			return
+		}
 		if(!fadeIn){
 			this.clean()
 		}
@@ -241,6 +244,9 @@ class Controller{
 		}
 	}
 	restartSong(){
+		if(this.cleaned){
+			return
+		}
 		this.clean()
 		if(this.multiplayer){
 			new LoadSong(this.selectedSong, false, true, this.touchEnabled)
@@ -363,6 +369,7 @@ class Controller{
 		return true
 	}
 	clean(){
+		this.cleaned = true
 		if(this.multiplayer === 1){
 			this.syncWith.clean()
 		}

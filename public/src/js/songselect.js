@@ -104,18 +104,20 @@ class SongSelect{
 				return a.id > b.id ? 1 : -1
 			}
 		})
-		this.songs.push({
-			title: strings.back,
-			skin: this.songSkin.back,
-			action: "back"
-		})
-		this.songs.push({
-			title: strings.randomSong,
-			skin: this.songSkin.random,
-			action: "random",
-			category: strings.random,
-			canJump: true
-		})
+		if(assets.songs.length){
+			this.songs.push({
+				title: strings.back,
+				skin: this.songSkin.back,
+				action: "back"
+			})
+			this.songs.push({
+				title: strings.randomSong,
+				skin: this.songSkin.random,
+				action: "random",
+				category: strings.random,
+				canJump: true
+			})
+		}
 		if(touchEnabled){
 			if(fromTutorial === "tutorial"){
 				fromTutorial = false
@@ -287,7 +289,8 @@ class SongSelect{
 			options: 0,
 			selLock: false,
 			catJump: false,
-			focused: true
+			focused: true,
+			waitPreview: 0
 		}
 		this.songSelecting = {
 			speed: 400,
@@ -472,7 +475,7 @@ class SongSelect{
 				this.toAccount()
 			}else if(p2.session && 438 < mouse.x && mouse.x < 834 && mouse.y > 603){
 				this.toSession()
-			}else if(!p2.session && mouse.x > 641 && mouse.y > 603 && p2.socket.readyState === 1 && !assets.customSongs){
+			}else if(!p2.session && mouse.x > 641 && mouse.y > 603 && p2.socket && p2.socket.readyState === 1 && !assets.customSongs){
 				this.toSession()
 			}else{
 				var moveBy = this.songSelMouse(mouse.x, mouse.y)
@@ -508,7 +511,7 @@ class SongSelect{
 		event.preventDefault()
 	}
 	mouseWheel(event){
-		if(this.state.screen === "song"){
+		if(this.state.screen === "song" && this.state.focused){
 			this.wheelTimer = this.getMS()
 
 			if(event.deltaY < 0) {
@@ -809,7 +812,7 @@ class SongSelect{
 			this.selectedDiff = 1
 			do{
 				this.state.options = this.mod(this.optionsList.length, this.state.options + moveBy)
-			}while((p2.socket.readyState !== 1 || assets.customSongs) && this.state.options === 2)
+			}while((p2.socket && p2.socket.readyState !== 1 || assets.customSongs) && this.state.options === 2)
 		}
 	}
 	toTitleScreen(){
@@ -913,12 +916,7 @@ class SongSelect{
 				}
 			}
 		}
-
-		if(this.wheelScrolls !== 0 && !this.state.locked && ms >= this.wheelTimer + 20) {
-			this.moveToSong(this.wheelScrolls)
-			this.wheelScrolls -= this.wheelScrolls
-		}
-
+		
 		if(!this.redrawRunning){
 			return
 		}
@@ -944,8 +942,8 @@ class SongSelect{
 		var ratioY = winH / 720
 		var ratio = (ratioX < ratioY ? ratioX : ratioY)
 		if(this.winW !== winW || this.winH !== winH){
-			this.canvas.width = winW
-			this.canvas.height = winH
+			this.canvas.width = Math.max(1, winW)
+			this.canvas.height = Math.max(1, winH)
 			ctx.scale(ratio, ratio)
 			this.canvas.style.width = (winW / this.pixelRatio) + "px"
 			this.canvas.style.height = (winH / this.pixelRatio) + "px"
@@ -1033,6 +1031,17 @@ class SongSelect{
 		var songSelMoving = false
 		var screen = this.state.screen
 		var selectedWidth = this.songAsset.width
+		
+		if(this.wheelScrolls !== 0 && !this.state.locked && ms >= this.wheelTimer + 20) {
+			if(p2.session){
+				this.moveToSong(this.wheelScrolls)
+			}else{
+				this.state.move = this.wheelScrolls
+				this.state.waitPreview = ms + 400
+				this.endPreview()
+			}
+			this.wheelScrolls = 0
+		}
 		
 		if(screen === "title" || screen === "titleFadeIn"){
 			if(ms > this.state.screenMS + 1000){
@@ -2439,7 +2448,7 @@ class SongSelect{
 	}
 	
 	startPreview(loadOnly){
-		if(!loadOnly && this.state && this.state.showWarning){
+		if(!loadOnly && this.state && this.state.showWarning || this.state.waitPreview > this.getMS()){
 			return
 		}
 		var currentSong = this.songs[this.selectedSong]

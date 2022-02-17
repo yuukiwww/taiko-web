@@ -216,6 +216,10 @@ var translations = {
 		ja: "曲「%s」を読み込むことができませんでした。（ID：%s）\n\n%s",
 		en: "Could not load song %s with ID %s.\n\n%s"
 	},
+	accessNotGrantedError: {
+		ja: null,
+		en: "Permission to access the file was not granted"
+	},
 	loading: {
 		ja: "ロード中...",
 		en: "Loading...",

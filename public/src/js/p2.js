@@ -28,16 +28,18 @@ class P2Connection{
 		}
 	}
 	open(){
-		this.closed = false
-		var wsProtocol = location.protocol == "https:" ? "wss:" : "ws:"
-		this.socket = new WebSocket(wsProtocol + "//" + location.host + "/p2")
-		pageEvents.race(this.socket, "open", "close").then(response => {
-			if(response.type === "open"){
-				return this.openEvent()
-			}
-			return this.closeEvent()
-		})
-		pageEvents.add(this.socket, "message", this.messageEvent.bind(this))
+		if(this.closed && !this.disabled){
+			this.closed = false
+			var wsProtocol = location.protocol == "https:" ? "wss:" : "ws:"
+			this.socket = new WebSocket(wsProtocol + "//" + location.host + "/p2")
+			pageEvents.race(this.socket, "open", "close").then(response => {
+				if(response.type === "open"){
+					return this.openEvent()
+				}
+				return this.closeEvent()
+			})
+			pageEvents.add(this.socket, "message", this.messageEvent.bind(this))
+		}
 	}
 	openEvent(){
 		var addedType = this.allEvents.get("open")
@@ -46,8 +48,12 @@ class P2Connection{
 		}
 	}
 	close(){
-		this.closed = true
-		this.socket.close()
+		if(!this.closed){
+			this.closed = true
+			if(this.socket){
+				this.socket.close()
+			}
+		}
 	}
 	closeEvent(){
 		this.removeEventListener(onmessage)
@@ -249,5 +255,13 @@ class P2Connection{
 		}else if(mekadon.miss(circle)){
 			this.notes.shift()
 		}
+	}
+	enable(){
+		this.disabled = false
+		this.open()
+	}
+	disable(){
+		this.disabled = true
+		this.close()
 	}
 }

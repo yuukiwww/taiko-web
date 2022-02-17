@@ -12,28 +12,85 @@ class Tutorial{
 		this.tutorialTitle = this.getElement("view-title")
 		this.tutorialDiv = document.createElement("div")
 		this.getElement("view-content").appendChild(this.tutorialDiv)
+		
+		this.items = []
+		this.items.push(this.endButton)
+		this.selected = this.items.length - 1
+		
 		this.setStrings()
 		
-		pageEvents.add(this.endButton, ["mousedown", "touchstart"], event => {
-			if(event.type === "touchstart"){
-				event.preventDefault()
-				this.touched = true
-			}else if(event.type === "mousedown" && event.which !== 1){
-				return
-			}
-			this.onEnd(true)
-		})
+		pageEvents.add(this.endButton, ["mousedown", "touchstart"], this.onEnd.bind(this))
 		this.keyboard = new Keyboard({
-			confirm: ["enter", "space", "esc", "don_l", "don_r"]
-		}, this.onEnd.bind(this))
+			confirm: ["enter", "space", "don_l", "don_r"],
+			previous: ["left", "up", "ka_l"],
+			next: ["right", "down", "ka_r"],
+			back: ["escape"]
+		}, this.keyPressed.bind(this))
 		this.gamepad = new Gamepad({
-			confirm: ["start", "b", "ls", "rs"]
-		}, this.onEnd.bind(this))
+			"confirm": ["b", "ls", "rs"],
+			"previous": ["u", "l", "lb", "lt", "lsu", "lsl"],
+			"next": ["d", "r", "rb", "rt", "lsd", "lsr"],
+			"back": ["start", "a"]
+		}, this.keyPressed.bind(this))
 		
 		pageEvents.send("tutorial")
 	}
 	getElement(name){
 		return loader.screen.getElementsByClassName(name)[0]
+	}
+	keyPressed(pressed, name){
+		if(!pressed){
+			return
+		}
+		var selected = this.items[this.selected]
+		if(name === "confirm"){
+			if(selected === this.endButton){
+				this.onEnd()
+			}else{
+				this.getLink(selected).click()
+				assets.sounds["se_don"].play()
+			}
+		}else if(name === "previous" || name === "next"){
+			if(this.items.length >= 2){
+				selected.classList.remove("selected")
+				this.selected = this.mod(this.items.length, this.selected + (name === "next" ? 1 : -1))
+				this.items[this.selected].classList.add("selected")
+				assets.sounds["se_ka"].play()
+			}
+		}else if(name === "back"){
+			this.onEnd()
+		}
+	}
+	mod(length, index){
+		return ((index % length) + length) % length
+	}
+	onEnd(event){
+		var touched = false
+		if(event){
+			if(event.type === "touchstart"){
+				event.preventDefault()
+				touched = true
+			}else if(event.which !== 1){
+				return
+			}
+		}
+		this.clean()
+		assets.sounds["se_don"].play()
+		try{
+			localStorage.setItem("tutorial", "true")
+		}catch(e){}
+		setTimeout(() => {
+			new SongSelect(this.fromSongSel ? "tutorial" : false, false, touched, this.songId)
+		}, 500)
+	}
+	getLink(target){
+		return target.getElementsByTagName("a")[0]
+	}
+	linkButton(event){
+		if(event.target === event.currentTarget && (event.type === "touchstart" || event.which === 1)){
+			this.getLink(event.currentTarget).click()
+			assets.sounds["se_don"].play()
+		}
 	}
 	insertText(text, parent){
 		parent.appendChild(document.createTextNode(text))
@@ -61,18 +118,6 @@ class Tutorial{
 			var kbd = document.createElement("kbd")
 			kbd.innerText = key[i]
 			parent.appendChild(kbd)
-		}
-	}
-	onEnd(pressed, name){
-		if(pressed){
-			this.clean()
-			assets.sounds["se_don"].play()
-			try{
-				localStorage.setItem("tutorial", "true")
-			}catch(e){}
-			setTimeout(() => {
-				new SongSelect(this.fromSongSel ? "tutorial" : false, false, this.touched, this.songId)
-			}, 500)
 		}
 	}
 	setStrings(){
