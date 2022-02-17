@@ -39,6 +39,7 @@ csrf = CSRFProtect(app)
 db = client[config.MONGO['database']]
 db.users.create_index('username', unique=True)
 db.songs.create_index('id', unique=True)
+db.scores.create_index('username')
 
 
 class HashException(Exception):
