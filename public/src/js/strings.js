@@ -217,7 +217,7 @@ var translations = {
 		en: "Could not load song %s with ID %s.\n\n%s"
 	},
 	accessNotGrantedError: {
-		ja: null,
+		ja: "ファイルへのアクセス権が拒否されました",
 		en: "Permission to access the file was not granted"
 	},
 	loading: {
