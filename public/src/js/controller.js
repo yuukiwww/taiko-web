@@ -231,10 +231,10 @@ class Controller{
 		this.view.displayScore(score, notPlayed, bigNote)
 	}
 	songSelection(fadeIn, showWarning){
-		if(this.cleaned){
-			return
-		}
 		if(!fadeIn){
+			if(this.cleaned){
+				return
+			}
 			this.clean()
 		}
 		if(this.calibrationMode){
