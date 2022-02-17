@@ -506,10 +506,10 @@ class Game{
 					p2.send("gameend")
 				}
 				this.musicFadeOut++
-			}else if(this.musicFadeOut === 2 && (ms >= started + 8600 && ms >= musicDuration + 250)){
+			}else if(this.musicFadeOut === 2 && (ms >= Math.max(started + 8600, Math.min(started + 8600 + 5000, musicDuration + 250)))){
 				this.controller.displayResults()
 				this.musicFadeOut++
-			}else if(this.musicFadeOut === 3 && (ms >= started + 9600 && ms >= musicDuration + 1250)){
+			}else if(this.musicFadeOut === 3 && (ms >= Math.max(started + 9600, Math.min(started + 9600 + 5000, musicDuration + 1250)))){
 				this.controller.clean()
 				if(this.controller.scoresheet){
 					this.controller.scoresheet.startRedraw()

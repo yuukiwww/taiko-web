@@ -64,8 +64,8 @@
 		var pixelRatio = window.devicePixelRatio || 1
 		var winW = this.canvas.offsetWidth * pixelRatio
 		var winH = this.canvas.offsetHeight * pixelRatio
-		this.canvas.width = winW
-		this.canvas.height = winH
+		this.canvas.width = Math.max(1, winW)
+		this.canvas.height = Math.max(1, winH)
 		ctx.scale(winW / this.width, winH / this.height)
 		
 		ctx.lineJoin = "round"

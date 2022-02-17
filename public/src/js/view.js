@@ -199,8 +199,8 @@
 			this.ratio = ratio
 			
 			if(this.player !== 2){
-				this.canvas.width = winW
-				this.canvas.height = winH
+				this.canvas.width = Math.max(1, winW)
+				this.canvas.height = Math.max(1, winH)
 				ctx.scale(ratio, ratio)
 				this.canvas.style.width = (winW / this.pixelRatio) + "px"
 				this.canvas.style.height = (winH / this.pixelRatio) + "px"
@@ -1515,6 +1515,7 @@
 	}
 	updateNoteFaces(){
 		var ms = this.getMS()
+		var lastNextBeat = this.nextBeat
 		while(ms >= this.nextBeat){
 			this.nextBeat += this.beatInterval
 			if(this.controller.getCombo() >= 50){
@@ -1528,6 +1529,9 @@
 					small: 0,
 					big: 3
 				}
+			}
+			if(this.nextBeat <= lastNextBeat){
+				break
 			}
 		}
 	}

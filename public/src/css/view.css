@@ -201,6 +201,20 @@ kbd{
 .setting-name::before{
 	padding-left: 0.3em;
 }
+.setting-name::after{
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 40px;
+	height: 100%;
+	background-image: linear-gradient(90deg, transparent, #f6ead4 90%);
+}
+.view-content:not(:hover) .setting-box.selected .setting-name::after,
+.setting-box:hover .setting-name::after{
+	background-image: linear-gradient(90deg, transparent, #ffb547 90%);
+}
 .setting-value{
 	display: flex;
 	background: #fff;
@@ -403,6 +417,7 @@ kbd{
 }
 .customdon-canvas{
 	width: 13em;
+	cursor: pointer;
 }
 .customdon-div label{
 	display: block;

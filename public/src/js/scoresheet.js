@@ -215,8 +215,8 @@ class Scoresheet{
 		
 		if(this.redrawing){
 			if(this.winW !== winW || this.winH !== winH){
-				this.canvas.width = winW
-				this.canvas.height = winH
+				this.canvas.width = Math.max(1, winW)
+				this.canvas.height = Math.max(1, winH)
 				ctx.scale(ratio, ratio)
 				this.canvas.style.width = (winW / this.pixelRatio) + "px"
 				this.canvas.style.height = (winH / this.pixelRatio) + "px"

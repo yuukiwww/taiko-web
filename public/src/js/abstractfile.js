@@ -13,7 +13,7 @@ function filePermission(file){
 				if(response === "granted"){
 					return file
 				}else{
-					return Promise.reject(file)
+					return Promise.reject(strings.accessNotGrantedError)
 				}
 			})
 		}

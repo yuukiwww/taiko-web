@@ -371,12 +371,15 @@ def route_admin_users_post():
     max_level = admin['user_level'] - 1
     
     username = request.form.get('username')
-    level = int(request.form.get('level')) or 0
+    try:
+        level = int(request.form.get('level')) or 0
+    except ValueError:
+        level = 0
     
-    user = db.users.find_one({'username': username})
+    user = db.users.find_one({'username_lower': username.lower()})
     if not user:
         flash('Error: User was not found.')
-    elif admin_name == username:
+    elif admin['username'] == user['username']:
         flash('Error: You cannot modify your own level.')
     else:
         user_level = user['user_level']
@@ -386,7 +389,7 @@ def route_admin_users_post():
             flash('Error: This user has higher level than you.')
         else:
             output = {'user_level': level}
-            db.users.update_one({'username': username}, {'$set': output})
+            db.users.update_one({'username': user['username']}, {'$set': output})
             flash('User updated.')
     
     return render_template('admin_users.html', config=get_config(), max_level=max_level, username=username, level=level)

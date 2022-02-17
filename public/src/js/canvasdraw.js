@@ -157,7 +157,7 @@
 			ctx.fillRect(0, 0, w, h)
 		}
 		if(config.cached){
-			if(this.songFrameCache.w !== config.frameCache.w){
+			if(this.songFrameCache.w !== config.frameCache.w || this.songFrameCache.scale !== config.frameCache.ratio){
 				this.songFrameCache.resize(config.frameCache.w, config.frameCache.h, config.frameCache.ratio)
 			}
 			this.songFrameCache.get({
@@ -1680,8 +1680,8 @@
 		if(amount >= 1){
 			return callback(ctx)
 		}else if(amount >= 0){
-			this.tmpCanvas.width = winW || ctx.canvas.width
-			this.tmpCanvas.height = winH || ctx.canvas.height
+			this.tmpCanvas.width = Math.max(1, winW || ctx.canvas.width)
+			this.tmpCanvas.height = Math.max(1, winH || ctx.canvas.height)
 			callback(this.tmpCtx)
 			ctx.save()
 			ctx.globalAlpha = amount

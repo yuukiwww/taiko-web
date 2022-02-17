@@ -111,10 +111,7 @@
 						var plugin = plugins.add(obj.data, obj.name)
 						if(plugin){
 							pluginAmount++
-							plugins.imported.push({
-								name: plugin.name,
-								plugin: plugin
-							})
+							plugin.imported = true
 							startPromises.push(plugin.start())
 						}
 					})

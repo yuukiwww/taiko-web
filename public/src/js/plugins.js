@@ -3,10 +3,10 @@ class Plugins{
 		this.init(...args)
 	}
 	init(){
-		this.imported = []
 		this.allPlugins = []
 		this.pluginMap = {}
 		this.hashes = []
+		this.startOrder = []
 	}
 	add(script, name){
 		var hash = md5.base64(script.toString())
@@ -16,7 +16,7 @@ class Plugins{
 		}
 		name = name || "plugin"
 		var baseName = name
-		for(var i = 2; name in this.allPlugins; i++){
+		for(var i = 2; name in this.pluginMap; i++){
 			name = baseName + i.toString()
 		}
 		var plugin = new PluginLoader(script, name, hash)
@@ -37,10 +37,6 @@ class Plugins{
 			}
 		}
 		this.unload(name)
-		var index = this.imported.findIndex(obj => obj.name === name)
-		if(index !== -1){
-			this.imported.splice(index, 1)
-		}
 		var index = this.allPlugins.findIndex(obj => obj.name === name)
 		if(index !== -1){
 			this.allPlugins.splice(index, 1)
@@ -67,21 +63,33 @@ class Plugins{
 		this.pluginMap[name].stop()
 	}
 	stopAll(){
-		for(var i = this.allPlugins.length; i--;){
-			this.allPlugins[i].plugin.stop()
+		for(var i = this.startOrder.length; i--;){
+			this.pluginMap[this.startOrder[i]].stop()
 		}
 	}
 	unload(name){
 		this.pluginMap[name].unload()
 	}
 	unloadAll(){
+		for(var i = this.startOrder.length; i--;){
+			this.pluginMap[this.startOrder[i]].unload()
+		}
 		for(var i = this.allPlugins.length; i--;){
 			this.allPlugins[i].plugin.unload()
 		}
 	}
 	unloadImported(){
-		for(var i = this.imported.length; i--;){
-			this.imported[i].plugin.unload()
+		for(var i = this.startOrder.length; i--;){
+			var plugin = this.pluginMap[this.startOrder[i]]
+			if(plugin.imported){
+				plugin.unload()
+			}
+		}
+		for(var i = this.allPlugins.length; i--;){
+			var obj = this.allPlugins[i]
+			if(obj.plugin.imported){
+				obj.plugin.unload()
+			}
 		}
 	}
 	
@@ -130,9 +138,9 @@ class Plugins{
 				getItem: () => plugin.started,
 				setItem: value => {
 					if(plugin.started && !value){
-						plugin.stop()
+						this.stop(plugin.name)
 					}else if(!plugin.started && value){
-						plugin.start()
+						this.start(plugin.name)
 					}
 				}
 			}
@@ -188,10 +196,17 @@ class PluginLoader{
 					console.error(e)
 					this.error()
 				}
+			}, e => {
+				console.error(e)
+				this.error()
+				return Promise.resolve()
 			})
 		}
 	}
-	start(){
+	start(orderChange){
+		if(!orderChange){
+			plugins.startOrder.push(this.name)
+		}
 		return this.load().then(() => {
 			if(!this.started && this.module){
 				this.started = true
@@ -209,8 +224,18 @@ class PluginLoader{
 			}
 		})
 	}
-	stop(error){
+	stop(orderChange, error){
 		if(this.loaded && this.started){
+			if(!orderChange){
+				var stopIndex = plugins.startOrder.indexOf(this.name)
+				if(stopIndex !== -1){
+					plugins.startOrder.splice(stopIndex, 1)
+					for(var i = plugins.startOrder.length; i-- > stopIndex;){
+						plugins.pluginMap[plugins.startOrder[i]].stop(true)
+					}
+				}
+			}
+			
 			this.started = false
 			try{
 				if(this.module.beforeStop){
@@ -225,12 +250,18 @@ class PluginLoader{
 					this.error()
 				}
 			}
+			
+			if(!orderChange && stopIndex !== -1){
+				for(var i = stopIndex; i < plugins.startOrder.length; i++){
+					plugins.pluginMap[plugins.startOrder[i]].start(true)
+				}
+			}
 		}
 	}
 	unload(error){
 		if(this.loaded){
 			if(this.started){
-				this.stop(error)
+				this.stop(false, error)
 			}
 			this.loaded = false
 			plugins.remove(this.name)
@@ -267,7 +298,6 @@ class EditValue{
 	}
 	init(parent, name){
 		if(name){
-			this.original = parent[name]
 			this.name = [parent, name]
 			this.delete = !(name in parent)
 		}else{
@@ -275,18 +305,21 @@ class EditValue{
 		}
 	}
 	load(callback){
-		var output = callback(this.original)
-		if(typeof output === "undefined"){
-			throw new Error("A value is expected to be returned")
-		}
-		this.edited = output
+		this.loadCallback = callback
 		return this
 	}
 	start(){
 		if(this.name){
-			this.name[0][this.name[1]] = this.edited
+			this.original = this.name[0][this.name[1]]
 		}
-		return this.edited
+		var output = this.loadCallback(this.original)
+		if(typeof output === "undefined"){
+			throw new Error("A value is expected to be returned")
+		}
+		if(this.name){
+			this.name[0][this.name[1]] = output
+		}
+		return output
 	}
 	stop(){
 		if(this.name){
@@ -300,20 +333,26 @@ class EditValue{
 	}
 	unload(){
 		delete this.name
-		delete this.edited
 		delete this.original
+		delete this.loadCallback
 	}
 }
 
 class EditFunction extends EditValue{
-	load(callback){
-		var output = callback(plugins.strFromFunc(this.original))
+	start(){
+		if(this.name){
+			this.original = this.name[0][this.name[1]]
+		}
+		var args = plugins.argsFromFunc(this.original)
+		var output = this.loadCallback(plugins.strFromFunc(this.original), args)
 		if(typeof output === "undefined"){
 			throw new Error("A value is expected to be returned")
 		}
-		var args = plugins.argsFromFunc(this.original)
-		this.edited = Function(...args, output)
-		return this
+		var output = Function(...args, output)
+		if(this.name){
+			this.name[0][this.name[1]] = output
+		}
+		return output
 	}
 }
 
