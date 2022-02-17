@@ -132,7 +132,7 @@ class Plugins{
 			var obj = this.allPlugins[i]
 			let plugin = obj.plugin
 			items[obj.name] = {
-				name: plugin.module.name || obj.name,
+				name: plugin.module ? this.getLocalTitle(plugin.module.name || obj.name, plugin.module.name_lang) : obj.name,
 				type: "toggle",
 				default: true,
 				getItem: () => plugin.started,
@@ -146,6 +146,16 @@ class Plugins{
 			}
 		}
 		return items
+	}
+	getLocalTitle(title, titleLang){
+		if(titleLang){
+			for(var id in titleLang){
+				if(id === strings.id && titleLang[id]){
+					return titleLang[id]
+				}
+			}
+		}
+		return title
 	}
 }
 
