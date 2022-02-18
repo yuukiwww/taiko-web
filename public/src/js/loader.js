@@ -167,7 +167,7 @@ class Loader{
 						song.lyricsFile = new RemoteFile(directory + "main.vtt")
 					}
 					if(song.preview > 0){
-						song.previewMusic = new RemoteFile(directory + "preview.mp3")
+						song.previewMusic = new RemoteFile(directory + "preview." + gameConfig.preview_type)
 					}
 				})
 				assets.songsDefault = songs

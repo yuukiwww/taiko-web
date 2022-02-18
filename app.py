@@ -121,7 +121,8 @@ def get_config(credentials=False):
         'assets_baseurl': config.ASSETS_BASEURL,
         'email': config.EMAIL,
         'accounts': config.ACCOUNTS,
-        'custom_js': config.CUSTOM_JS
+        'custom_js': config.CUSTOM_JS,
+        'preview_type': config.PREVIEW_TYPE or 'mp3'
     }
     if credentials:
         min_level = config.GOOGLE_CREDENTIALS['min_level'] or 0
