@@ -13,6 +13,13 @@ ACCOUNTS = True
 # Custom JavaScript file to load with the simulator.
 CUSTOM_JS = ''
 
+# Default plugins to load with the simulator.
+PLUGINS = [{
+    'url': '',
+    'start': False,
+    'hide': False
+}]
+
 # Filetype to use for song previews. (mp3/ogg)
 PREVIEW_TYPE = 'mp3'
 

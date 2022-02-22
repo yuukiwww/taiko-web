@@ -108,7 +108,10 @@
 					)
 				))){
 					this.plugins.forEach(obj => {
-						var plugin = plugins.add(obj.data, obj.name)
+						var plugin = plugins.add(obj.data, {
+							name: obj.name,
+							raw: true
+						})
 						if(plugin){
 							pluginAmount++
 							plugin.imported = true

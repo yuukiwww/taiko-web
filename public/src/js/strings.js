@@ -1323,6 +1323,14 @@ var translations = {
 				one: "%s plugin",
 				other: "%s plugins"
 			}
+		},
+		author: {
+			ja: null,
+			en: "By %s"
+		},
+		version: {
+			ja: null,
+			en: "Version %s"
 		}
 	}
 }

@@ -293,7 +293,7 @@ kbd{
 #settings-latency .view{
 	width: 30em;
 }
-#settings-latency .setting-value{
+.setting-value{
 	position: relative;
 }
 .setting-value:not(.selected) .latency-buttons{

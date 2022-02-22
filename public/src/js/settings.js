@@ -253,27 +253,72 @@ class SettingsView{
 			}
 			var settingBox = document.createElement("div")
 			settingBox.classList.add("setting-box")
+			if(current.indent){
+				settingBox.style.marginLeft = (2 * current.indent || 0).toString() + "em"
+			}
 			var nameDiv = document.createElement("div")
 			nameDiv.classList.add("setting-name", "stroke-sub")
-			var name = current.name || strings.settings[i].name
+			if(current.name || current.name_lang){
+				var name = this.getLocalTitle(current.name, current.name_lang)
+			}else{
+				var name = strings.settings[i].name
+			}
 			this.setAltText(nameDiv, name)
+			if(current.description || current.description_lang){
+				nameDiv.title = this.getLocalTitle(current.description, current.description_lang) || ""
+			}
 			settingBox.appendChild(nameDiv)
 			var valueDiv = document.createElement("div")
 			valueDiv.classList.add("setting-value")
-			this.getValue(i, valueDiv)
+			let outputObject = {
+				id: i,
+				settingBox: settingBox,
+				nameDiv: nameDiv,
+				valueDiv: valueDiv,
+				name: current.name,
+				name_lang: current.name_lang,
+				description: current.description,
+				description_lang: current.description_lang
+			}
+			if(current.type === "number"){
+				["min", "max", "fixedPoint", "step", "sign", "format", "format_lang"].forEach(opt => {
+					if(opt in current){
+						outputObject[opt] = current[opt]
+					}
+				})
+				outputObject.valueText = document.createTextNode("")
+				valueDiv.appendChild(outputObject.valueText)
+				var buttons = document.createElement("div")
+				buttons.classList.add("latency-buttons")
+				var buttonMinus = document.createElement("span")
+				buttonMinus.innerText = "-"
+				buttons.appendChild(buttonMinus)
+				this.addTouchRepeat(buttonMinus, event => {
+					this.numberAdjust(outputObject, -1)
+				})
+				var buttonPlus = document.createElement("span")
+				buttonPlus.innerText = "+"
+				buttons.appendChild(buttonPlus)
+				this.addTouchRepeat(buttonPlus, event => {
+					this.numberAdjust(outputObject, 1)
+				})
+				valueDiv.appendChild(buttons)
+				this.addTouch(settingBox, event => {
+					if(event.target.tagName !== "SPAN"){
+						this.setValue(i)
+					}
+				})
+			}else{
+				this.addTouchEnd(settingBox, event => this.setValue(i))
+			}
 			settingBox.appendChild(valueDiv)
 			content.appendChild(settingBox)
 			if(!toSetting && this.items.length === this.selected || toSetting === i){
 				this.selected = this.items.length
 				settingBox.classList.add("selected")
 			}
-			this.addTouchEnd(settingBox, event => this.setValue(i))
-			this.items.push({
-				id: i,
-				settingBox: settingBox,
-				nameDiv: nameDiv,
-				valueDiv: valueDiv
-			})
+			this.items.push(outputObject)
+			this.getValue(i, valueDiv)
 		}
 		this.items.push({
 			id: "default",
@@ -443,6 +488,9 @@ class SettingsView{
 		pageEvents.remove(element, ["mousedown", "touchend"])
 	}
 	getValue(name, valueDiv){
+		if(!this.items){
+			return
+		}
 		var current = this.settingsItems[name]
 		if(current.getItem){
 			var value = current.getItem()
@@ -482,6 +530,17 @@ class SettingsView{
 				}
 				value += string
 			})
+		}else if(current.type === "number"){
+			var mul = Math.pow(10, current.fixedPoint || 0)
+			this.items[name].value = value * mul
+			value = Intl.NumberFormat(strings.intl, current.sign ? {
+				signDisplay: "always"
+			} : undefined).format(value)
+			if(current.format || current.format_lang){
+				value = this.getLocalTitle(current.format, current.format_lang).replace("%s", value)
+			}
+			this.items[name].valueText.data = value
+			return
 		}
 		valueDiv.innerText = value
 	}
@@ -496,6 +555,9 @@ class SettingsView{
 		var selectedIndex = this.items.findIndex(item => item.id === name)
 		var selected = this.items[selectedIndex]
 		if(this.mode !== "settings"){
+			if(this.mode === "number"){
+				return this.numberBack(this.items[this.selected])
+			}
 			if(this.selected === selectedIndex){
 				this.keyboardBack(selected)
 				this.playSound("se_don")
@@ -528,6 +590,12 @@ class SettingsView{
 		}else if(current.type === "latency"){
 			this.mode = "latency"
 			this.latencySet()
+			this.playSound("se_don")
+			return
+		}else if(current.type === "number"){
+			this.mode = "number"
+			selected.settingBox.style.animation = "none"
+			selected.valueDiv.classList.add("selected")
 			this.playSound("se_don")
 			return
 		}
@@ -633,6 +701,19 @@ class SettingsView{
 				this.playSound(name === "confirm" ? "se_don" : "se_cancel")
 			}else if(name === "up" || name === "right" || name === "down" || name === "left"){
 				this.latencySetAdjust(latencySelected, (name === "up" || name === "right") ? 1 : -1)
+				if(event){
+					event.preventDefault()
+				}
+			}
+		}else if(this.mode === "number"){
+			if(name === "confirm" || name === "back"){
+				this.numberBack(selected)
+				this.playSound(name === "confirm" ? "se_don" : "se_cancel")
+			}else if(name === "up" || name === "right" || name === "down" || name === "left"){
+				this.numberAdjust(selected, (name === "up" || name === "right") ? 1 : -1)
+				if(event){
+					event.preventDefault()
+				}
 			}
 		}
 	}
@@ -833,6 +914,42 @@ class SettingsView{
 		this.latencySettings.style.display = ""
 		this.mode = "settings"
 	}
+	numberAdjust(selected, add){
+		var selectedItem = this.items[this.selected]
+		var mul = Math.pow(10, selected.fixedPoint || 0)
+		selectedItem.value += add * ("step" in selected ? selected.step : 1)
+		if("max" in selected && selectedItem.value > selected.max * mul){
+			selectedItem.value = selected.max * mul
+		}else if("min" in selected && selectedItem.value < selected.min * mul){
+			selectedItem.value = selected.min * mul
+		}else{
+			this.playSound("se_ka")
+		}
+		var valueText = Intl.NumberFormat(strings.intl, selected.sign ? {
+			signDisplay: "always"
+		} : undefined).format(selectedItem.value / mul)
+		if(selected.format || selected.format_lang){
+			valueText = this.getLocalTitle(selected.format, selected.format_lang).replace("%s", valueText)
+		}
+		selectedItem.valueText.data = valueText
+	}
+	numberBack(selected){
+		this.mode = "settings"
+		selected.settingBox.style.animation = ""
+		selected.valueDiv.classList.remove("selected")
+		var current = this.settingsItems[selected.id]
+		var promise
+		var mul = Math.pow(10, selected.fixedPoint || 0)
+		var value = selected.value / mul
+		if(current.setItem){
+			promise = current.setItem(value)
+		}else{
+			settings.setItem(selected.id, value)
+		}
+		(promise || Promise.resolve()).then(() => {
+			this.getValue(selected.id, selected.valueText)
+		})
+	}
 	addMs(input){
 		var split = strings.calibration.ms.split("%s")
 		var index = 0
@@ -869,6 +986,9 @@ class SettingsView{
 		this.playSound("se_don")
 	}
 	onEnd(){
+		if(this.mode === "number"){
+			this.numberBack(this.items[this.selected])
+		}
 		this.clean()
 		this.playSound("se_don")
 		setTimeout(() => {
@@ -882,6 +1002,16 @@ class SettingsView{
 			}
 		}, 500)
 	}
+	getLocalTitle(title, titleLang){
+		if(titleLang){
+			for(var id in titleLang){
+				if(id === strings.id && titleLang[id]){
+					return titleLang[id]
+				}
+			}
+		}
+		return title
+	}
 	setLang(lang){
 		settings.setLang(lang)
 		if(failedTests.length !== 0){
@@ -890,8 +1020,15 @@ class SettingsView{
 		for(var i in this.items){
 			var item = this.items[i]
 			if(item.valueDiv){
-				var name = strings.settings[item.id].name
+				if(item.name || item.name_lang){
+					var name = this.getLocalTitle(item.name, item.name_lang)
+				}else{
+					var name = strings.settings[item.id].name
+				}
 				this.setAltText(item.nameDiv, name)
+				if(item.description || item.description_lang){
+					item.nameDiv.title = this.getLocalTitle(item.description, item.description_lang) || ""
+				}
 				this.getValue(item.id, item.valueDiv)
 			}
 		}

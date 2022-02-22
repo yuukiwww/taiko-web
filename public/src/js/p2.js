@@ -11,6 +11,7 @@ class P2Connection{
 		this.allEvents = new Map()
 		this.addEventListener("message", this.message.bind(this))
 		this.currentHash = ""
+		this.disabled = 0
 		pageEvents.add(window, "hashchange", this.onhashchange.bind(this))
 	}
 	addEventListener(type, callback){
@@ -257,11 +258,11 @@ class P2Connection{
 		}
 	}
 	enable(){
-		this.disabled = false
-		this.open()
+		this.disabled = Math.max(0, this.disabled - 1)
+		setTimeout(this.open.bind(this), 100)
 	}
 	disable(){
-		this.disabled = true
+		this.disabled++
 		this.close()
 	}
 }
