@@ -265,7 +265,7 @@ class SettingsView{
 			}
 			this.setAltText(nameDiv, name)
 			if(current.description || current.description_lang){
-				nameDiv.title = this.getLocalTitle(current.description, current.description_lang) || ""
+				settingBox.title = this.getLocalTitle(current.description, current.description_lang) || ""
 			}
 			settingBox.appendChild(nameDiv)
 			var valueDiv = document.createElement("div")
@@ -290,6 +290,7 @@ class SettingsView{
 				valueDiv.appendChild(outputObject.valueText)
 				var buttons = document.createElement("div")
 				buttons.classList.add("latency-buttons")
+				buttons.title = ""
 				var buttonMinus = document.createElement("span")
 				buttonMinus.innerText = "-"
 				buttons.appendChild(buttonMinus)
@@ -1027,7 +1028,7 @@ class SettingsView{
 				}
 				this.setAltText(item.nameDiv, name)
 				if(item.description || item.description_lang){
-					item.nameDiv.title = this.getLocalTitle(item.description, item.description_lang) || ""
+					item.settingBox.title = this.getLocalTitle(item.description, item.description_lang) || ""
 				}
 				this.getValue(item.id, item.valueDiv)
 			}
