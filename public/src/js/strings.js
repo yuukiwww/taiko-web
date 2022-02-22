@@ -1325,11 +1325,11 @@ var translations = {
 			}
 		},
 		author: {
-			ja: null,
+			ja: "作成者：%s",
 			en: "By %s"
 		},
 		version: {
-			ja: null,
+			ja: "Ver. %s",
 			en: "Version %s"
 		}
 	}
