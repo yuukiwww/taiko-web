@@ -161,7 +161,7 @@ class SongSelect{
 				category: strings.random
 			})
 		}
-		if(plugins.allPlugins.length){
+		if(plugins.hasSettings()){
 			this.songs.push({
 				title: strings.plugins.title,
 				skin: this.songSkin.plugins,

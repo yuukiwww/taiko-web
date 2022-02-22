@@ -151,6 +151,15 @@ class Plugins{
 		return input.slice(0, index) + insertedText + input.slice(index + searchString.length)
 	}
 	
+	hasSettings(){
+		for(var i = 0; i < this.allPlugins.length; i++){
+			var plugin = this.allPlugins[i].plugin
+			if(plugin.loaded && (!plugin.hide || plugin.settings())){
+				return true
+			}
+		}
+		return false
+	}
 	getSettings(){
 		var items = []
 		for(var i = 0; i < this.allPlugins.length; i++){
