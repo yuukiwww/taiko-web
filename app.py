@@ -3,7 +3,10 @@
 import base64
 import bcrypt
 import hashlib
-import config
+try:
+    import config
+except ModuleNotFoundError:
+    raise FileNotFoundError('No such file or directory: \'config.py\'. Copy the example config file config.example.py to config.py')
 import json
 import re
 import requests
@@ -20,23 +23,32 @@ from ffmpy import FFmpeg
 from pymongo import MongoClient
 from redis import Redis
 
-app = Flask(__name__)
-client = MongoClient(host=config.MONGO['host'])
+def take_config(name, required=False):
+    if hasattr(config, name):
+        return getattr(config, name)
+    elif required:
+        raise ValueError('Required option is not defined in the config.py file: {}'.format(name))
+    else:
+        return None
 
-app.secret_key = config.SECRET_KEY
+app = Flask(__name__)
+client = MongoClient(host=take_config('MONGO', required=True)['host'])
+
+app.secret_key = take_config('SECRET_KEY') or 'change-me'
 app.config['SESSION_TYPE'] = 'redis'
+redis_config = take_config('REDIS', required=True)
 app.config['SESSION_REDIS'] = Redis(
-    host=config.REDIS['CACHE_REDIS_HOST'],
-    port=config.REDIS['CACHE_REDIS_PORT'],
-    password=config.REDIS['CACHE_REDIS_PASSWORD'],
-    db=config.REDIS['CACHE_REDIS_DB']
+    host=redis_config['CACHE_REDIS_HOST'],
+    port=redis_config['CACHE_REDIS_PORT'],
+    password=redis_config['CACHE_REDIS_PASSWORD'],
+    db=redis_config['CACHE_REDIS_DB']
 )
-app.cache = Cache(app, config=config.REDIS)
+app.cache = Cache(app, config=redis_config)
 sess = Session()
 sess.init_app(app)
 csrf = CSRFProtect(app)
 
-db = client[config.MONGO['database']]
+db = client[take_config('MONGO', required=True)['database']]
 db.users.create_index('username', unique=True)
 db.songs.create_index('id', unique=True)
 db.scores.create_index('username')
@@ -53,12 +65,12 @@ def api_error(message):
 def generate_hash(id, form):
     md5 = hashlib.md5()
     if form['type'] == 'tja':
-        urls = ['%s%s/main.tja' % (config.SONGS_BASEURL, id)]
+        urls = ['%s%s/main.tja' % (take_config('SONGS_BASEURL', required=True), id)]
     else:
         urls = []
         for diff in ['easy', 'normal', 'hard', 'oni', 'ura']:
             if form['course_' + diff]:
-                urls.append('%s%s/%s.osu' % (config.SONGS_BASEURL, id, diff))
+                urls.append('%s%s/%s.osu' % (take_config('SONGS_BASEURL', required=True), id, diff))
 
     for url in urls:
         if url.startswith("http://") or url.startswith("https://"):
@@ -117,22 +129,24 @@ def before_request_func():
 
 def get_config(credentials=False):
     config_out = {
-        'songs_baseurl': config.SONGS_BASEURL,
-        'assets_baseurl': config.ASSETS_BASEURL,
-        'email': config.EMAIL,
-        'accounts': config.ACCOUNTS,
-        'custom_js': config.CUSTOM_JS,
-        'preview_type': config.PREVIEW_TYPE or 'mp3'
+        'songs_baseurl': take_config('SONGS_BASEURL', required=True),
+        'assets_baseurl': take_config('ASSETS_BASEURL', required=True),
+        'email': take_config('EMAIL'),
+        'accounts': take_config('ACCOUNTS'),
+        'custom_js': take_config('CUSTOM_JS'),
+        'plugins': take_config('PLUGINS') and [x for x in take_config('PLUGINS') if x['url']],
+        'preview_type': take_config('PREVIEW_TYPE') or 'mp3'
     }
     if credentials:
-        min_level = config.GOOGLE_CREDENTIALS['min_level'] or 0
+        google_credentials = take_config('GOOGLE_CREDENTIALS')
+        min_level = google_credentials['min_level'] or 0
         if not session.get('username'):
             user_level = 0
         else:
             user = db.users.find_one({'username': session.get('username')})
             user_level = user['user_level']
         if user_level >= min_level:
-            config_out['google_credentials'] = config.GOOGLE_CREDENTIALS
+            config_out['google_credentials'] = google_credentials
         else:
             config_out['google_credentials'] = {
                 'gdrive_enabled': False
@@ -146,9 +160,8 @@ def get_config(credentials=False):
     config_out['_version'] = get_version()
     return config_out
 
-
 def get_version():
-    version = {'commit': None, 'commit_short': '', 'version': None, 'url': config.URL}
+    version = {'commit': None, 'commit_short': '', 'version': None, 'url': take_config('URL')}
     if os.path.isfile('version.json'):
         try:
             ver = json.load(open('version.json', 'r'))
@@ -669,7 +682,7 @@ def route_api_scores_get():
 @app.route('/privacy')
 def route_api_privacy():
     last_modified = time.strftime('%d %B %Y', time.gmtime(os.path.getmtime('templates/privacy.txt')))
-    integration = config.GOOGLE_CREDENTIALS['gdrive_enabled']
+    integration = take_config('GOOGLE_CREDENTIALS')['gdrive_enabled'] if take_config('GOOGLE_CREDENTIALS') else False
     
     response = make_response(render_template('privacy.txt', last_modified=last_modified, config=get_config(), integration=integration))
     response.headers['Content-type'] = 'text/plain; charset=utf-8'

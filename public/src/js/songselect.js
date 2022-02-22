@@ -1161,9 +1161,9 @@ class SongSelect{
 				selectedWidth = this.songAsset.selectedWidth
 			}
 			
-			var lastMoveMul = Math.pow(Math.abs(this.state.lastMove), 1 / 4)
+			var lastMoveMul = Math.pow(Math.abs(this.state.lastMove || 0), 1 / 4)
 			var changeSpeed = this.songSelecting.speed * lastMoveMul
-			var resize = changeSpeed * this.songSelecting.resize / lastMoveMul
+			var resize = changeSpeed * (lastMoveMul === 0 ? 0 : this.songSelecting.resize / lastMoveMul)
 			var scrollDelay = changeSpeed * this.songSelecting.scrollDelay
 			var resize2 = changeSpeed - resize
 			var scroll = resize2 - resize - scrollDelay * 2

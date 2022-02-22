@@ -183,7 +183,7 @@ class Loader{
 					var image = document.createElement("img")
 					var url = gameConfig.assets_baseurl + "img/" + name
 					categoryPromises.push(pageEvents.load(image).catch(response => {
-						this.errorMsg(response, url)
+						return this.errorMsg(response, url)
 					}))
 					image.id = name
 					image.src = url
@@ -325,6 +325,26 @@ class Loader{
 				
 				promises.push(this.canvasTest.drawAllImages())
 				
+				if(gameConfig.plugins){
+					gameConfig.plugins.forEach(obj => {
+						if(obj.url){
+							var plugin = plugins.add(obj.url, {
+								hide: obj.hide
+							})
+							if(plugin){
+								plugin.loadErrors = true
+								promises.push(plugin.load(true).then(() => {
+									if(obj.start){
+										plugin.start()
+									}
+								}, response => {
+									return this.errorMsg(response, obj.url)
+								}))
+							}
+						}
+					})
+				}
+				
 				Promise.all(promises).then(result => {
 					perf.allImg = result
 					perf.load = Date.now() - this.startTime
@@ -332,8 +352,8 @@ class Loader{
 					this.clean()
 					this.callback(songId)
 					pageEvents.send("ready", readyEvent)
-				})
-			}, this.errorMsg.bind(this))
+				}, () => this.errorMsg())
+			}, () => this.errorMsg())
 		})
 	}
 	addPromise(promise, url){
@@ -433,6 +453,7 @@ class Loader{
 		}
 		var percentage = Math.floor(this.loadedAssets * 100 / (this.promises.length + this.afterJSCount))
 		this.errorTxt.element[this.errorTxt.method] = "```\n" + this.errorMessages.join("\n") + "\nPercentage: " + percentage + "%\n```"
+		return Promise.reject(error)
 	}
 	assetLoaded(){
 		if(!this.error){

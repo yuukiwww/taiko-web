@@ -8,18 +8,39 @@ class Plugins{
 		this.hashes = []
 		this.startOrder = []
 	}
-	add(script, name){
+	add(script, options){
+		options = options || {}
 		var hash = md5.base64(script.toString())
+		var isUrl = typeof script === "string" && !options.raw
+		if(isUrl){
+			hash = "url " + hash
+		}else if(typeof script !== "string"){
+			hash = "class " + hash
+		}
+		var name = options.name
+		if(!name && isUrl){
+			name = script
+			var index = name.lastIndexOf("/")
+			if(index !== -1){
+				name = name.slice(index + 1)
+			}
+			if(name.endsWith(".taikoweb.js")){
+				name = name.slice(0, -".taikoweb.js".length)
+			}else if(name.endsWith(".js")){
+				name = name.slice(0, -".js".length)
+			}
+		}
+		name = name || "plugin"
 		if(this.hashes.indexOf(hash) !== -1){
 			console.warn("Skip adding an already addded plugin: " + name)
 			return
 		}
-		name = name || "plugin"
 		var baseName = name
 		for(var i = 2; name in this.pluginMap; i++){
 			name = baseName + i.toString()
 		}
-		var plugin = new PluginLoader(script, name, hash)
+		var plugin = new PluginLoader(script, name, hash, options.raw)
+		plugin.hide = !!options.hide
 		this.allPlugins.push({
 			name: name,
 			plugin: plugin
@@ -41,10 +62,14 @@ class Plugins{
 		if(index !== -1){
 			this.allPlugins.splice(index, 1)
 		}
+		var index = this.startOrder.indexOf(name)
+		if(index !== -1){
+			this.startOrder.splice(index, 1)
+		}
 		delete this.pluginMap[name]
 	}
 	load(name){
-		this.pluginMap[name].load()
+		return this.pluginMap[name].load()
 	}
 	loadAll(){
 		for(var i = 0; i < this.allPlugins.length; i++){
@@ -52,7 +77,7 @@ class Plugins{
 		}
 	}
 	start(name){
-		this.pluginMap[name].start()
+		return this.pluginMap[name].start()
 	}
 	startAll(){
 		for(var i = 0; i < this.allPlugins.length; i++){
@@ -60,7 +85,7 @@ class Plugins{
 		}
 	}
 	stop(name){
-		this.pluginMap[name].stop()
+		return this.pluginMap[name].stop()
 	}
 	stopAll(){
 		for(var i = this.startOrder.length; i--;){
@@ -68,7 +93,7 @@ class Plugins{
 		}
 	}
 	unload(name){
-		this.pluginMap[name].unload()
+		return this.pluginMap[name].unload()
 	}
 	unloadAll(){
 		for(var i = this.startOrder.length; i--;){
@@ -127,30 +152,79 @@ class Plugins{
 	}
 	
 	getSettings(){
-		var items = {}
+		var items = []
 		for(var i = 0; i < this.allPlugins.length; i++){
 			var obj = this.allPlugins[i]
 			let plugin = obj.plugin
-			items[obj.name] = {
-				name: plugin.module ? this.getLocalTitle(plugin.module.name || obj.name, plugin.module.name_lang) : obj.name,
-				type: "toggle",
-				default: true,
-				getItem: () => plugin.started,
-				setItem: value => {
-					if(plugin.started && !value){
-						this.stop(plugin.name)
-					}else if(!plugin.started && value){
-						this.start(plugin.name)
-					}
+			if(!plugin.loaded){
+				continue
+			}
+			if(!plugin.hide){
+				let description
+				let description_lang
+				var module = plugin.module
+				if(module){
+					description = [
+						module.description,
+						module.author ? strings.plugins.author.replace("%s", module.author) : null,
+						module.version ? strings.plugins.version.replace("%s", module.version) : null
+					].filter(Boolean).join("\n")
+					description_lang = {}
+					languageList.forEach(lang => {
+						description_lang[lang] = [
+							this.getLocalTitle(module.description, module.description_lang, lang),
+							module.author ? allStrings[lang].plugins.author.replace("%s", module.author) : null,
+							module.version ? allStrings[lang].plugins.version.replace("%s", module.version) : null
+						].filter(Boolean).join("\n")
+					})
 				}
+				var name = module && module.name || obj.name
+				var name_lang = module && module.name_lang
+				items.push({
+					name: name,
+					name_lang: name_lang,
+					description: description,
+					description_lang: description_lang,
+					type: "toggle",
+					default: true,
+					getItem: () => plugin.started,
+					setItem: value => {
+						if(plugin.started && !value){
+							this.stop(plugin.name)
+						}else if(!plugin.started && value){
+							this.start(plugin.name)
+						}
+					}
+				})
+			}
+			var settings = plugin.settings()
+			if(settings){
+				settings.forEach(setting => {
+					if(!setting.name){
+						setting.name = name
+						if(!setting.name_lang){
+							setting.name_lang = name_lang
+						}
+					}
+					if(typeof setting.getItem !== "function"){
+						setting.getItem = () => {}
+					}
+					if(typeof setting.setItem !== "function"){
+						setting.setItem = () => {}
+					}
+					if(!("indent" in setting) && !plugin.hide){
+						setting.indent = 1
+					}
+					items.push(setting)
+				})
 			}
 		}
 		return items
 	}
-	getLocalTitle(title, titleLang){
+	getLocalTitle(title, titleLang, lang){
 		if(titleLang){
 			for(var id in titleLang){
-				if(id === strings.id && titleLang[id]){
+				if(id === (lang || strings.id) && titleLang[id]){
 					return titleLang[id]
 				}
 			}
@@ -163,20 +237,30 @@ class PluginLoader{
 	constructor(...args){
 		this.init(...args)
 	}
-	init(script, name, hash){
+	init(script, name, hash, raw){
 		this.name = name
 		this.hash = hash
 		if(typeof script === "string"){
-			this.url = URL.createObjectURL(new Blob([script], {
-				type: "application/javascript"
-			}))
+			if(raw){
+				this.url = URL.createObjectURL(new Blob([script], {
+					type: "application/javascript"
+				}))
+			}else{
+				this.url = script
+			}
 		}else{
 			this.class = script
 		}
 	}
-	load(){
-		if(this.loaded || !this.url && !this.class){
+	load(loadErrors){
+		if(this.loaded){
 			return Promise.resolve()
+		}else if(!this.url && !this.class){
+			if(loadErrors){
+				return Promise.reject()
+			}else{
+				return Promise.resolve()
+			}
 		}else{
 			return (this.url ? import(this.url) : Promise.resolve({
 				default: this.class
@@ -209,7 +293,11 @@ class PluginLoader{
 			}, e => {
 				console.error(e)
 				this.error()
-				return Promise.resolve()
+				if(loadErrors){
+					return Promise.reject(e)
+				}else{
+					return Promise.resolve()
+				}
 			})
 		}
 	}
@@ -300,6 +388,20 @@ class PluginLoader{
 		}
 		this.unload(true)
 	}
+	settings(){
+		if(this.module && this.module.settings){
+			try{
+				var settings = this.module.settings()
+			}catch(e){
+				console.error(e)
+				this.error()
+				return
+			}
+			if(Array.isArray(settings)){
+				return settings
+			}
+		}
+	}
 }
 
 class EditValue{
@@ -308,6 +410,9 @@ class EditValue{
 	}
 	init(parent, name){
 		if(name){
+			if(!parent){
+				throw new Error("Parent is not defined")
+			}
 			this.name = [parent, name]
 			this.delete = !(name in parent)
 		}else{
