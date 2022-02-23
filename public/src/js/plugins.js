@@ -143,12 +143,21 @@ class Plugins{
 		var length = searchString.length
 		return input.slice(0, index + length) + insertedText + input.slice(index + length)
 	}
-	strReplace(input, searchString, insertedText){
-		var index = input.indexOf(searchString)
-		if(index === -1){
-			throw new Error("searchString not found: " + searchString)
+	strReplace(input, searchString, insertedText, repeat=1){
+		var position = 0
+		for(var i = 0; i < repeat; i++){
+			var index = input.indexOf(searchString, position)
+			if(index === -1){
+				if(repeat === Infinity){
+					break
+				}else{
+					throw new Error("searchString not found: " + searchString)
+				}
+			}
+			input = input.slice(0, index) + insertedText + input.slice(index + searchString.length)
+			position = index + insertedText.length
 		}
-		return input.slice(0, index) + insertedText + input.slice(index + searchString.length)
+		return input
 	}
 	
 	hasSettings(){
@@ -288,16 +297,24 @@ class PluginLoader{
 					this.error()
 					return
 				}
+				var output
 				try{
 					if(this.module.beforeLoad){
 						this.module.beforeLoad(this)
 					}
 					if(this.module.load){
-						this.module.load(this)
+						output = this.module.load(this)
 					}
 				}catch(e){
 					console.error(e)
 					this.error()
+				}
+				if(typeof output === "object" && output.constructor === Promise){
+					return output.catch(e => {
+						console.error(e)
+						this.error()
+						return Promise.resolve()
+					})
 				}
 			}, e => {
 				console.error(e)
@@ -494,12 +511,12 @@ class Patch{
 	beforeUnload(){
 		this.edits.forEach(edit => edit.unload())
 	}
-	log(message){
+	log(...args){
 		var name = this.name || "Plugin"
 		console.log(
-			"%c[" + name + "]%c " + message,
+			"%c[" + name + "]",
 			"font-weight: bold;",
-			""
+			...args
 		)
 	}
 }
