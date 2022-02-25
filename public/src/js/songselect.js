@@ -2872,7 +2872,7 @@ class SongSelect{
 			}
 		})
 
-		query = editedSplit.join(" ")
+		query = editedSplit.join(" ").trim()
 
 		var songs = assets.songs
 		// TODO: fix this so it doesn't suck
