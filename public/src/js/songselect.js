@@ -408,7 +408,7 @@ class SongSelect{
 				this.showWarning = false
 			}
 		}else if (this.search){
-			if(name === "back" || (event.keyCode && event.keyCode === 70 && ctrl)) {
+			if(name === "back" || (event && event.keyCode && event.keyCode === 70 && ctrl)) {
 				this.removeSearch(true)
 			}else if(name === "down" && this.search.results.length){
 				if(this.search.input == document.activeElement && this.search.results){
@@ -438,7 +438,7 @@ class SongSelect{
 				}
 			}
 		}else if(this.state.screen === "song"){
-			if(event && event.code === "KeyF" && ctrl){
+			if(event && event.keyCode && event.keyCode === 70 && ctrl){
 				this.displaySearch()
 			}else if(name === "confirm"){
 				this.toSelectDifficulty()
