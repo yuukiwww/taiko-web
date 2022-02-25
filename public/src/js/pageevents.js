@@ -94,7 +94,9 @@ class PageEvents{
 		}
 		if(this.kbd.indexOf(event.key.toLowerCase()) !== -1){
 			this.lastKeyEvent = Date.now()
-			event.preventDefault()
+			if(event.target.tagName !== "INPUT"){
+				event.preventDefault()
+			}
 		}
 		this.keyListeners.forEach(addedKeyCode => {
 			this.checkListener(addedKeyCode.get("all"), event)
