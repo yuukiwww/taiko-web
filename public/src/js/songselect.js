@@ -408,7 +408,7 @@ class SongSelect{
 				this.showWarning = false
 			}
 		}else if (this.search){
-			if(name === "back" || (event && event.code === "KeyF" && ctrl)) {
+			if(name === "back" || (event.keyCode && event.keyCode === 70 && ctrl)) {
 				this.removeSearch(true)
 			}else if(name === "down" && this.search.results.length){
 				if(this.search.input == document.activeElement && this.search.results){
