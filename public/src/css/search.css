@@ -243,6 +243,10 @@
     cursor: pointer;
 }
 
+#song-search-close:hover::before{
+    -webkit-text-stroke: 0.25em #fff923;
+}
+
 .song-search-tip-error {
     height: 8vmax;
 }
