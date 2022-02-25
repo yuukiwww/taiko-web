@@ -2993,6 +2993,7 @@ class SongSelect{
 	searchProceed(songId){
 		var song = this.songs.find(song => song.id === songId)
 		this.removeSearch()
+		this.playBgm(false)
 		this.drawBackground(song.originalCategory)
 
 		var songIndex = this.songs.findIndex(song => song.id === songId)
