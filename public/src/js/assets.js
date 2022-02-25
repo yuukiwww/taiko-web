@@ -46,7 +46,8 @@ var assets = {
 		"game.css",
 		"debug.css",
 		"songbg.css",
-		"view.css"
+		"view.css",
+		"search.css"
 	],
 	"assetsCss": [
 		"img/img.css"
@@ -92,7 +93,10 @@ var assets = {
 		"results_mikoshi.png",
 		"results_tetsuohana.png",
 		"results_tetsuohana2.png",
-		"settings_gamepad.png"
+		"settings_gamepad.png",
+		"crown.png",
+		"miss.png",
+		"bg_search.png"
 	],
 	"audioSfx": [
 		"se_pause.ogg",
@@ -149,7 +153,8 @@ var assets = {
 		"settings.html",
 		"account.html",
 		"login.html",
-		"customsongs.html"
+		"customsongs.html",
+		"search.html"
 	],
 	
 	"songs": [],

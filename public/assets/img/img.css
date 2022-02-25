@@ -23,3 +23,17 @@
 #gamepad-buttons{
 	background-image: url("settings_gamepad.png");
 }
+#song-search{
+	background: linear-gradient(to top, rgb(245 246 252 / 8%), #ff5963), url("bg_search.png");
+	background-size: 3.12vmax;
+	background-position: -1.2vmax;
+}
+.song-search-result-course::before{
+	background-image: url("difficulty.png");
+}
+.song-search-result-crown{
+	background-image: url("crown.png");
+}
+.song-search-tip-error{
+	background-image: url("miss.png");
+}
