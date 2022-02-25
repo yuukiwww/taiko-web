@@ -762,6 +762,11 @@ class SongSelect{
 				if(currentSong.unloaded){
 					return
 				}
+
+				if(fromP2 && fromP2.player !== p2.player){
+					this.drawBackground(currentSong.originalCategory)	
+				}
+
 				this.state.screen = "difficulty"
 				this.state.screenMS = this.getMS()
 				this.state.locked = true
