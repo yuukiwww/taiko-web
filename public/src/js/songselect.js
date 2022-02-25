@@ -1105,6 +1105,16 @@ class SongSelect{
 		var screen = this.state.screen
 		var selectedWidth = this.songAsset.width
 		
+		if(this.search && this.searchContainer){
+			var vmin = Math.min(innerWidth, lastHeight) / 100
+			if(this.vmin !== vmin){
+				this.searchContainer.style.setProperty("--vmin", vmin + "px")
+				this.vmin = vmin
+			}
+		}else{
+			this.vmin = null
+		}
+		
 		if(this.wheelScrolls !== 0 && !this.state.locked && ms >= this.wheelTimer + 20) {
 			if(p2.session){
 				this.moveToSong(this.wheelScrolls)
@@ -2768,11 +2778,14 @@ class SongSelect{
 		this.search = {results: []}
 		this.search.div = document.createElement("div")
 		this.search.div.innerHTML = assets.pages["search"]
+		
+		this.searchContainer = this.search.div.querySelector(":scope #song-search-container")
+		if(this.touchEnabled){
+			this.searchContainer.classList.add("touch-enabled")
+		}
+		pageEvents.add(this.searchContainer, ["mousedown", "touchstart"], this.searchClick.bind(this))
 
-		pageEvents.add(this.search.div.querySelector("#song-search-container"),
-						["mousedown", "touchstart"], this.searchClick.bind(this))
-
-		this.search.input = this.search.div.querySelector("#song-search-input")
+		this.search.input = this.search.div.querySelector(":scope #song-search-input")
 		this.search.input.setAttribute("placeholder", strings.search.searchInput)
 		pageEvents.add(this.search.input, ["input"], this.searchInput.bind(this))
 
@@ -2780,6 +2793,7 @@ class SongSelect{
 		loader.screen.appendChild(this.search.div)
 		this.setSearchTip()
 		cancelTouch = false
+		noResizeRoot = true
 
 		setTimeout(() => {
 			this.search.input.focus()
@@ -2792,13 +2806,14 @@ class SongSelect{
 				this.playSound("se_cancel")
 			}
 
-			pageEvents.remove(this.search.div.querySelector("#song-search-container"),
+			pageEvents.remove(this.search.div.querySelector(":scope #song-search-container"),
 			["mousedown", "touchstart"])
 			pageEvents.remove(this.search.input, ["input"])
 
 			this.search.div.remove()
 			delete this.search
 			cancelTouch = true
+			noResizeRoot = false
 		}
 	}
 
@@ -2812,14 +2827,14 @@ class SongSelect{
 			tip = strings.search.tip + " " + strings.search.tips[Math.floor(Math.random() * strings.search.tips.length)]
 		}
 
-		var resultsDiv = this.search.div.querySelector("#song-search-results")
+		var resultsDiv = this.search.div.querySelector(":scope #song-search-results")
 		resultsDiv.innerHTML = ""
 		this.search.results = []
 
 		this.search.tip = document.createElement("div")
 		this.search.tip.setAttribute("id", "song-search-tip")
 		this.search.tip.innerText = tip
-		this.search.div.querySelector("#song-search").appendChild(this.search.tip)
+		this.search.div.querySelector(":scope #song-search").appendChild(this.search.tip)
 
 		if(error){
 			this.search.tip.classList.add("song-search-tip-error")
@@ -3190,5 +3205,6 @@ class SongSelect{
 		delete this.selectable
 		delete this.ctx
 		delete this.canvas
+		delete this.searchContainer
 	}
 }
