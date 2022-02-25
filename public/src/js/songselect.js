@@ -90,7 +90,7 @@ class SongSelect{
 			}
 		}
 		this.songSkin["default"].sort = songSkinLength + 1
-		
+
 		Object.keys(this.songSkin).forEach(key => {
 			var skin = this.songSkin[key]
 			var stripped = key.replace(/\W/g, '')
@@ -410,31 +410,30 @@ class SongSelect{
 		}else if (this.search){
 			if(name === "back" || (event && event.code === "KeyF" && ctrl)) {
 				this.removeSearch(true)
-			}else if(name === "down"){
+			}else if(name === "down" && this.search.results.length){
 				if(this.search.input == document.activeElement && this.search.results){
 					this.searchSetActive(0)
 				}else if(this.search.active === this.search.results.length-1){
 					this.searchSetActive(null)
 					this.search.input.focus()
-				}else if(this.search.active !== null){
+				}else if(Number.isInteger(this.search.active)){
 					this.searchSetActive(this.search.active+1)
 				}else{
 					this.searchSetActive(0)
 				}
-			}else if(name === "up"){
+			}else if(name === "up" && this.search.results.length){
 				if(this.search.input == document.activeElement && this.search.results){
 					this.searchSetActive(this.search.results.length-1)
 				}else if(this.search.active === 0){
 					this.searchSetActive(null)
 					this.search.input.focus()
-					//this.search.input.setSelectionRange(this.search.input.value.length, this.search.input.value.length)
-				}else if(this.search.active !== null){
+				}else if(Number.isInteger(this.search.active)){
 					this.searchSetActive(this.search.active-1)
 				}else{
 					this.searchSetActive(this.search.results.length-1)
 				}	
 			}else if(name === "confirm"){
-				if(this.search.active !== null){
+				if(Number.isInteger(this.search.active)){
 					this.searchProceed(parseInt(this.search.results[this.search.active].dataset.song_id))
 				}
 			}
