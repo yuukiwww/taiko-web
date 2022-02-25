@@ -474,7 +474,10 @@ class SongSelect{
 				this.playBgm(false)
 			}
 		}else if(this.state.screen === "difficulty"){
-			if(name === "confirm"){
+			if(event && event.keyCode && event.keyCode === 70 && ctrl){
+				this.displaySearch()
+				event.preventDefault()
+			}else if(name === "confirm"){
 				if(this.selectedDiff === 0){
 					this.toSongSelect()
 				}else if(this.selectedDiff === 1){
@@ -2771,7 +2774,10 @@ class SongSelect{
 		this.playSound("se_pause")
 		loader.screen.appendChild(this.search.div)
 		this.setSearchTip()
-		this.search.input.focus()
+
+		setTimeout(() => {
+			this.search.input.focus()
+		}, 10)
 	}
 
 	removeSearch(byUser=false){
