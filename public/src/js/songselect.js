@@ -2774,6 +2774,7 @@ class SongSelect{
 		this.playSound("se_pause")
 		loader.screen.appendChild(this.search.div)
 		this.setSearchTip()
+		cancelTouch = false
 
 		setTimeout(() => {
 			this.search.input.focus()
@@ -2792,6 +2793,7 @@ class SongSelect{
 
 			this.search.div.remove()
 			delete this.search
+			cancelTouch = true
 		}
 	}
 
