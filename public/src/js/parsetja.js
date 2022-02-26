@@ -64,7 +64,7 @@
 			if(line.slice(0, 1) === "#"){
 				
 				var name = line.slice(1).toLowerCase()
-				if(name === "start" && !inSong){
+				if((name === "start" || name === "start p1") && !inSong){
 					
 					inSong = true
 					if(!hasSong){
