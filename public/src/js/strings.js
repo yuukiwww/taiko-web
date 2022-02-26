@@ -1354,7 +1354,7 @@ var translations = {
 			ja: [
 				"CTRL+Fで検索窓を開く!",
 				"検索フィルタの組み合わせは自由自在です！",
-				"最も関連性の高い100件のみを表示します。",
+				"最も関連性の高い50件のみを表示します。",
 				"キーワードでジャンルを絞り込めます！(例: \"genre:variety\", \"genre:namco\")",
 				"「oni:10」などのフィルターを使用して、特定の難易度の曲を検索して！",
 				"Difficulty filters support ranges, too! Try \"ura:1-5\"!",
@@ -1367,7 +1367,7 @@ var translations = {
 			en: [
 				"Open the search window by pressing CTRL+F!",
 				"Mix and match as many search filters as you want!",
-				"Only the 100 most relevant search results are shown.",
+				"Only the 50 most relevant search results are shown.",
 				"Filter by genre by using the \"genre:\" keyword! (e.g. \"genre:variety\", \"genre:namco\")",
 				"Use filters like \"oni:10\" to search for songs with a particular difficulty!",
 				"Difficulty filters support ranges, too! Try \"ura:1-5\"!",

@@ -3028,7 +3028,7 @@ class SongSelect{
 			}
 		})
 
-		results = results.slice(0, 100)
+		results = results.slice(0, 50)
 		return results
 	}
 
