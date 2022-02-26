@@ -99,6 +99,7 @@ class SongSelect{
 			document.styleSheets[0].insertRule('.song-search-' + stripped + '::before { border: 0.4em solid ' + skin.border[0] + ' ; border-bottom-color: ' + skin.border[1] + ' ; border-right-color: ' + skin.border[1] + ' }')
 			document.styleSheets[0].insertRule('.song-search-' + stripped + ' .song-search-result-title::before { -webkit-text-stroke: 0.4em ' + skin.outline + ' }')
 			document.styleSheets[0].insertRule('.song-search-' + stripped + ' .song-search-result-subtitle::before { -webkit-text-stroke: 0.4em ' + skin.outline + ' }')
+			document.styleSheets[0].insertRule('.song-search-' + stripped + ' .song-search-result-info::after { background-image: linear-gradient(90deg, rgba(255, 255, 255, 0), ' + skin.background + ' 90%) }')
 		})
 
 		this.font = strings.font
