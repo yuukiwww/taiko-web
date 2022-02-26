@@ -34,6 +34,12 @@ class SongSelect{
 				border: ["#ffdfff", "#b068b2"],
 				outline: "#b221bb"
 			},
+			"search": {
+				sort: 0,
+				background: "#FF5266",
+				border: ["#FF9FB7", "#BE1432"],
+				outline: "#A50B15"
+			},
 			"tutorial": {
 				sort: 0,
 				background: "#29e8aa",
@@ -84,7 +90,17 @@ class SongSelect{
 			}
 		}
 		this.songSkin["default"].sort = songSkinLength + 1
-		
+
+		Object.keys(this.songSkin).forEach(key => {
+			var skin = this.songSkin[key]
+			var stripped = key.replace(/\W/g, '')
+
+			document.styleSheets[0].insertRule('.song-search-' + stripped + ' { background-color: ' + skin.background + ' }')
+			document.styleSheets[0].insertRule('.song-search-' + stripped + '::before { border: 0.4em solid ' + skin.border[0] + ' ; border-bottom-color: ' + skin.border[1] + ' ; border-right-color: ' + skin.border[1] + ' }')
+			document.styleSheets[0].insertRule('.song-search-' + stripped + ' .song-search-result-title::before { -webkit-text-stroke: 0.4em ' + skin.outline + ' }')
+			document.styleSheets[0].insertRule('.song-search-' + stripped + ' .song-search-result-subtitle::before { -webkit-text-stroke: 0.4em ' + skin.outline + ' }')
+		})
+
 		this.font = strings.font
 		
 		this.songs = []
@@ -116,6 +132,12 @@ class SongSelect{
 				action: "random",
 				category: strings.random,
 				canJump: true
+			})
+			this.songs.push({
+				title: strings.search.search,
+				skin: this.songSkin.search,
+				action: "search",
+				category: strings.random,
 			})
 		}
 		if(touchEnabled){
@@ -313,7 +335,8 @@ class SongSelect{
 			session: ["backspace"],
 			ctrl: ["ctrl"],
 			shift: ["shift"],
-			mute: ["q"]
+			mute: ["q"],
+			search: ["f"]
 		}, this.keyPress.bind(this))
 		this.gamepad = new Gamepad({
 			confirm: ["b", "start", "ls", "rs"],
@@ -359,7 +382,12 @@ class SongSelect{
 			pageEvents.send("song-select-difficulty", this.songs[this.selectedSong])
 		}
 	}
-	
+
+	setAltText(element, text){
+		element.innerText = text
+		element.setAttribute("alt", text)
+	}
+
 	keyPress(pressed, name, event, repeat){
 		if(pressed){
 			if(!this.pressedKeys[name]){
@@ -380,8 +408,45 @@ class SongSelect{
 				this.state.showWarning = false
 				this.showWarning = false
 			}
+		}else if (this.search){
+			if(name === "back" || (event && event.keyCode && event.keyCode === 70 && ctrl)) {
+				this.removeSearch(true)
+				if(event){ event.preventDefault() }
+			}else if(name === "down" && this.search.results.length){
+				if(this.search.input == document.activeElement && this.search.results){
+					this.searchSetActive(0)
+				}else if(this.search.active === this.search.results.length-1){
+					this.searchSetActive(null)
+					this.search.input.focus()
+				}else if(Number.isInteger(this.search.active)){
+					this.searchSetActive(this.search.active+1)
+				}else{
+					this.searchSetActive(0)
+				}
+			}else if(name === "up" && this.search.results.length){
+				if(this.search.input == document.activeElement && this.search.results){
+					this.searchSetActive(this.search.results.length-1)
+				}else if(this.search.active === 0){
+					this.searchSetActive(null)
+					this.search.input.focus()
+					setTimeout(() => {
+						this.search.input.setSelectionRange(this.search.input.value.length, this.search.input.value.length)
+					}, 0)
+				}else if(Number.isInteger(this.search.active)){
+					this.searchSetActive(this.search.active-1)
+				}else{
+					this.searchSetActive(this.search.results.length-1)
+				}	
+			}else if(name === "confirm"){
+				if(Number.isInteger(this.search.active)){
+					this.searchProceed(parseInt(this.search.results[this.search.active].dataset.song_id))
+				}
+			}
 		}else if(this.state.screen === "song"){
-			if(name === "confirm"){
+			if(event && event.keyCode && event.keyCode === 70 && ctrl){
+				this.displaySearch()
+				if(event){ event.preventDefault() }
+			}else if(name === "confirm"){
 				this.toSelectDifficulty()
 			}else if(name === "back"){
 				this.toTitleScreen()
@@ -412,7 +477,10 @@ class SongSelect{
 				this.playBgm(false)
 			}
 		}else if(this.state.screen === "difficulty"){
-			if(name === "confirm"){
+			if(event && event.keyCode && event.keyCode === 70 && ctrl){
+				this.displaySearch()
+				event.preventDefault()
+			}else if(name === "confirm"){
 				if(this.selectedDiff === 0){
 					this.toSongSelect()
 				}else if(this.selectedDiff === 1){
@@ -528,7 +596,7 @@ class SongSelect{
 			if(408 < mouse.x && mouse.x < 872 && 470 < mouse.y && mouse.y < 550){
 				moveTo = "showWarning"
 			}
-		}else if(this.state.screen === "song"){
+		}else if(this.state.screen === "song" && !this.search){
 			if(20 < mouse.y && mouse.y < 90 && 410 < mouse.x && mouse.x < 880 && (mouse.x < 540 || mouse.x > 750)){
 				moveTo = mouse.x < 640 ? "categoryPrev" : "categoryNext"
 			}else if(!p2.session && 60 < mouse.x && mouse.x < 332 && 640 < mouse.y && mouse.y < 706 && gameConfig.accounts){
@@ -692,10 +760,16 @@ class SongSelect{
 				}
 			}
 		}else if(this.state.locked === 0 || fromP2){
+			this.removeSearch()
 			if(currentSong.courses){
 				if(currentSong.unloaded){
 					return
 				}
+
+				if(fromP2 && fromP2.player !== p2.player){
+					this.drawBackground(currentSong.originalCategory)	
+				}
+
 				this.state.screen = "difficulty"
 				this.state.screenMS = this.getMS()
 				this.state.locked = true
@@ -725,6 +799,8 @@ class SongSelect{
 					this.moveToSong(moveBy, fromP2)
 				}, 200)
 				pageEvents.send("song-select-random")
+			}else if(currentSong.action === "search"){
+				this.displaySearch(true)
 			}else if(currentSong.action === "tutorial"){
 				this.toTutorial()
 			}else if(currentSong.action === "about"){
@@ -1031,6 +1107,16 @@ class SongSelect{
 		var songSelMoving = false
 		var screen = this.state.screen
 		var selectedWidth = this.songAsset.width
+		
+		if(this.search && this.searchContainer){
+			var vmin = Math.min(innerWidth, lastHeight) / 100
+			if(this.vmin !== vmin){
+				this.searchContainer.style.setProperty("--vmin", vmin + "px")
+				this.vmin = vmin
+			}
+		}else{
+			this.vmin = null
+		}
 		
 		if(this.wheelScrolls !== 0 && !this.state.locked && ms >= this.wheelTimer + 20) {
 			if(p2.session){
@@ -2607,6 +2693,397 @@ class SongSelect{
 		}
 		return addedSong
 	}
+
+	createSearchResult(song, resultsDiv, resultWidth){
+		var title = this.getLocalTitle(song.title, song.title_lang)
+		var subtitle = this.getLocalTitle(title === song.title ? song.subtitle : "", song.subtitle_lang)
+
+		var strippedCat = "default"
+		if(song.category_id){
+			var cat = assets.categories.find(cat => cat.id === song.category_id)
+			strippedCat = cat.title.replace(/\W/g, '')
+		}
+
+		var resultDiv = document.createElement("div")
+		resultDiv.classList.add("song-search-result", "song-search-" + strippedCat)
+		resultDiv.dataset.song_id = song.id
+
+		var resultInfoDiv = document.createElement("div")
+		resultInfoDiv.classList.add("song-search-result-info")
+		var resultInfoTitle = document.createElement("span")
+		resultInfoTitle.classList.add("song-search-result-title")
+		this.setAltText(resultInfoTitle, title)
+		resultInfoDiv.appendChild(resultInfoTitle)
+
+		if(subtitle){
+			resultInfoDiv.appendChild(document.createElement("br"))
+			var resultInfoSubtitle = document.createElement("span")
+			resultInfoSubtitle.classList.add("song-search-result-subtitle")
+			this.setAltText(resultInfoSubtitle, subtitle)
+			resultInfoDiv.appendChild(resultInfoSubtitle)
+		}
+
+		resultDiv.appendChild(resultInfoDiv)
+
+		var courses = ["easy", "normal", "hard", "oni", "ura"]
+		courses.forEach(course => {
+			var courseDiv = document.createElement("div")
+			courseDiv.classList.add("song-search-result-course", "song-search-result-" + course)
+			if (song.courses[course]) {
+				var crown = "noclear"
+				if (scoreStorage.scores[song.hash]) {
+					if (scoreStorage.scores[song.hash][course]) {
+						crown = scoreStorage.scores[song.hash][course].crown || "noclear"
+					}
+				}
+				var courseCrown = document.createElement("div")
+				courseCrown.classList.add("song-search-result-crown", "song-search-result-" + crown)
+				var courseStars = document.createElement("div")
+				courseStars.classList.add("song-search-result-stars")
+				courseStars.innerText = song.courses[course].stars + '★'
+
+				courseDiv.appendChild(courseCrown)
+				courseDiv.appendChild(courseStars)
+			} else {
+				courseDiv.classList.add("song-search-result-hidden")
+			}
+
+			resultDiv.appendChild(courseDiv)
+		})
+
+		resultsDiv.appendChild(resultDiv)
+		
+		if(typeof resultWidth === "undefined"){
+			var computedStyle = getComputedStyle(resultInfoDiv)
+			var padding = parseFloat(computedStyle.paddingLeft.slice(0, -2)) + parseFloat(computedStyle.paddingRight.slice(0, -2))
+			resultWidth = resultInfoDiv.offsetWidth - padding
+		}
+		
+		var titleRatio = resultWidth / resultInfoTitle.offsetWidth
+		if(titleRatio < 1){
+			resultInfoTitle.style.transform = "scale(" + titleRatio + ", 1)"
+		}
+		if(subtitle){
+			var subtitleRatio = resultWidth / resultInfoSubtitle.offsetWidth
+			if(subtitleRatio < 1){
+				resultInfoSubtitle.style.transform = "scale(" + subtitleRatio + ", 1)"
+			}
+		}
+		
+		return {
+			div: resultDiv,
+			width: resultWidth
+		}
+	}
+
+	searchSetActive(idx){
+		this.playSound("se_ka")
+		var active = this.search.div.querySelector(":scope .song-search-result-active")
+		if(active){
+			active.classList.remove("song-search-result-active")
+		}
+
+		if(idx === null){
+			this.search.active = null
+			return			
+		}
+
+		var el = this.search.results[idx]
+		this.search.input.blur()
+		el.classList.add("song-search-result-active")
+		this.scrollTo(el)
+
+		this.search.active = idx
+	}
+	
+	scrollTo(element){
+		var parentNode = element.parentNode
+		var selected = element.getBoundingClientRect()
+		var parent = parentNode.getBoundingClientRect()
+		var scrollY = parentNode.scrollTop
+		var selectedPosTop = selected.top - selected.height / 2
+		if(Math.floor(selectedPosTop) < Math.floor(parent.top)){
+			parentNode.scrollTop += selectedPosTop - parent.top
+		}else{
+			var selectedPosBottom = selected.top + selected.height * 1.5 - parent.top
+			if(Math.floor(selectedPosBottom) > Math.floor(parent.height)){
+				parentNode.scrollTop += selectedPosBottom - parent.height
+			}
+		}
+	}
+
+	displaySearch(fromButton=false){
+		if(this.search){
+			return this.removeSearch(true)
+		}
+
+		this.search = {results: []}
+		this.search.div = document.createElement("div")
+		this.search.div.innerHTML = assets.pages["search"]
+		
+		this.searchContainer = this.search.div.querySelector(":scope #song-search-container")
+		if(this.touchEnabled){
+			this.searchContainer.classList.add("touch-enabled")
+		}
+		pageEvents.add(this.searchContainer, ["mousedown", "touchstart"], this.searchClick.bind(this))
+
+		this.search.input = this.search.div.querySelector(":scope #song-search-input")
+		this.search.input.setAttribute("placeholder", strings.search.searchInput)
+		pageEvents.add(this.search.input, ["input"], this.searchInput.bind(this))
+
+		this.playSound("se_pause")
+		loader.screen.appendChild(this.search.div)
+		this.setSearchTip()
+		cancelTouch = false
+		noResizeRoot = true
+
+		setTimeout(() => {
+			this.search.input.focus()
+		}, 10)
+
+		var lastQuery = localStorage.getItem("lastSearchQuery")
+		if(lastQuery){
+			this.search.input.value = lastQuery
+			this.search.input.dispatchEvent(new Event('input', {value: lastQuery}))
+		}
+	}
+
+	removeSearch(byUser=false){
+		if(this.search){
+			if(byUser){
+				this.playSound("se_cancel")
+			}
+
+			pageEvents.remove(this.search.div.querySelector(":scope #song-search-container"),
+			["mousedown", "touchstart"])
+			pageEvents.remove(this.search.input, ["input"])
+
+			this.search.div.remove()
+			delete this.search
+			cancelTouch = true
+			noResizeRoot = false
+		}
+	}
+
+	setSearchTip(tip, error=false){
+		if(this.search.tip){
+			this.search.tip.remove()
+			delete this.search.tip
+		}
+
+		if(!tip){
+			tip = strings.search.tip + " " + strings.search.tips[Math.floor(Math.random() * strings.search.tips.length)]
+		}
+
+		var resultsDiv = this.search.div.querySelector(":scope #song-search-results")
+		resultsDiv.innerHTML = ""
+		this.search.results = []
+
+		this.search.tip = document.createElement("div")
+		this.search.tip.setAttribute("id", "song-search-tip")
+		this.search.tip.innerText = tip
+		this.search.div.querySelector(":scope #song-search").appendChild(this.search.tip)
+
+		if(error){
+			this.search.tip.classList.add("song-search-tip-error")
+		}
+	}
+
+	parseRange(string){
+		var range = string.split("-")
+		if(range.length == 1){
+			return {min: parseInt(range[0]), max: parseInt(range[0])}
+		} else if(range.length == 2){
+			return {min: parseInt(range[0]), max: parseInt(range[1])}
+		}
+	}
+
+	performSearch(query){
+		var results = []
+		var filters = {}
+
+		var querySplit = query.split(" ")
+		var editedSplit = query.split(" ")
+		querySplit.forEach(word => {
+			if(word.length > 0){
+				var parts = word.toLowerCase().split(":")
+				if(parts.length > 1){
+					switch(parts[0]){
+						case "easy":
+						case "normal":
+						case "hard":
+						case "oni":
+						case "ura":
+							filters[parts[0]] = this.parseRange(parts[1])
+							break
+						case "extreme":
+							filters.oni = this.parseRange(parts[1])
+							break
+						case "clear":
+						case "silver":
+						case "gold":
+						case "genre":
+						case "lyrics":
+						case "creative":
+						case "played":
+						case "maker":
+							filters[parts[0]] = parts[1]
+							break
+					}
+
+					editedSplit.splice(editedSplit.indexOf(word), 1)
+				}
+			}
+		})
+
+		query = editedSplit.join(" ").trim()
+
+		var songs = assets.songs
+		// TODO: fix this so it doesn't suck
+		songs.sort((a, b) => {
+			var aScore = 0
+			var bScore = 0
+			var aTitle = a.title.replace(query, "").length
+			var bTitle = b.title.replace(query, "").length
+			var aLength = aTitle - query.length
+			var bLength = bTitle - query.length
+			aScore += aLength - bLength
+			bScore += bLength - aLength
+
+			return aScore - bScore
+		})
+
+		assets.songs.forEach(song => {
+			var passedFilters = 0
+
+			Object.keys(filters).forEach(filter => {
+				var value = filters[filter]
+				switch(filter){
+					case "easy":
+					case "normal":
+					case "hard":
+					case "oni":
+					case "ura":
+						if(song.courses[filter] && song.courses[filter].stars >= value.min && song.courses[filter].stars <= value.max){
+							passedFilters++
+						}
+						break
+					case "clear":
+					case "silver":
+					case "gold":
+						if(value === "any"){
+							var score = scoreStorage.scores[song.hash]
+							scoreStorage.difficulty.forEach(difficulty => {
+								if(score && score[difficulty] && score[difficulty].crown && (filter === "clear" || score[difficulty].crown === filter)){
+									passedFilters++
+								}
+							})
+						} else {
+							var score = scoreStorage.scores[song.hash]
+							if(score && score[value] && score[value].crown && (filter === "clear" || score[value].crown === filter)){
+								passedFilters++
+							}
+						}
+						break
+					case "played":
+						var score = scoreStorage.scores[song.hash]
+						if((value === "yes" && score) || (value === "no" && !score)){
+							passedFilters++
+						}
+						break
+					case "lyrics":
+						if((value === "yes" && song.lyrics) || (value === "no" && !song.lyrics)){
+							passedFilters++
+						}
+						break
+					case "creative":
+						if((value === "yes" && song.maker) || (value === "no" && !song.maker)){
+							passedFilters++
+						}
+						break
+					case "maker":
+						if(song.maker && song.maker.toLowerCase().includes(value.toLowerCase())){
+							passedFilters++
+						}
+						break
+					case "genre":
+						var cat = assets.categories.find(cat => cat.id === song.category_id)
+						var aliases = cat.aliases ? cat.aliases.concat([cat.title]) : [cat.title]
+						
+						if(aliases.find(alias => alias.toLowerCase() === value.toLowerCase())){
+							passedFilters++
+						}
+
+						break
+				}
+			})
+
+			if(passedFilters === Object.keys(filters).length){
+				var title = this.getLocalTitle(song.title, song.title_lang)
+				var subtitle = this.getLocalTitle(title === song.title ? song.subtitle : "", song.subtitle_lang)
+		
+				if(title.toLowerCase().includes(query) || (subtitle && subtitle.toLowerCase().includes(query))){
+					results.push(song)
+				}
+			}
+		})
+
+		results = results.slice(0, 50)
+		return results
+	}
+
+	searchInput(e){
+		var text = e.target.value.toLowerCase()
+		localStorage.setItem("lastSearchQuery", text)
+
+		if(text.length === 0){
+			this.setSearchTip()
+			return
+		}
+
+		var new_results = this.performSearch(text)
+
+		if (new_results.length === 0) {
+			this.setSearchTip(strings.search.noResults, true)
+			return
+		} else if (this.search.tip) {
+			this.search.tip.remove()
+			delete this.search.tip
+		}
+
+		var resultsDiv = this.search.div.querySelector("#song-search-results")
+		resultsDiv.innerHTML = ""
+		this.search.results = []
+		var resultWidth
+		new_results.forEach(song => {
+			var result = this.createSearchResult(song, resultsDiv, resultWidth)
+			resultWidth = result.width
+			this.search.results.push(result.div)
+		})
+	}
+
+	searchClick(e){
+		if((e.target.id === "song-search-container" || e.target.id === "song-search-close") && e.which === 1){
+			this.removeSearch(true)
+		}else if(e.which === 1){
+			var songEl = e.target.closest(".song-search-result")
+			if(songEl){
+				var songId = parseInt(songEl.dataset.song_id)
+				this.searchProceed(songId)
+			}
+		}
+	}
+
+	searchProceed(songId){
+		var song = this.songs.find(song => song.id === songId)
+		this.removeSearch()
+		this.playBgm(false)
+		this.drawBackground(song.originalCategory)
+
+		var songIndex = this.songs.findIndex(song => song.id === songId)
+		this.selectedSong = songIndex
+		this.toSelectDifficulty()
+	}
 	
 	onusers(response){
 		this.songs.forEach(song => {
@@ -2784,5 +3261,6 @@ class SongSelect{
 		delete this.selectable
 		delete this.ctx
 		delete this.canvas
+		delete this.searchContainer
 	}
 }

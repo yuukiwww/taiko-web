@@ -68,7 +68,11 @@ class Keyboard{
 	}
 	keyEvent(event){
 		var key = event.key.toLowerCase()
-		if(
+		if(event.target.tagName === "INPUT"){
+			if(key === "escape"){
+				event.preventDefault()
+			}
+		}else if(
 			key === "escape" ||
 			key === "backspace" ||
 			key === "tab" ||

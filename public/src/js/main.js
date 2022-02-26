@@ -38,7 +38,8 @@ function toggleFullscreen(){
 }
 
 function resizeRoot(){
-	if(lastHeight !== innerHeight){
+	if((noResizeRoot ? lastWidth !== innerWidth : true) && lastHeight !== innerHeight){
+		lastWidth = innerWidth
 		lastHeight = innerHeight
 		root.style.height = innerHeight + "px"
 	}
@@ -70,6 +71,7 @@ var snd = {}
 var p2
 var disableBlur = false
 var cancelTouch = true
+var lastWidth
 var lastHeight
 var debugObj = {
 	state: "closed",
@@ -92,6 +94,7 @@ var account = {}
 var gpicker
 var db
 var plugins
+var noResizeRoot = false
 
 pageEvents.add(root, ["touchstart", "touchmove", "touchend"], event => {
 	if(event.cancelable && cancelTouch && event.target.tagName !== "SELECT"){

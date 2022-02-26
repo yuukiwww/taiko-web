@@ -209,11 +209,11 @@ kbd{
 	right: 0;
 	width: 40px;
 	height: 100%;
-	background-image: linear-gradient(90deg, transparent, #f6ead4 90%);
+	background-image: linear-gradient(90deg, rgba(246, 234, 212, 0), #f6ead4 90%);
 }
 .view-content:not(:hover) .setting-box.selected .setting-name::after,
 .setting-box:hover .setting-name::after{
-	background-image: linear-gradient(90deg, transparent, #ffb547 90%);
+	background-image: linear-gradient(90deg, rgba(255, 181, 71, 0), #ffb547 90%);
 }
 .setting-value{
 	display: flex;
