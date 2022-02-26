@@ -258,6 +258,10 @@ class Loader{
 			db = new IDB("taiko", "store")
 			plugins = new Plugins()
 			
+			if(localStorage.getItem("lastSearchQuery")){
+				localStorage.removeItem("lastSearchQuery")
+			}
+			
 			Promise.all(this.promises).then(() => {
 				if(this.error){
 					return

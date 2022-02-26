@@ -2798,6 +2798,12 @@ class SongSelect{
 		setTimeout(() => {
 			this.search.input.focus()
 		}, 10)
+
+		var lastQuery = localStorage.getItem("lastSearchQuery")
+		if(lastQuery){
+			this.search.input.value = lastQuery
+			this.search.input.dispatchEvent(new Event('input', {value: lastQuery}))
+		}
 	}
 
 	removeSearch(byUser=false){
@@ -2987,6 +2993,7 @@ class SongSelect{
 		}
 
 		var new_results = this.performSearch(text)
+		localStorage.setItem("lastSearchQuery", text)
 
 		if (new_results.length === 0) {
 			this.setSearchTip(strings.search.noResults, true)
