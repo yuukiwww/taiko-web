@@ -99,7 +99,6 @@ class SongSelect{
 			document.styleSheets[0].insertRule('.song-search-' + stripped + '::before { border: 0.4em solid ' + skin.border[0] + ' ; border-bottom-color: ' + skin.border[1] + ' ; border-right-color: ' + skin.border[1] + ' }')
 			document.styleSheets[0].insertRule('.song-search-' + stripped + ' .song-search-result-title::before { -webkit-text-stroke: 0.4em ' + skin.outline + ' }')
 			document.styleSheets[0].insertRule('.song-search-' + stripped + ' .song-search-result-subtitle::before { -webkit-text-stroke: 0.4em ' + skin.outline + ' }')
-			document.styleSheets[0].insertRule('.song-search-' + stripped + ' .song-search-result-info::after { background-image: linear-gradient(90deg, rgba(255, 255, 255, 0), ' + skin.background + ' 90%) }')
 		})
 
 		this.font = strings.font
@@ -2695,7 +2694,7 @@ class SongSelect{
 		return addedSong
 	}
 
-	createSearchResult(song){
+	createSearchResult(song, resultsDiv){
 		var title = this.getLocalTitle(song.title, song.title_lang)
 		var subtitle = this.getLocalTitle(title === song.title ? song.subtitle : "", song.subtitle_lang)
 
@@ -2751,12 +2750,30 @@ class SongSelect{
 			resultDiv.appendChild(courseDiv)
 		})
 
+		resultsDiv.appendChild(resultDiv)
+		
+		var computedStyle = getComputedStyle(resultInfoDiv)
+		var padding = parseFloat(computedStyle.paddingLeft.slice(0, -2)) + parseFloat(computedStyle.paddingRight.slice(0, -2))
+		
+		var titleRatio = (resultInfoDiv.offsetWidth - padding) / resultInfoTitle.offsetWidth
+		if(titleRatio < 1){
+			resultInfoTitle.style.display = "block"
+			resultInfoTitle.style.transform = "scale(" + titleRatio + ", 1)"
+		}
+		if(subtitle){
+			var subtitleRatio = (resultInfoDiv.offsetWidth - padding) / resultInfoSubtitle.offsetWidth
+			if(subtitleRatio < 1){
+				resultInfoSubtitle.style.transform = "scale(" + subtitleRatio + ", 1)"
+			}
+			resultInfoSubtitle.style.display = "block"
+		}
+		
 		return resultDiv
 	}
 
 	searchSetActive(idx){
 		this.playSound("se_ka")
-		var active = this.search.div.querySelector(".song-search-result-active")
+		var active = this.search.div.querySelector(":scope .song-search-result-active")
 		if(active){
 			active.classList.remove("song-search-result-active")
 		}
@@ -2769,9 +2786,25 @@ class SongSelect{
 		var el = this.search.results[idx]
 		this.search.input.blur()
 		el.classList.add("song-search-result-active")
-		el.scrollIntoView();
+		this.scrollTo(el)
 
 		this.search.active = idx
+	}
+	
+	scrollTo(element){
+		var parentNode = element.parentNode
+		var selected = element.getBoundingClientRect()
+		var parent = parentNode.getBoundingClientRect()
+		var scrollY = parentNode.scrollTop
+		var selectedPosTop = selected.top - selected.height / 2
+		if(Math.floor(selectedPosTop) < Math.floor(parent.top)){
+			parentNode.scrollTop += selectedPosTop - parent.top
+		}else{
+			var selectedPosBottom = selected.top + selected.height * 1.5 - parent.top
+			if(Math.floor(selectedPosBottom) > Math.floor(parent.height)){
+				parentNode.scrollTop += selectedPosBottom - parent.height
+			}
+		}
 	}
 
 	displaySearch(fromButton=false){
@@ -3017,8 +3050,7 @@ class SongSelect{
 		resultsDiv.innerHTML = ""
 		this.search.results = []
 		new_results.forEach(song => {
-			var result = this.createSearchResult(song)
-			resultsDiv.appendChild(result)
+			var result = this.createSearchResult(song, resultsDiv)
 			this.search.results.push(result)
 		})
 	}
