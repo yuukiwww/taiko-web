@@ -1352,7 +1352,16 @@ var translations = {
 		},
 		tips: {
 			ja: [
-				"CTRL+Fで検索窓を開く!"
+				"CTRL+Fで検索窓を開く!",
+				"検索フィルタの組み合わせは自由自在です！",
+				"最も関連性の高い100件のみを表示します。",
+				"キーワードでジャンルを絞り込めます！(例: \"genre:variety\", \"genre:namco\")",
+				"「oni:10」などのフィルターを使用して、特定の難易度の曲を検索して！",
+				"Difficulty filters support ranges, too! Try \"ura:1-5\"!",
+				"Want to see your full combos? Try \"gold:any\", \"gold:oni\", etc.!",
+				"Only want to see creative songs? Use the \"creative:yes\" filter!",
+				"Find songs with lyrics enabled with the \"lyrics:yes\" filter!",
+				"Feel like trying something new? Use the \"played:no\" filter to only see songs you haven't played yet!"
 			],
 			en: [
 				"Open the search window by pressing CTRL+F!",

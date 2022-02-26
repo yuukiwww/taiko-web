@@ -2954,7 +2954,7 @@ class SongSelect{
 						break
 					case "genre":
 						var cat = assets.categories.find(cat => cat.id === song.category_id)
-						var aliases = cat.aliases ? cat.aliases.concat([song.category]) : [song.category]
+						var aliases = cat.aliases ? cat.aliases.concat([cat.title]) : [cat.title]
 						
 						if(aliases.find(alias => alias.toLowerCase() === value.toLowerCase())){
 							passedFilters++
