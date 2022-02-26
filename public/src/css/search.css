@@ -18,7 +18,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    width: 60em;
+    width: min(100%, 60em);
     height: 80%;
     border-radius: 0.8em;
     border: 0.35em solid #8C0C42;
@@ -167,6 +167,7 @@
     width: 100%;
     padding: 0.1em 0;
     border-radius: 0 0 0.3em 0.3em;
+    overflow: hidden;
 }
 
 .song-search-result-easy {
@@ -218,21 +219,27 @@
     background-size: 1.4em;
     background-position-x: center;
     background-repeat: repeat-y;
-    width: 100%;
     position: absolute;
-    height: 2em;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    width: 1.4em;
+    height: 1.3em;
+    margin-bottom: 1.2em;
 }
 
 .song-search-result-gold {
-	background-position-y: 4.1em;
+	background-position-y: 59%;
 }
 
 .song-search-result-silver {
-	background-position-y: 6.1em;
+	background-position-y: 29%;
 }
 
 .song-search-result-noclear {
-	background-position-y: 0.15em;
+	background-position-y: -1%;
 }
 
 #song-search-tip {

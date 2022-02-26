@@ -96,7 +96,7 @@ class SongSelect{
 			var stripped = key.replace(/\W/g, '')
 
 			document.styleSheets[0].insertRule('.song-search-' + stripped + ' { background-color: ' + skin.background + ' }')
-			document.styleSheets[0].insertRule('.song-search-' + stripped + '::before { border: 0.4vmax solid ' + skin.border[0] + ' ; border-bottom-color: ' + skin.border[1] + ' ; border-right-color: ' + skin.border[1] + ' }')
+			document.styleSheets[0].insertRule('.song-search-' + stripped + '::before { border: 0.4em solid ' + skin.border[0] + ' ; border-bottom-color: ' + skin.border[1] + ' ; border-right-color: ' + skin.border[1] + ' }')
 			document.styleSheets[0].insertRule('.song-search-' + stripped + ' .song-search-result-title::before { -webkit-text-stroke: 0.4em ' + skin.outline + ' }')
 			document.styleSheets[0].insertRule('.song-search-' + stripped + ' .song-search-result-subtitle::before { -webkit-text-stroke: 0.4em ' + skin.outline + ' }')
 		})
