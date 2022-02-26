@@ -429,6 +429,9 @@ class SongSelect{
 				}else if(this.search.active === 0){
 					this.searchSetActive(null)
 					this.search.input.focus()
+					setTimeout(() => {
+						this.search.input.setSelectionRange(this.search.input.value.length, this.search.input.value.length)
+					}, 0)
 				}else if(Number.isInteger(this.search.active)){
 					this.searchSetActive(this.search.active-1)
 				}else{
