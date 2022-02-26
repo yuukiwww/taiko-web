@@ -3002,7 +3002,7 @@ class SongSelect{
 						}
 						break
 					case "maker":
-						if(song.maker && song.maker.toLowerCase().includes(value.toLowerCase())){
+						if(song.maker && song.maker.name.toLowerCase().includes(value.toLowerCase())){
 							passedFilters++
 						}
 						break
