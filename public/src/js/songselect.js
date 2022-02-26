@@ -2992,6 +2992,7 @@ class SongSelect{
 
 	searchInput(e){
 		var text = e.target.value.toLowerCase()
+		localStorage.setItem("lastSearchQuery", text)
 
 		if(text.length === 0){
 			this.setSearchTip()
@@ -2999,7 +3000,6 @@ class SongSelect{
 		}
 
 		var new_results = this.performSearch(text)
-		localStorage.setItem("lastSearchQuery", text)
 
 		if (new_results.length === 0) {
 			this.setSearchTip(strings.search.noResults, true)
