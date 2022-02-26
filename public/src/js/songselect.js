@@ -2884,6 +2884,7 @@ class SongSelect{
 						case "lyrics":
 						case "creative":
 						case "played":
+						case "maker":
 							filters[parts[0]] = parts[1]
 							break
 					}
@@ -2955,6 +2956,11 @@ class SongSelect{
 						break
 					case "creative":
 						if((value === "yes" && song.maker) || (value === "no" && !song.maker)){
+							passedFilters++
+						}
+						break
+					case "maker":
+						if(song.maker && song.maker.toLowerCase().includes(value.toLowerCase())){
 							passedFilters++
 						}
 						break

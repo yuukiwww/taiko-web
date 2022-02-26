@@ -1361,7 +1361,8 @@ var translations = {
 				"Want to see your full combos? Try \"gold:any\", \"gold:oni\", etc.!",
 				"Only want to see creative songs? Use the \"creative:yes\" filter!",
 				"Find songs with lyrics enabled with the \"lyrics:yes\" filter!",
-				"Feel like trying something new? Use the \"played:no\" filter to only see songs you haven't played yet!"
+				"Feel like trying something new? Use the \"played:no\" filter to only see songs you haven't played yet!",
+				"Looking for creative courses from a specific creator? Use the \"maker:<name>\" filter!",
 			],
 			en: [
 				"Open the search window by pressing CTRL+F!",
@@ -1373,7 +1374,8 @@ var translations = {
 				"Want to see your full combos? Try \"gold:any\", \"gold:oni\", etc.!",
 				"Only want to see creative songs? Use the \"creative:yes\" filter!",
 				"Find songs with lyrics enabled with the \"lyrics:yes\" filter!",
-				"Feel like trying something new? Use the \"played:no\" filter to only see songs you haven't played yet!"
+				"Feel like trying something new? Use the \"played:no\" filter to only see songs you haven't played yet!",
+				"Looking for creative courses from a specific creator? Use the \"maker:<name>\" filter!"
 			]
 		}
 	}
