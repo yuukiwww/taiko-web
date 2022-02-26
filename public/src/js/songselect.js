@@ -2694,7 +2694,7 @@ class SongSelect{
 		return addedSong
 	}
 
-	createSearchResult(song, resultsDiv){
+	createSearchResult(song, resultsDiv, resultWidth){
 		var title = this.getLocalTitle(song.title, song.title_lang)
 		var subtitle = this.getLocalTitle(title === song.title ? song.subtitle : "", song.subtitle_lang)
 
@@ -2716,6 +2716,7 @@ class SongSelect{
 		resultInfoDiv.appendChild(resultInfoTitle)
 
 		if(subtitle){
+			resultInfoDiv.appendChild(document.createElement("br"))
 			var resultInfoSubtitle = document.createElement("span")
 			resultInfoSubtitle.classList.add("song-search-result-subtitle")
 			this.setAltText(resultInfoSubtitle, subtitle)
@@ -2752,23 +2753,27 @@ class SongSelect{
 
 		resultsDiv.appendChild(resultDiv)
 		
-		var computedStyle = getComputedStyle(resultInfoDiv)
-		var padding = parseFloat(computedStyle.paddingLeft.slice(0, -2)) + parseFloat(computedStyle.paddingRight.slice(0, -2))
+		if(typeof resultWidth === "undefined"){
+			var computedStyle = getComputedStyle(resultInfoDiv)
+			var padding = parseFloat(computedStyle.paddingLeft.slice(0, -2)) + parseFloat(computedStyle.paddingRight.slice(0, -2))
+			resultWidth = resultInfoDiv.offsetWidth - padding
+		}
 		
-		var titleRatio = (resultInfoDiv.offsetWidth - padding) / resultInfoTitle.offsetWidth
+		var titleRatio = resultWidth / resultInfoTitle.offsetWidth
 		if(titleRatio < 1){
-			resultInfoTitle.style.display = "block"
 			resultInfoTitle.style.transform = "scale(" + titleRatio + ", 1)"
 		}
 		if(subtitle){
-			var subtitleRatio = (resultInfoDiv.offsetWidth - padding) / resultInfoSubtitle.offsetWidth
+			var subtitleRatio = resultWidth / resultInfoSubtitle.offsetWidth
 			if(subtitleRatio < 1){
 				resultInfoSubtitle.style.transform = "scale(" + subtitleRatio + ", 1)"
 			}
-			resultInfoSubtitle.style.display = "block"
 		}
 		
-		return resultDiv
+		return {
+			div: resultDiv,
+			width: resultWidth
+		}
 	}
 
 	searchSetActive(idx){
@@ -3049,9 +3054,11 @@ class SongSelect{
 		var resultsDiv = this.search.div.querySelector("#song-search-results")
 		resultsDiv.innerHTML = ""
 		this.search.results = []
+		var resultWidth
 		new_results.forEach(song => {
-			var result = this.createSearchResult(song, resultsDiv)
-			this.search.results.push(result)
+			var result = this.createSearchResult(song, resultsDiv, resultWidth)
+			resultWidth = result.width
+			this.search.results.push(result.div)
 		})
 	}
 
