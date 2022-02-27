@@ -3056,16 +3056,18 @@ class SongSelect{
 			}
 		}
 
+		var maxResults = totalFilters > 0 && !query ? 100 : 50
+
 		if(query){
 			results = fuzzysort.go(query, results, {
 				keys: ["titlePrepared", "subtitlePrepared"],
 				allowTypo: true,
-				limit: 100
+				limit: maxResults
 			})
 		}else{
 			results = results.map(result => {
 				return {obj: result}
-			}).slice(0, 100)
+			}).slice(0, maxResults)
 		}
 
 		return results
