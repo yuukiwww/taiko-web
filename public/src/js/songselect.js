@@ -2896,9 +2896,12 @@ class SongSelect{
 	parseRange(string){
 		var range = string.split("-")
 		if(range.length == 1){
-			return {min: parseInt(range[0]), max: parseInt(range[0])}
+			var min = parseInt(range[0]) || 0
+			return min > 0 ? {min: min, max: min} : false
 		} else if(range.length == 2){
-			return {min: parseInt(range[0]), max: parseInt(range[1])}
+			var min = parseInt(range[0]) || 0
+			var max = parseInt(range[1]) || 0
+			return min > 0 && max > 0 ? {min: min, max: max} : false
 		}
 	}
 
@@ -2918,10 +2921,12 @@ class SongSelect{
 						case "hard":
 						case "oni":
 						case "ura":
-							filters[parts[0]] = this.parseRange(parts[1])
+							var range = this.parseRange(parts[1])
+							if (range) { filters[parts[0]] = range }
 							break
 						case "extreme":
-							filters.oni = this.parseRange(parts[1])
+							var range = this.parseRange(parts[1])
+							if (range) { filters.oni = this.parseRange(parts[1]) }
 							break
 						case "clear":
 						case "silver":
