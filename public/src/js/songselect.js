@@ -776,7 +776,7 @@ class SongSelect{
 				if(fromP2 && fromP2.player !== p2.player){
 					this.drawBackground(currentSong.originalCategory)	
 				}
-
+				var prevScreen = this.state.screen
 				this.state.screen = "difficulty"
 				this.state.screenMS = this.getMS()
 				this.state.locked = true
@@ -788,7 +788,7 @@ class SongSelect{
 				
 				this.playSound("se_don", 0, fromP2 ? fromP2.player : false)
 				assets.sounds["v_songsel"].stop()
-				if(!this.showWarning){
+				if(!this.showWarning && prevScreen !== "difficulty"){
 					this.playSound("v_diffsel", 0.3)
 				}
 				pageEvents.send("song-select-difficulty", currentSong)
