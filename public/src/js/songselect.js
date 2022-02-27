@@ -3059,8 +3059,10 @@ class SongSelect{
 						a[0].ranges = this.indexesToRanges(a[0].indexes)
 						if(a[0].indexes.length > 1){
 							if(a[0].ranges.length > a[0].indexes.length / 2){
-								score0 = -Infinity
-								a[0].ranges = null
+								if(a[0].target.indexOf(query) === -1){
+									score0 = -Infinity
+									a[0].ranges = null
+								}
 							}else if(a[0].ranges.length !== 1){
 								score0 -= 9000
 							}
@@ -3071,8 +3073,10 @@ class SongSelect{
 						a[1].ranges = this.indexesToRanges(a[1].indexes)
 						if(a[1].indexes.length > 1){
 							if(a[1].ranges.length > a[1].indexes.length / 2){
-								score1 = -Infinity
-								a[1].ranges = null
+								if(a[1].target.indexOf(query) === -1){
+									score1 = -Infinity
+									a[1].ranges = null
+								}
 							}else if(a[1].ranges.length !== 1){
 								score1 -= 9000
 							}
