@@ -25,6 +25,7 @@
     color: #fff;
     padding: 1em 1em 0 1em;
     z-index: 1;
+    box-sizing: border-box;
 }
 
 #song-search-container.touch-enabled{

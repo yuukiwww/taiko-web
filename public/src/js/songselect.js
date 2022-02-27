@@ -1085,6 +1085,10 @@ class SongSelect{
 			}
 			
 			this.selectableText = ""
+			
+			if(this.search && this.searchContainer){
+				this.searchInput()
+			}
 		}else if(!document.hasFocus() && !p2.session){
 			if(this.state.focused){
 				this.state.focused = false
@@ -2951,9 +2955,6 @@ class SongSelect{
 		})
 
 		for(var i = 0; i < songs.length; i++){
-			if(i >= 50){
-				break
-			}
 			var song = songs[i]
 			var passedFilters = 0
 
@@ -3029,11 +3030,11 @@ class SongSelect{
 			}
 		}
 		
-		return results
+		return results.slice(0, 50)
 	}
 
-	searchInput(e){
-		var text = e.target.value.toLowerCase()
+	searchInput(){
+		var text = this.search.input.value.toLowerCase()
 		localStorage.setItem("lastSearchQuery", text)
 
 		if(text.length === 0){
@@ -3057,7 +3058,8 @@ class SongSelect{
 		
 		var fontSize = parseFloat(getComputedStyle(this.search.div.querySelector(":scope #song-search")).fontSize.slice(0, -2))
 		var resultsWidth = parseFloat(getComputedStyle(resultsDiv).width.slice(0, -2))
-		var courseWidth = Math.min(3 * fontSize * 1.2, 7 * this.vmin)
+		var vmin = Math.min(innerWidth, lastHeight) / 100
+		var courseWidth = Math.min(3 * fontSize * 1.2, 7 * vmin)
 		var resultWidth = resultsWidth - 1.8 * fontSize - 0.8 * fontSize - (courseWidth + 0.4 * fontSize * 1.2) * 5 - 0.6 * fontSize
 		
 		this.ctx.save()
