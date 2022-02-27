@@ -90,17 +90,21 @@ class SongSelect{
 			}
 		}
 		this.songSkin["default"].sort = songSkinLength + 1
-
+		
+		this.searchStyle = document.createElement("style")
+		var searchCss = []
 		Object.keys(this.songSkin).forEach(key => {
 			var skin = this.songSkin[key]
 			var stripped = key.replace(/\W/g, '')
-
-			document.styleSheets[0].insertRule('.song-search-' + stripped + ' { background-color: ' + skin.background + ' }')
-			document.styleSheets[0].insertRule('.song-search-' + stripped + '::before { border: 0.4em solid ' + skin.border[0] + ' ; border-bottom-color: ' + skin.border[1] + ' ; border-right-color: ' + skin.border[1] + ' }')
-			document.styleSheets[0].insertRule('.song-search-' + stripped + ' .song-search-result-title::before { -webkit-text-stroke: 0.4em ' + skin.outline + ' }')
-			document.styleSheets[0].insertRule('.song-search-' + stripped + ' .song-search-result-subtitle::before { -webkit-text-stroke: 0.4em ' + skin.outline + ' }')
+			
+			searchCss.push('.song-search-' + stripped + ' { background-color: ' + skin.background + ' }')
+			searchCss.push('.song-search-' + stripped + '::before { border: 0.4em solid ' + skin.border[0] + ' ; border-bottom-color: ' + skin.border[1] + ' ; border-right-color: ' + skin.border[1] + ' }')
+			searchCss.push('.song-search-' + stripped + ' .song-search-result-title::before { -webkit-text-stroke: 0.4em ' + skin.outline + ' }')
+			searchCss.push('.song-search-' + stripped + ' .song-search-result-subtitle::before { -webkit-text-stroke: 0.4em ' + skin.outline + ' }')
 		})
-
+		this.searchStyle.appendChild(document.createTextNode(searchCss.join("\n")))
+		loader.screen.appendChild(this.searchStyle)
+		
 		this.font = strings.font
 		
 		this.songs = []
@@ -2694,7 +2698,7 @@ class SongSelect{
 		return addedSong
 	}
 
-	createSearchResult(song, resultsDiv, resultWidth){
+	createSearchResult(song, resultWidth, fontSize){
 		var title = this.getLocalTitle(song.title, song.title_lang)
 		var subtitle = this.getLocalTitle(title === song.title ? song.subtitle : "", song.subtitle_lang)
 
@@ -2751,29 +2755,22 @@ class SongSelect{
 			resultDiv.appendChild(courseDiv)
 		})
 
-		resultsDiv.appendChild(resultDiv)
-		
-		if(typeof resultWidth === "undefined"){
-			var computedStyle = getComputedStyle(resultInfoDiv)
-			var padding = parseFloat(computedStyle.paddingLeft.slice(0, -2)) + parseFloat(computedStyle.paddingRight.slice(0, -2))
-			resultWidth = resultInfoDiv.offsetWidth - padding
-		}
-		
-		var titleRatio = resultWidth / resultInfoTitle.offsetWidth
+		this.ctx.font = (1.2 * fontSize) + "px " + strings.font
+		var titleWidth = this.ctx.measureText(title).width
+		var titleRatio = resultWidth / titleWidth
 		if(titleRatio < 1){
 			resultInfoTitle.style.transform = "scale(" + titleRatio + ", 1)"
 		}
 		if(subtitle){
-			var subtitleRatio = resultWidth / resultInfoSubtitle.offsetWidth
+			this.ctx.font =  (0.8 * 1.2 * fontSize) + "px " + strings.font
+			var subtitleWidth = this.ctx.measureText(subtitle).width
+			var subtitleRatio = resultWidth / subtitleWidth
 			if(subtitleRatio < 1){
 				resultInfoSubtitle.style.transform = "scale(" + subtitleRatio + ", 1)"
 			}
 		}
 		
-		return {
-			div: resultDiv,
-			width: resultWidth
-		}
+		return resultDiv
 	}
 
 	searchSetActive(idx){
@@ -2953,7 +2950,11 @@ class SongSelect{
 			return aScore - bScore
 		})
 
-		assets.songs.forEach(song => {
+		for(var i = 0; i < songs.length; i++){
+			if(i >= 50){
+				break
+			}
+			var song = songs[i]
 			var passedFilters = 0
 
 			Object.keys(filters).forEach(filter => {
@@ -3026,9 +3027,8 @@ class SongSelect{
 					results.push(song)
 				}
 			}
-		})
-
-		results = results.slice(0, 50)
+		}
+		
 		return results
 	}
 
@@ -3051,15 +3051,26 @@ class SongSelect{
 			delete this.search.tip
 		}
 
-		var resultsDiv = this.search.div.querySelector("#song-search-results")
+		var resultsDiv = this.search.div.querySelector(":scope #song-search-results")
 		resultsDiv.innerHTML = ""
 		this.search.results = []
-		var resultWidth
+		
+		var fontSize = parseFloat(getComputedStyle(this.search.div.querySelector(":scope #song-search")).fontSize.slice(0, -2))
+		var resultsWidth = parseFloat(getComputedStyle(resultsDiv).width.slice(0, -2))
+		var courseWidth = Math.min(3 * fontSize * 1.2, 7 * this.vmin)
+		var resultWidth = resultsWidth - 1.8 * fontSize - 0.8 * fontSize - (courseWidth + 0.4 * fontSize * 1.2) * 5 - 0.6 * fontSize
+		
+		this.ctx.save()
+		
+		var fragment = document.createDocumentFragment()
 		new_results.forEach(song => {
-			var result = this.createSearchResult(song, resultsDiv, resultWidth)
-			resultWidth = result.width
-			this.search.results.push(result.div)
+			var result = this.createSearchResult(song, resultWidth, fontSize)
+			fragment.appendChild(result)
+			this.search.results.push(result)
 		})
+		resultsDiv.appendChild(fragment)
+		
+		this.ctx.restore()
 	}
 
 	searchClick(e){
@@ -3258,9 +3269,11 @@ class SongSelect{
 			pageEvents.remove(this.touchFullBtn, "click")
 			delete this.touchFullBtn
 		}
+		loader.screen.removeChild(this.searchStyle)
 		delete this.selectable
 		delete this.ctx
 		delete this.canvas
 		delete this.searchContainer
+		delete this.searchStyle
 	}
 }

@@ -82,6 +82,8 @@
 	border: 0.3em black solid;
 	position: relative;
 	--course-width: min(3em, calc(7 * var(--vmin, 1vmin)));
+	content-visibility: auto;
+	contain-intrinsic-size: 1px 3.2em;
 }
 
 .song-search-result::before {
