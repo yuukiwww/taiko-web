@@ -104,11 +104,14 @@ class SongSelect{
 		})
 		this.searchStyle.appendChild(document.createTextNode(searchCss.join("\n")))
 		loader.screen.appendChild(this.searchStyle)
-		
+
 		this.font = strings.font
 		
 		this.songs = []
 		for(let song of assets.songs){
+			var title = this.getLocalTitle(song.title, song.title_lang)
+			song.titlePrepared = fuzzysort.prepare(title)
+			song.subtitlePrepared = fuzzysort.prepare(this.getLocalTitle(title === song.title ? song.subtitle : "", song.subtitle_lang))
 			this.songs.push(this.addSong(song))
 		}
 		this.songs.sort((a, b) => {
@@ -2939,23 +2942,9 @@ class SongSelect{
 
 		query = editedSplit.join(" ").trim()
 
-		var songs = assets.songs
-		// TODO: fix this so it doesn't suck
-		songs.sort((a, b) => {
-			var aScore = 0
-			var bScore = 0
-			var aTitle = a.title.replace(query, "").length
-			var bTitle = b.title.replace(query, "").length
-			var aLength = aTitle - query.length
-			var bLength = bTitle - query.length
-			aScore += aLength - bLength
-			bScore += bLength - aLength
-
-			return aScore - bScore
-		})
-
-		for(var i = 0; i < songs.length; i++){
-			var song = songs[i]
+		var totalFilters = Object.keys(filters).length
+		for(var i = 0; i < assets.songs.length; i++){
+			var song = assets.songs[i]
 			var passedFilters = 0
 
 			Object.keys(filters).forEach(filter => {
@@ -3020,17 +3009,18 @@ class SongSelect{
 				}
 			})
 
-			if(passedFilters === Object.keys(filters).length){
-				var title = this.getLocalTitle(song.title, song.title_lang)
-				var subtitle = this.getLocalTitle(title === song.title ? song.subtitle : "", song.subtitle_lang)
-		
-				if(title.toLowerCase().includes(query) || (subtitle && subtitle.toLowerCase().includes(query))){
-					results.push(song)
-				}
+			if(passedFilters === totalFilters){
+				results.push(song)
 			}
 		}
-		
-		return results.slice(0, 50)
+
+		if(query){
+			results = fuzzysort.go(query, results, {keys: ["titlePrepared", "subtitlePrepared"], allowTypo: true})
+			results = results.map(result => result.obj)
+		}
+
+		results = results.slice(0, 100)
+		return results
 	}
 
 	searchInput(){
