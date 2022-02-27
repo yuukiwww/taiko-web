@@ -2705,7 +2705,8 @@ class SongSelect{
 		return addedSong
 	}
 
-	createSearchResult(song, resultWidth, fontSize){
+	createSearchResult(result, resultWidth, fontSize){
+		var song = result.obj
 		var title = this.getLocalTitle(song.title, song.title_lang)
 		var subtitle = this.getLocalTitle(title === song.title ? song.subtitle : "", song.subtitle_lang)
 
@@ -2723,14 +2724,20 @@ class SongSelect{
 		resultInfoDiv.classList.add("song-search-result-info")
 		var resultInfoTitle = document.createElement("span")
 		resultInfoTitle.classList.add("song-search-result-title")
-		this.setAltText(resultInfoTitle, title)
+		
+		resultInfoTitle.appendChild(this.highlightResult(title, result[0]))
+		resultInfoTitle.setAttribute("alt", title)
+		
 		resultInfoDiv.appendChild(resultInfoTitle)
 
 		if(subtitle){
 			resultInfoDiv.appendChild(document.createElement("br"))
 			var resultInfoSubtitle = document.createElement("span")
 			resultInfoSubtitle.classList.add("song-search-result-subtitle")
-			this.setAltText(resultInfoSubtitle, subtitle)
+			
+			resultInfoSubtitle.appendChild(this.highlightResult(subtitle, result[1]))
+			resultInfoSubtitle.setAttribute("alt", subtitle)
+			
 			resultInfoDiv.appendChild(resultInfoSubtitle)
 		}
 
@@ -2778,6 +2785,36 @@ class SongSelect{
 		}
 		
 		return resultDiv
+	}
+	
+	highlightResult(text, result){
+		var fragment = document.createDocumentFragment()
+		var indexes = result ? result.indexes : []
+		var ranges = []
+		var range
+		indexes.forEach(idx => {
+			if(range && range[1] === idx - 1){
+				range[1] = idx
+			}else{
+				range = [idx, idx]
+				ranges.push(range)
+			}
+		})
+		var lastIdx = 0
+		ranges.forEach(range => {
+			if(lastIdx !== range[0]){
+				fragment.appendChild(document.createTextNode(text.slice(lastIdx, range[0])))
+			}
+			var span = document.createElement("span")
+			span.classList.add("highlighted-text")
+			span.innerText = text.slice(range[0], range[1] + 1)
+			fragment.appendChild(span)
+			lastIdx = range[1] + 1
+		})
+		if(text.length !== lastIdx){
+			fragment.appendChild(document.createTextNode(text.slice(lastIdx)))
+		}
+		return fragment
 	}
 
 	searchSetActive(idx){
@@ -3024,9 +3061,11 @@ class SongSelect{
 				keys: ["titlePrepared", "subtitlePrepared"],
 				allowTypo: true,
 				limit: 100
-			}).map(result => result.obj)
+			})
 		}else{
-			results = results.slice(0, 100)
+			results = results.map(result => {
+				return {obj: result}
+			}).slice(0, 100)
 		}
 
 		return results
@@ -3064,8 +3103,8 @@ class SongSelect{
 		this.ctx.save()
 		
 		var fragment = document.createDocumentFragment()
-		new_results.forEach(song => {
-			var result = this.createSearchResult(song, resultWidth, fontSize)
+		new_results.forEach(result => {
+			var result = this.createSearchResult(result, resultWidth, fontSize)
 			fragment.appendChild(result)
 			this.search.results.push(result)
 		})

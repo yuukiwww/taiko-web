@@ -113,6 +113,10 @@
 	width: calc(100% - (var(--course-width) + 0.4em) * 5 - 0.6em);
 }
 
+.song-search-result-info .highlighted-text {
+	color: #faff00;
+}
+
 .song-search-result-title,
 .song-search-result-subtitle {
 	display: inline-block;
