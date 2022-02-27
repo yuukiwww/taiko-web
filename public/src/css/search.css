@@ -25,6 +25,7 @@
     color: #fff;
     padding: 1em 1em 0 1em;
     z-index: 1;
+    box-sizing: border-box;
 }
 
 #song-search-container.touch-enabled{
@@ -82,6 +83,8 @@
 	border: 0.3em black solid;
 	position: relative;
 	--course-width: min(3em, calc(7 * var(--vmin, 1vmin)));
+	content-visibility: auto;
+	contain-intrinsic-size: 1px 3.2em;
 }
 
 .song-search-result::before {
@@ -108,6 +111,10 @@
     white-space: nowrap;
 	overflow-x: hidden;
 	width: calc(100% - (var(--course-width) + 0.4em) * 5 - 0.6em);
+}
+
+.song-search-result-info .highlighted-text {
+	color: #faff00;
 }
 
 .song-search-result-title,
