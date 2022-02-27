@@ -3015,11 +3015,16 @@ class SongSelect{
 		}
 
 		if(query){
-			results = fuzzysort.go(query, results, {keys: ["titlePrepared", "subtitlePrepared"], allowTypo: true})
-							   .map(result => result.obj)
+			results = fuzzysort.go(query, results, {
+				keys: ["titlePrepared", "subtitlePrepared"],
+				allowTypo: true,
+				limit: 100
+			}).map(result => result.obj)
+		}else{
+			results = results.slice(0, 100)
 		}
 
-		return results.slice(0, 100)
+		return results
 	}
 
 	searchInput(){
