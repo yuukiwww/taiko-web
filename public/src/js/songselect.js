@@ -110,8 +110,9 @@ class SongSelect{
 		this.songs = []
 		for(let song of assets.songs){
 			var title = this.getLocalTitle(song.title, song.title_lang)
-			song.titlePrepared = fuzzysort.prepare(title)
-			song.subtitlePrepared = fuzzysort.prepare(this.getLocalTitle(title === song.title ? song.subtitle : "", song.subtitle_lang))
+			song.titlePrepared = title ? fuzzysort.prepare(title.normalize("NFD").replace(/[\u0300-\u036f]/g, "")) : null
+			var subtitle = this.getLocalTitle(title === song.title ? song.subtitle : "", song.subtitle_lang)
+			song.subtitlePrepared = subtitle ? fuzzysort.prepare(subtitle.normalize("NFD").replace(/[\u0300-\u036f]/g, "")) : null
 			this.songs.push(this.addSong(song))
 		}
 		this.songs.sort((a, b) => {
@@ -2972,7 +2973,7 @@ class SongSelect{
 			}
 		})
 
-		query = editedSplit.join(" ").trim()
+		query = editedSplit.join(" ").trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
 
 		var totalFilters = Object.keys(filters).length
 		for(var i = 0; i < assets.songs.length; i++){
