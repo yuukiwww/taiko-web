@@ -2789,17 +2789,7 @@ class SongSelect{
 	
 	highlightResult(text, result){
 		var fragment = document.createDocumentFragment()
-		var indexes = result ? result.indexes : []
-		var ranges = []
-		var range
-		indexes.forEach(idx => {
-			if(range && range[1] === idx - 1){
-				range[1] = idx
-			}else{
-				range = [idx, idx]
-				ranges.push(range)
-			}
-		})
+		var ranges = (result ? result.ranges : null) || []
 		var lastIdx = 0
 		ranges.forEach(range => {
 			if(lastIdx !== range[0]){
@@ -3062,7 +3052,62 @@ class SongSelect{
 			results = fuzzysort.go(query, results, {
 				keys: ["titlePrepared", "subtitlePrepared"],
 				allowTypo: true,
-				limit: maxResults
+				limit: maxResults,
+				scoreFn: a => {
+					if(a[0]){
+						var score0 = a[0].score
+						a[0].ranges = this.indexesToRanges(a[0].indexes)
+						if(a[0].indexes.length > 1){
+							var rangeAmount = a[0].ranges.length
+							var lastIdx = -3
+							a[0].ranges.forEach(range => {
+								if(range[0] - lastIdx <= 2){
+									rangeAmount--
+									score0 -= 1000
+								}
+								lastIdx = range[1]
+							})
+							var index = a[0].target.indexOf(query)
+							if(index !== -1){
+								a[0].ranges = [[index, index + query.length - 1]]
+							}else if(rangeAmount > a[0].indexes.length / 2){
+								score0 = -Infinity
+								a[0].ranges = null
+							}else if(rangeAmount !== 1){
+								score0 -= 9000
+							}
+						}
+					}
+					if(a[1]){
+						var score1 = a[1].score - 1000
+						a[1].ranges = this.indexesToRanges(a[1].indexes)
+						if(a[1].indexes.length > 1){
+							var rangeAmount = a[1].ranges.length
+							var lastIdx = -3
+							a[1].ranges.forEach(range => {
+								if(range[0] - lastIdx <= 2){
+									rangeAmount--
+									score1 -= 1000
+								}
+								lastIdx = range[1]
+							})
+							var index = a[1].target.indexOf(query)
+							if(index !== -1){
+								a[1].ranges = [[index, index + query.length - 1]]
+							}else if(rangeAmount > a[1].indexes.length / 2){
+								score1 = -Infinity
+								a[1].ranges = null
+							}else if(rangeAmount !== 1){
+								score1 -= 9000
+							}
+						}
+					}
+					if(a[0]){
+						return a[1] ? Math.max(score0, score1) : score0
+					}else{
+						return a[1] ? score1 : -Infinity
+					}
+				}
 			})
 		}else{
 			results = results.map(result => {
@@ -3071,6 +3116,20 @@ class SongSelect{
 		}
 
 		return results
+	}
+	
+	indexesToRanges(indexes){
+		var ranges = []
+		var range
+		indexes.forEach(idx => {
+			if(range && range[1] === idx - 1){
+				range[1] = idx
+			}else{
+				range = [idx, idx]
+				ranges.push(range)
+			}
+		})
+		return ranges
 	}
 
 	searchInput(){
