@@ -159,6 +159,58 @@ class Settings{
 			pageEvents.send("language-change", lang.id)
 		}
 	}
+	addLang(lang, forceSet){
+		allStrings[lang.id] = lang
+		if(lang.categories){
+			assets.categories.forEach(category => {
+				if("title_lang" in category && lang.categories[category.title_lang.en]){
+					category.title_lang[lang.id] = lang.categories[category.title_lang.en]
+				}
+			})
+		}
+		languageList.push(lang.id)
+		this.allLanguages.push(lang.id)
+		this.items.language.default = this.getLang()
+		if(forceSet){
+			this.storage.language = lang.id
+		}else{
+			try{
+				this.storage.language = localStorage.getItem("lang")
+			}catch(e){}
+			if(this.items.language.options.indexOf(this.storage.language) === -1){
+				this.storage.language = null
+			}
+		}
+		if(settings.getItem("language") === lang.id){
+			settings.setLang(lang)
+		}
+	}
+	removeLang(lang){
+		delete allStrings[lang.id]
+		assets.categories.forEach(category => {
+			if("title_lang" in category){
+				delete category.title_lang[lang.id]
+			}
+		})
+		var index = languageList.indexOf(lang.id)
+		if(index !== -1){
+			languageList.splice(index, 1)
+		}
+		var index = this.allLanguages.indexOf(lang.id)
+		if(index !== -1){
+			this.allLanguages.splice(index, 1)
+		}
+		this.items.language.default = this.getLang()
+		try{
+			this.storage.language = localStorage.getItem("lang")
+		}catch(e){}
+		if(this.items.language.options.indexOf(this.storage.language) === -1){
+			this.storage.language = null
+		}
+		if(lang.id === strings.id){
+			settings.setLang(allStrings[this.getItem("language")])
+		}
+	}
 }
 
 class SettingsView{
@@ -203,6 +255,10 @@ class SettingsView{
 				move.active = false
 			}
 		}, this.windowSymbol)
+		
+		if(this.customSettings){
+			pageEvents.add(window, "language-change", event => this.setLang(), this.windowSymbol)
+		}
 		
 		var gamepadEnabled = false
 		if("getGamepads" in navigator){
@@ -441,7 +497,11 @@ class SettingsView{
 			this.mode = "latency"
 			this.latencySet()
 		}
-		pageEvents.send("settings")
+		if(this.customSettings){
+			pageEvents.send("plugins")
+		}else{
+			pageEvents.send("settings")
+		}
 	}
 	getElement(name){
 		return loader.screen.getElementsByClassName(name)[0]
@@ -1014,7 +1074,9 @@ class SettingsView{
 		return title
 	}
 	setLang(lang){
-		settings.setLang(lang)
+		if(lang){
+			settings.setLang(lang)
+		}
 		if(failedTests.length !== 0){
 			showUnsupported(strings)
 		}
@@ -1098,6 +1160,9 @@ class SettingsView{
 		this.gamepad.clean()
 		assets.sounds["bgm_settings"].stop()
 		pageEvents.remove(window, ["mouseup", "touchstart", "touchmove", "touchend", "blur"], this.windowSymbol)
+		if(this.customSettings){
+			pageEvents.remove(window, "language-change", this.windowSymbol)
+		}
 		for(var i in this.items){
 			this.removeTouchEnd(this.items[i].settingBox)
 		}

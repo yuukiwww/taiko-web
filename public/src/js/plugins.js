@@ -159,6 +159,34 @@ class Plugins{
 		}
 		return input
 	}
+	isObject(input){
+		return input && typeof input === "object" && input.constructor === Object
+	}
+	deepMerge(target, ...sources){
+		sources.forEach(source => {
+			if(this.isObject(target) && this.isObject(source)){
+				for(var i in source){
+					if(this.isObject(source[i])){
+						if(!target[i]){
+							target[i] = {}
+						}
+						this.deepMerge(target[i], source[i])
+					}else if(source[i]){
+						target[i] = source[i]
+					}
+				}
+			}
+		})
+		return target
+	}
+	arrayDel(array, item){
+		var index = array.indexOf(item)
+		if(index !== -1){
+			array.splice(index, 1)
+			return true
+		}
+		return false
+	}
 	
 	hasSettings(){
 		for(var i = 0; i < this.allPlugins.length; i++){
@@ -499,14 +527,32 @@ class EditFunction extends EditValue{
 
 class Patch{
 	edits = []
+	addedLanguages = []
 	addEdits(...args){
 		args.forEach(arg => this.edits.push(arg))
 	}
+	addLanguage(lang, forceSet, fallback="en"){
+		if(fallback){
+			lang = plugins.deepMerge({}, allStrings[fallback], lang)
+		}
+		this.addedLanguages.push({
+			lang: lang,
+			forceSet: forceSet
+		})
+	}
 	beforeStart(){
 		this.edits.forEach(edit => edit.start())
+		this.addedLanguages.forEach(obj => {
+			settings.addLang(obj.lang, obj.forceSet)
+		})
 	}
 	beforeStop(){
-		this.edits.forEach(edit => edit.stop())
+		for(var i = this.edits.length; i--;){
+			this.edits[i].stop()
+		}
+		for(var i = this.addedLanguages.length; i--;){
+			settings.removeLang(this.addedLanguages[i].lang)
+		}
 	}
 	beforeUnload(){
 		this.edits.forEach(edit => edit.unload())
