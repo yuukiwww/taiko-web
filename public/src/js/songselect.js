@@ -3371,7 +3371,9 @@ class SongSelect{
 			pageEvents.remove(this.touchFullBtn, "click")
 			delete this.touchFullBtn
 		}
-		loader.screen.removeChild(this.searchStyle)
+		if(this.searchStyle){
+			loader.screen.removeChild(this.searchStyle)
+		}
 		delete this.selectable
 		delete this.ctx
 		delete this.canvas
