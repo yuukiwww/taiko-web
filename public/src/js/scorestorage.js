@@ -48,7 +48,7 @@ class ScoreStorage{
 						var scoreArray = diffArray[i].slice(1).split(",")
 						for(var j in this.scoreKeys){
 							var name = this.scoreKeys[j]
-							var value = parseInt(scoreArray[j], 36) || 0
+							var value = parseInt(scoreArray[j] || 0, 36) || 0
 							if(value < 0){
 								value = 0
 							}

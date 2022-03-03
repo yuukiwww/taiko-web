@@ -20,6 +20,10 @@ class Plugins{
 		var name = options.name
 		if(!name && isUrl){
 			name = script
+			var index = name.lastIndexOf("?")
+			if(index !== -1){
+				name = name.slice(0, index)
+			}
 			var index = name.lastIndexOf("/")
 			if(index !== -1){
 				name = name.slice(index + 1)
@@ -50,14 +54,16 @@ class Plugins{
 		return plugin
 	}
 	remove(name){
-		var hash = this.pluginMap[name].hash
-		if(hash){
-			var index = this.hashes.indexOf(hash)
-			if(index !== -1){
-				this.hashes.splice(index, 1)
+		if(name in this.pluginMap){
+			var hash = this.pluginMap[name].hash
+			if(hash){
+				var index = this.hashes.indexOf(hash)
+				if(index !== -1){
+					this.hashes.splice(index, 1)
+				}
 			}
+			this.unload(name)
 		}
-		this.unload(name)
 		var index = this.allPlugins.findIndex(obj => obj.name === name)
 		if(index !== -1){
 			this.allPlugins.splice(index, 1)
@@ -159,6 +165,34 @@ class Plugins{
 		}
 		return input
 	}
+	isObject(input){
+		return input && typeof input === "object" && input.constructor === Object
+	}
+	deepMerge(target, ...sources){
+		sources.forEach(source => {
+			if(this.isObject(target) && this.isObject(source)){
+				for(var i in source){
+					if(this.isObject(source[i])){
+						if(!target[i]){
+							target[i] = {}
+						}
+						this.deepMerge(target[i], source[i])
+					}else if(source[i]){
+						target[i] = source[i]
+					}
+				}
+			}
+		})
+		return target
+	}
+	arrayDel(array, item){
+		var index = array.indexOf(item)
+		if(index !== -1){
+			array.splice(index, 1)
+			return true
+		}
+		return false
+	}
 	
 	hasSettings(){
 		for(var i = 0; i < this.allPlugins.length; i++){
@@ -207,10 +241,12 @@ class Plugins{
 					default: true,
 					getItem: () => plugin.started,
 					setItem: value => {
-						if(plugin.started && !value){
-							this.stop(plugin.name)
-						}else if(!plugin.started && value){
-							this.start(plugin.name)
+						if(plugin.name in this.pluginMap){
+							if(plugin.started && !value){
+								this.stop(plugin.name)
+							}else if(!plugin.started && value){
+								this.start(plugin.name)
+							}
 						}
 					}
 				})
@@ -293,9 +329,15 @@ class PluginLoader{
 				try{
 					this.module = new module.default()
 				}catch(e){
-					console.error(e)
 					this.error()
-					return
+					var error = new Error()
+					error.stack = "Error initializing plugin: " + this.name + "\n" + e.stack
+					if(loadErrors){
+						return Promise.reject(error)
+					}else{
+						console.error(error)
+						return Promise.resolve()
+					}
 				}
 				var output
 				try{
@@ -306,22 +348,41 @@ class PluginLoader{
 						output = this.module.load(this)
 					}
 				}catch(e){
-					console.error(e)
 					this.error()
+					var error = new Error()
+					error.stack = "Error in plugin load: " + this.name + "\n" + e.stack
+					if(loadErrors){
+						return Promise.reject(error)
+					}else{
+						console.error(error)
+						return Promise.resolve()
+					}
 				}
 				if(typeof output === "object" && output.constructor === Promise){
 					return output.catch(e => {
-						console.error(e)
 						this.error()
-						return Promise.resolve()
+						var error = new Error()
+						error.stack = "Error in plugin load promise: " + this.name + (e ? "\n" + e.stack : "")
+						if(loadErrors){
+							return Promise.reject(error)
+						}else{
+							console.error(error)
+							return Promise.resolve()
+						}
 					})
 				}
 			}, e => {
-				console.error(e)
 				this.error()
-				if(loadErrors){
-					return Promise.reject(e)
+				if(e.name === "SyntaxError"){
+					var error = new SyntaxError()
+					error.stack = "Error in plugin syntax: " + this.name + "\n" + e.stack
 				}else{
+					var error = e
+				}
+				if(loadErrors){
+					return Promise.reject(error)
+				}else{
+					console.error(error)
 					return Promise.resolve()
 				}
 			})
@@ -342,13 +403,15 @@ class PluginLoader{
 						this.module.start()
 					}
 				}catch(e){
-					console.error(e)
+					var error = new Error()
+					error.stack = "Error in plugin start: " + this.name + "\n" + e.stack
+					console.error(error)
 					this.error()
 				}
 			}
 		})
 	}
-	stop(orderChange, error){
+	stop(orderChange, noError){
 		if(this.loaded && this.started){
 			if(!orderChange){
 				var stopIndex = plugins.startOrder.indexOf(this.name)
@@ -369,8 +432,10 @@ class PluginLoader{
 					this.module.stop()
 				}
 			}catch(e){
-				console.error(e)
-				if(!error){
+				var error = new Error()
+				error.stack = "Error in plugin stop: " + this.name + "\n" + e.stack
+				console.error(error)
+				if(!noError){
 					this.error()
 				}
 			}
@@ -398,7 +463,9 @@ class PluginLoader{
 						this.module.unload()
 					}
 				}catch(e){
-					console.error(e)
+					var error = new Error()
+					error.stack = "Error in plugin unload: " + this.name + "\n" + e.stack
+					console.error(error)
 				}
 				delete this.module
 			}
@@ -409,7 +476,9 @@ class PluginLoader{
 			try{
 				this.module.error()
 			}catch(e){
-				console.error(e)
+				var error = new Error()
+				error.stack = "Error in plugin error: " + this.name + "\n" + e.stack
+				console.error(error)
 			}
 		}
 		this.unload(true)
@@ -453,9 +522,17 @@ class EditValue{
 		if(this.name){
 			this.original = this.name[0][this.name[1]]
 		}
-		var output = this.loadCallback(this.original)
+		try{
+			var output = this.loadCallback(this.original)
+		}catch(e){
+			console.error(this.loadCallback)
+			var error = new Error()
+			error.stack = "Error editing the value of " + this.getName() + "\n" + e.stack
+			throw error
+		}
 		if(typeof output === "undefined"){
-			throw new Error("A value is expected to be returned")
+			console.error(this.loadCallback)
+			throw new Error("Error editing the value of " + this.getName() + ": A value is expected to be returned")
 		}
 		if(this.name){
 			this.name[0][this.name[1]] = output
@@ -472,6 +549,27 @@ class EditValue{
 		}
 		return this.original
 	}
+	getName(){
+		var name = "unknown"
+		try{
+			if(this.name){
+				var name = (
+					typeof this.name[0] === "function" && this.name[0].name
+					|| (
+						typeof this.name[0] === "object" && typeof this.name[0].constructor === "function" && (
+							this.name[0] instanceof this.name[0].constructor ? (() => {
+								var consName = this.name[0].constructor.name || ""
+								return consName.slice(0, 1).toLowerCase() + consName.slice(1)
+							})() : this.name[0].constructor.name + ".prototype"
+						)
+					) || name
+				) + (this.name[1] ? "." + this.name[1] : "")
+			}
+		}catch(e){
+			name = "error"
+		}
+		return name
+	}
 	unload(){
 		delete this.name
 		delete this.original
@@ -485,11 +583,33 @@ class EditFunction extends EditValue{
 			this.original = this.name[0][this.name[1]]
 		}
 		var args = plugins.argsFromFunc(this.original)
-		var output = this.loadCallback(plugins.strFromFunc(this.original), args)
-		if(typeof output === "undefined"){
-			throw new Error("A value is expected to be returned")
+		try{
+			var output = this.loadCallback(plugins.strFromFunc(this.original), args)
+		}catch(e){
+			console.error(this.loadCallback)
+			var error = new Error()
+			error.stack = "Error editing the function value of " + this.getName() + "\n" + e.stack
+			throw error
 		}
-		var output = Function(...args, output)
+		if(typeof output === "undefined"){
+			console.error(this.loadCallback)
+			throw new Error("Error editing the function value of " + this.getName() + ": A value is expected to be returned")
+		}
+		try{
+			var output = Function(...args, output)
+		}catch(e){
+			console.error(this.loadCallback)
+			var error = new SyntaxError()
+			var blob = new Blob([output], {
+				type: "application/javascript"
+			})
+			var url = URL.createObjectURL(blob)
+			error.stack = "Error editing the function value of " + this.getName() + ": Could not evaluate string, check the full string for errors: " + url + "\n" + e.stack
+			setTimeout(() => {
+				URL.revokeObjectURL(url)
+			}, 5 * 60 * 1000)
+			throw error
+		}
 		if(this.name){
 			this.name[0][this.name[1]] = output
 		}
@@ -499,14 +619,32 @@ class EditFunction extends EditValue{
 
 class Patch{
 	edits = []
+	addedLanguages = []
 	addEdits(...args){
 		args.forEach(arg => this.edits.push(arg))
 	}
+	addLanguage(lang, forceSet, fallback="en"){
+		if(fallback){
+			lang = plugins.deepMerge({}, allStrings[fallback], lang)
+		}
+		this.addedLanguages.push({
+			lang: lang,
+			forceSet: forceSet
+		})
+	}
 	beforeStart(){
 		this.edits.forEach(edit => edit.start())
+		this.addedLanguages.forEach(obj => {
+			settings.addLang(obj.lang, obj.forceSet)
+		})
 	}
 	beforeStop(){
-		this.edits.forEach(edit => edit.stop())
+		for(var i = this.edits.length; i--;){
+			this.edits[i].stop()
+		}
+		for(var i = this.addedLanguages.length; i--;){
+			settings.removeLang(this.addedLanguages[i].lang)
+		}
 	}
 	beforeUnload(){
 		this.edits.forEach(edit => edit.unload())

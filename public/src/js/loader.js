@@ -327,7 +327,9 @@ class Loader{
 					p2.hash("")
 				}
 				
-				promises.push(this.canvasTest.drawAllImages())
+				promises.push(this.canvasTest.drawAllImages().then(result => {
+					perf.allImg = result
+				}))
 				
 				if(gameConfig.plugins){
 					gameConfig.plugins.forEach(obj => {
@@ -349,8 +351,7 @@ class Loader{
 					})
 				}
 				
-				Promise.all(promises).then(result => {
-					perf.allImg = result
+				Promise.all(promises).then(() => {
 					perf.load = Date.now() - this.startTime
 					this.canvasTest.clean()
 					this.clean()
