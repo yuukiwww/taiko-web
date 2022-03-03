@@ -86,6 +86,7 @@ class SongSelect{
 				if(category.songSkin.sort === null){
 					category.songSkin.sort = songSkinLength + 1
 				}
+				category.songSkin.id = category.id
 				this.songSkin[category.title] = category.songSkin
 			}
 		}
@@ -95,12 +96,14 @@ class SongSelect{
 		var searchCss = []
 		Object.keys(this.songSkin).forEach(key => {
 			var skin = this.songSkin[key]
-			var stripped = key.replace(/\W/g, '')
-			
-			searchCss.push('.song-search-' + stripped + ' { background-color: ' + skin.background + ' }')
-			searchCss.push('.song-search-' + stripped + '::before { border: 0.4em solid ' + skin.border[0] + ' ; border-bottom-color: ' + skin.border[1] + ' ; border-right-color: ' + skin.border[1] + ' }')
-			searchCss.push('.song-search-' + stripped + ' .song-search-result-title::before { -webkit-text-stroke: 0.4em ' + skin.outline + ' }')
-			searchCss.push('.song-search-' + stripped + ' .song-search-result-subtitle::before { -webkit-text-stroke: 0.4em ' + skin.outline + ' }')
+			if("id" in skin || key === "default"){
+				var id = "id" in skin ? ("cat" + skin.id) : key
+				
+				searchCss.push('.song-search-' + id + ' { background-color: ' + skin.background + ' }')
+				searchCss.push('.song-search-' + id + '::before { border: 0.4em solid ' + skin.border[0] + ' ; border-bottom-color: ' + skin.border[1] + ' ; border-right-color: ' + skin.border[1] + ' }')
+				searchCss.push('.song-search-' + id + ' .song-search-result-title::before { -webkit-text-stroke: 0.4em ' + skin.outline + ' }')
+				searchCss.push('.song-search-' + id + ' .song-search-result-subtitle::before { -webkit-text-stroke: 0.4em ' + skin.outline + ' }')
+			}
 		})
 		this.searchStyle.appendChild(document.createTextNode(searchCss.join("\n")))
 		loader.screen.appendChild(this.searchStyle)
@@ -447,7 +450,7 @@ class SongSelect{
 				}	
 			}else if(name === "confirm"){
 				if(Number.isInteger(this.search.active)){
-					this.searchProceed(parseInt(this.search.results[this.search.active].dataset.song_id))
+					this.searchProceed(parseInt(this.search.results[this.search.active].dataset.songId))
 				}
 			}
 		}else if(this.state.screen === "song"){
@@ -487,7 +490,7 @@ class SongSelect{
 		}else if(this.state.screen === "difficulty"){
 			if(event && event.keyCode && event.keyCode === 70 && ctrl){
 				this.displaySearch()
-				event.preventDefault()
+				if(event){ event.preventDefault() }
 			}else if(name === "confirm"){
 				if(this.selectedDiff === 0){
 					this.toSongSelect()
@@ -508,13 +511,18 @@ class SongSelect{
 				this.endPreview(true)
 				this.playBgm(false)
 			}
+		}else if(this.state.screen === "title" || this.state.screen === "titleFadeIn"){
+			if(event && event.keyCode && event.keyCode === 70 && ctrl){
+				this.displaySearch()
+				if(event){ event.preventDefault() }
+			}
 		}
 	}
 	
 	mouseDown(event){
 		if(event.target === this.selectable || event.target.parentNode === this.selectable){
 			this.selectable.focus()
-		}else{
+		}else if(event.target.tagName !== "INPUT"){
 			getSelection().removeAllRanges()
 			this.selectable.blur()
 		}
@@ -896,7 +904,7 @@ class SongSelect{
 			this.selectedDiff = 1
 			do{
 				this.state.options = this.mod(this.optionsList.length, this.state.options + moveBy)
-			}while((p2.socket && p2.socket.readyState !== 1 || assets.customSongs) && this.state.options === 2)
+			}while((!p2.socket || p2.socket.readyState !== 1 || assets.customSongs) && this.state.options === 2)
 		}
 	}
 	toTitleScreen(){
@@ -2711,15 +2719,17 @@ class SongSelect{
 		var title = this.getLocalTitle(song.title, song.title_lang)
 		var subtitle = this.getLocalTitle(title === song.title ? song.subtitle : "", song.subtitle_lang)
 
-		var strippedCat = "default"
+		var id = "default"
 		if(song.category_id){
 			var cat = assets.categories.find(cat => cat.id === song.category_id)
-			strippedCat = cat.title.replace(/\W/g, '')
+			if(cat && "id" in cat){
+				id = "cat" + cat.id
+			}
 		}
 
 		var resultDiv = document.createElement("div")
-		resultDiv.classList.add("song-search-result", "song-search-" + strippedCat)
-		resultDiv.dataset.song_id = song.id
+		resultDiv.classList.add("song-search-result", "song-search-" + id)
+		resultDiv.dataset.songId = song.id
 
 		var resultInfoDiv = document.createElement("div")
 		resultInfoDiv.classList.add("song-search-result-info")
@@ -2868,9 +2878,15 @@ class SongSelect{
 		this.setSearchTip()
 		cancelTouch = false
 		noResizeRoot = true
+		if(this.songs[this.selectedSong].courses){
+			snd.previewGain.setVolumeMul(0.5)
+		}else if(this.bgmEnabled){
+			snd.musicGain.setVolumeMul(0.5)
+		}
 
 		setTimeout(() => {
 			this.search.input.focus()
+			this.search.input.setSelectionRange(0, this.search.input.value.length)
 		}, 10)
 
 		var lastQuery = localStorage.getItem("lastSearchQuery")
@@ -2894,6 +2910,11 @@ class SongSelect{
 			delete this.search
 			cancelTouch = true
 			noResizeRoot = false
+			if(this.songs[this.selectedSong].courses){
+				snd.previewGain.setVolumeMul(1)
+			}else if(this.bgmEnabled){
+				snd.musicGain.setVolumeMul(1)
+			}
 		}
 	}
 
@@ -2964,6 +2985,7 @@ class SongSelect{
 						case "creative":
 						case "played":
 						case "maker":
+						case "diverge":
 							filters[parts[0]] = parts[1]
 							break
 					}
@@ -3037,7 +3059,12 @@ class SongSelect{
 						if(aliases.find(alias => alias.toLowerCase() === value.toLowerCase())){
 							passedFilters++
 						}
-
+						break
+					case "diverge":
+						var branch = Object.values(song.courses).find(course => course && course.branch)
+						if((value === "yes" && branch) || (value === "no" && !branch)){
+							passedFilters++
+						}
 						break
 				}
 			})
@@ -3068,7 +3095,7 @@ class SongSelect{
 								}
 								lastIdx = range[1]
 							})
-							var index = a[0].target.indexOf(query)
+							var index = a[0].target.toLowerCase().indexOf(query)
 							if(index !== -1){
 								a[0].ranges = [[index, index + query.length - 1]]
 							}else if(rangeAmount > a[0].indexes.length / 2){
@@ -3134,8 +3161,9 @@ class SongSelect{
 	}
 
 	searchInput(){
-		var text = this.search.input.value.toLowerCase()
+		var text = this.search.input.value
 		localStorage.setItem("lastSearchQuery", text)
+		text = text.toLowerCase()
 
 		if(text.length === 0){
 			this.setSearchTip()
@@ -3181,7 +3209,7 @@ class SongSelect{
 		}else if(e.which === 1){
 			var songEl = e.target.closest(".song-search-result")
 			if(songEl){
-				var songId = parseInt(songEl.dataset.song_id)
+				var songId = parseInt(songEl.dataset.songId)
 				this.searchProceed(songId)
 			}
 		}
@@ -3309,7 +3337,7 @@ class SongSelect{
 	getLocalTitle(title, titleLang){
 		if(titleLang){
 			for(var id in titleLang){
-				if(id === strings.id && titleLang[id]){
+				if(id === "en" && strings.preferEn && !(strings.id in titleLang) && titleLang.en || id === strings.id && titleLang[id]){
 					return titleLang[id]
 				}
 			}
