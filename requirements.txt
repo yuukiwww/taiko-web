@@ -1,6 +1,6 @@
 bcrypt==3.2.0
 ffmpy==0.2.3
-Flask==1.1.2
+Flask==2.0.3
 Flask-Caching==1.9.0
 Flask-Session==0.3.2
 Flask-WTF==0.14.3
