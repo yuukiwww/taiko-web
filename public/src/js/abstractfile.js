@@ -33,10 +33,17 @@ class RemoteFile{
 		if(this.path.startsWith("/")){
 			this.path = this.path.slice(1)
 		}
-		this.name = this.path
-		var index = this.name.lastIndexOf("/")
-		if(index !== -1){
-			this.name = this.name.slice(index + 1)
+		if(this.url.startsWith("data:")){
+			this.name = "datauri"
+			if(this.url.startsWith("data:audio/ogg")){
+				this.name += ".ogg"
+			}
+		}else{
+			this.name = this.path
+			var index = this.name.lastIndexOf("/")
+			if(index !== -1){
+				this.name = this.name.slice(index + 1)
+			}
 		}
 	}
 	arrayBuffer(){
