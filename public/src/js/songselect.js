@@ -257,6 +257,7 @@ class SongSelect{
 		this.selectedSong = 0
 		this.selectedDiff = 0
 		this.lastCurrentSong = {}
+		this.searchEnabled = true
 		assets.sounds["bgm_songsel"].playLoop(0.1, false, 0, 1.442, 3.506)
 		
 		if(!assets.customSongs && !fromTutorial && !("selectedSong" in localStorage) && !songId){
@@ -2855,6 +2856,9 @@ class SongSelect{
 	}
 
 	displaySearch(fromButton=false){
+		if(!this.searchEnabled){
+			return
+		}
 		if(this.search){
 			return this.removeSearch(true)
 		}
@@ -3227,6 +3231,7 @@ class SongSelect{
 	}
 	
 	onusers(response){
+		var p2InSong = false
 		this.songs.forEach(song => {
 			song.p2Cursor = null
 		})
@@ -3252,10 +3257,17 @@ class SongSelect{
 							if(this.state.screen !== "difficulty"){
 								this.toSelectDifficulty({player: response.value.player})
 							}
+							this.searchEnabled = false
+							p2InSong = true
+							this.removeSearch()
 						}
 					}
 				}
 			})
+		}
+
+		if(!this.searchEnabled && !p2InSong){
+			this.searchEnabled = true
 		}
 	}
 	onsongsel(response){
