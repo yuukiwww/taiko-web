@@ -786,7 +786,8 @@ class SongSelect{
 					this.state.selLock = true
 					p2.send("songsel", {
 						song: this.selectedSong,
-						selected: true
+						selected: true,
+						fromRandom: this.lastRandom
 					})
 				}
 			}
@@ -846,8 +847,7 @@ class SongSelect{
 			if(!this.state.selLock){
 				this.state.selLock = true
 				p2.send("songsel", {
-					song: this.lastRandom ? this.songs.findIndex(song => song.action === "random") : this.selectedSong,
-					fromRandom: this.lastRandom
+					song: this.lastRandom ? this.songs.findIndex(song => song.action === "random") : this.selectedSong
 				})
 			}
 			
