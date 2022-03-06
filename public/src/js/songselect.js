@@ -401,7 +401,7 @@ class SongSelect{
 		element.setAttribute("alt", text)
 	}
 
-	setSelectedSong(songIdx, drawBg){
+	setSelectedSong(songIdx, drawBg=true){
 		if(drawBg){
 			var cat = this.songs[songIdx].originalCategory
 			if(cat){
