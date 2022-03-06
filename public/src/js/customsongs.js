@@ -152,7 +152,7 @@ class CustomSongs{
 			return
 		}
 		this.changeSelected(this.linkLocalFolder)
-		if(typeof showDirectoryPicker === "function"){
+		if(typeof showDirectoryPicker === "function" && !(/\bOPR\/|\bOPRGX\//.test(navigator.userAgent))){
 			return showDirectoryPicker().then(file => {
 				this.walkFilesystem(file).then(files => this.importLocal(files)).then(input => {
 					if(input){
