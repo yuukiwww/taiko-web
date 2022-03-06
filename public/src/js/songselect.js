@@ -258,6 +258,7 @@ class SongSelect{
 		this.selectedDiff = 0
 		this.lastCurrentSong = {}
 		this.searchEnabled = true
+		this.lastRandom = false
 		assets.sounds["bgm_songsel"].playLoop(0.1, false, 0, 1.442, 3.506)
 		
 		if(!assets.customSongs && !fromTutorial && !("selectedSong" in localStorage) && !songId){
@@ -276,7 +277,7 @@ class SongSelect{
 			newSelected = this.songs.findIndex(song => song.action === fromTutorial)
 		}
 		if(newSelected !== -1){
-			this.selectedSong = newSelected
+			this.setSelectedSong(newSelected, drawBg=false)
 			this.playBgm(true)
 		}else{
 			if(songId){
@@ -286,11 +287,11 @@ class SongSelect{
 				}
 			}
 			if(songIdIndex !== -1){
-				this.selectedSong = songIdIndex
+				this.setSelectedSong(songIdIndex, drawBg=false)
 			}else if(assets.customSongs){
-				this.selectedSong = Math.min(Math.max(0, assets.customSelected), this.songs.length - 1)
+				this.setSelectedSong(Math.min(Math.max(0, assets.customSelected), this.songs.length - 1), drawBg=false)
 			}else if((!p2.session || fadeIn) && "selectedSong" in localStorage){
-				this.selectedSong = Math.min(Math.max(0, localStorage["selectedSong"] |0), this.songs.length - 1)
+				this.setSelectedSong(Math.min(Math.max(0, localStorage["selectedSong"] |0), this.songs.length - 1), drawBg=false)
 			}
 			if(!this.showWarning){
 				this.playSound(songIdIndex !== -1 ? "v_diffsel" : "v_songsel")
@@ -303,7 +304,7 @@ class SongSelect{
 		}
 		
 		this.songSelect = document.getElementById("song-select")
-		var cat = this.songs[this.selectedSong].originalCategory
+		var cat = this.songs[this.selectedSong].originalCategory || this.songs.find(song => song.action === "random").category
 		this.drawBackground(cat)
 		
 		this.previewId = 0
@@ -398,6 +399,19 @@ class SongSelect{
 	setAltText(element, text){
 		element.innerText = text
 		element.setAttribute("alt", text)
+	}
+
+	setSelectedSong(songIdx, drawBg=true){
+		if(drawBg){
+			var cat = this.songs[songIdx].originalCategory
+			if(cat){
+				this.drawBackground(cat)
+			}else{
+				this.drawBackground(this.songs.find(song => song.action === "random").category)
+			}
+		}
+
+		this.selectedSong = songIdx
 	}
 
 	keyPress(pressed, name, event, repeat){
@@ -764,7 +778,7 @@ class SongSelect{
 		}
 	}
 	
-	toSelectDifficulty(fromP2){
+	toSelectDifficulty(fromP2, playVoice=true){
 		var currentSong = this.songs[this.selectedSong]
 		if(p2.session && !fromP2 && currentSong.action !== "random"){
 			if(this.songs[this.selectedSong].courses){
@@ -783,9 +797,6 @@ class SongSelect{
 					return
 				}
 
-				if(fromP2 && fromP2.player !== p2.player){
-					this.drawBackground(currentSong.originalCategory)	
-				}
 				var prevScreen = this.state.screen
 				this.state.screen = "difficulty"
 				this.state.screenMS = this.getMS()
@@ -798,7 +809,7 @@ class SongSelect{
 				
 				this.playSound("se_don", 0, fromP2 ? fromP2.player : false)
 				assets.sounds["v_songsel"].stop()
-				if(!this.showWarning && prevScreen !== "difficulty"){
+				if(!this.showWarning && prevScreen !== "difficulty" && playVoice){
 					this.playSound("v_diffsel", 0.3)
 				}
 				pageEvents.send("song-select-difficulty", currentSong)
@@ -806,15 +817,13 @@ class SongSelect{
 				this.clean()
 				this.toTitleScreen()
 			}else if(currentSong.action === "random"){
-				this.playSound("se_don", 0, fromP2 ? fromP2.player : false)
-				this.state.locked = true
 				do{
 					var i = Math.floor(Math.random() * this.songs.length)
 				}while(!this.songs[i].courses)
-				var moveBy = i - this.selectedSong
-				setTimeout(() => {
-					this.moveToSong(moveBy, fromP2)
-				}, 200)
+				this.setSelectedSong(i)
+				this.lastRandom = true
+				this.playBgm(false)
+				this.toSelectDifficulty(false, playVoice=false)
 				pageEvents.send("song-select-random")
 			}else if(currentSong.action === "search"){
 				this.displaySearch(true)
@@ -837,15 +846,23 @@ class SongSelect{
 			if(!this.state.selLock){
 				this.state.selLock = true
 				p2.send("songsel", {
-					song: this.selectedSong
+					song: this.lastRandom ? this.songs.findIndex(song => song.action === "random") : this.selectedSong,
+					fromRandom: this.lastRandom
 				})
 			}
+			
 		}else if(fromP2 || this.state.locked !== 1){
 			this.state.screen = "song"
 			this.state.screenMS = this.getMS()
 			this.state.locked = true
 			this.state.moveHover = null
-			
+
+			if(this.lastRandom){
+				this.endPreview(false)
+				this.setSelectedSong(this.songs.findIndex(song => song.action === "random"))
+				this.lastRandom = false
+			}
+
 			assets.sounds["v_diffsel"].stop()
 			this.playSound("se_cancel", 0, fromP2 ? fromP2.player : false)
 		}
@@ -1282,7 +1299,7 @@ class SongSelect{
 				
 				if(!isJump){
 					this.playSound("se_ka", 0, this.lastMoveBy)
-					this.selectedSong = this.mod(this.songs.length, this.selectedSong + this.state.move)
+					this.setSelectedSong(this.mod(this.songs.length, this.selectedSong + this.state.move))
 				}else{
 					var currentCat = this.songs[this.selectedSong].category
 					var currentIdx = this.mod(this.songs.length, this.selectedSong)
@@ -1320,7 +1337,7 @@ class SongSelect{
 						}
 					}
 
-					this.selectedSong = this.songs.indexOf(nextSong)
+					this.setSelectedSong(this.songs.indexOf(nextSong))
 					this.state.catJump = false
 				}
 
@@ -1336,11 +1353,6 @@ class SongSelect{
 					try{
 						localStorage["selectedSong"] = this.selectedSong
 					}catch(e){}
-				}
-				
-				if(this.songs[this.selectedSong].action !== "back"){
-					var cat = this.songs[this.selectedSong].originalCategory
-					this.drawBackground(cat)
 				}
 			}
 			if(this.state.moveMS && ms < this.state.moveMS + changeSpeed){
@@ -3223,10 +3235,9 @@ class SongSelect{
 		var song = this.songs.find(song => song.id === songId)
 		this.removeSearch()
 		this.playBgm(false)
-		this.drawBackground(song.originalCategory)
 
 		var songIndex = this.songs.findIndex(song => song.id === songId)
-		this.selectedSong = songIndex
+		this.setSelectedSong(songIndex)
 		this.toSelectDifficulty()
 	}
 	
@@ -3252,7 +3263,7 @@ class SongSelect{
 					if(currentSong){
 						currentSong.p2Cursor = diffId
 						if(p2.session && currentSong.courses){
-							this.selectedSong = index
+							this.setSelectedSong(index)
 							this.state.move = 0
 							if(this.state.screen !== "difficulty"){
 								this.toSelectDifficulty({player: response.value.player})
@@ -3276,13 +3287,16 @@ class SongSelect{
 			if(response.type === "songsel" && "selected" in response.value){
 				selected = response.value.selected
 			}
+			if("fromRandom" in response.value && response.value.fromRandom === true){
+				this.lastRandom = true
+			}
 			if("song" in response.value){
 				var song = +response.value.song
 				if(song >= 0 && song < this.songs.length){
 					if(response.type === "catjump"){
 						var moveBy = response.value.move
 						if(moveBy === -1 || moveBy === 1){
-							this.selectedSong = song
+							this.setSelectedSong(song)
 							this.categoryJump(moveBy, {player: response.value.player})
 						}
 					}else if(!selected){
@@ -3303,7 +3317,7 @@ class SongSelect{
 							this.moveToSong(moveBy, {player: response.value.player})
 						}
 					}else if(this.songs[song].courses){
-						this.selectedSong = song
+						this.setSelectedSong(song)
 						this.state.move = 0
 						if(this.state.screen !== "difficulty"){
 							this.toSelectDifficulty({player: response.value.player})
