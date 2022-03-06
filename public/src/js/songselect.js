@@ -304,7 +304,7 @@ class SongSelect{
 		}
 		
 		this.songSelect = document.getElementById("song-select")
-		var cat = this.songs[this.selectedSong].originalCategory || this.songs.find(song => song.action === "random").category
+		var cat = this.songs[this.selectedSong].originalCategory
 		this.drawBackground(cat)
 		
 		this.previewId = 0
@@ -407,7 +407,7 @@ class SongSelect{
 			if(cat){
 				this.drawBackground(cat)
 			}else{
-				this.drawBackground(this.songs.find(song => song.action === "random").category)
+				this.drawBackground(false)
 			}
 		}
 
