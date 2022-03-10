@@ -113,9 +113,9 @@ class SongSelect{
 		this.songs = []
 		for(let song of assets.songs){
 			var title = this.getLocalTitle(song.title, song.title_lang)
-			song.titlePrepared = title ? fuzzysort.prepare(title.normalize("NFD").replace(/[\u0300-\u036f]/g, "")) : null
+			song.titlePrepared = title ? fuzzysort.prepare(this.normalizeSearch(title)) : null
 			var subtitle = this.getLocalTitle(title === song.title ? song.subtitle : "", song.subtitle_lang)
-			song.subtitlePrepared = subtitle ? fuzzysort.prepare(subtitle.normalize("NFD").replace(/[\u0300-\u036f]/g, "")) : null
+			song.subtitlePrepared = subtitle ? fuzzysort.prepare(this.normalizeSearch(subtitle)) : null
 			this.songs.push(this.addSong(song))
 		}
 		this.songs.sort((a, b) => {
@@ -2970,6 +2970,17 @@ class SongSelect{
 		}
 	}
 
+	normalizeSearch(string){
+		string = string
+			.replace('’', '\'').replace('“', '"').replace('”', '"')
+
+		kanaPairs.forEach(pair => {
+			string = string.replace(pair[1], pair[0])
+		})
+
+		return string.normalize("NFKD").replace(/[\u0300-\u036f]/g, "")
+	}
+
 	performSearch(query){
 		var results = []
 		var filters = {}
@@ -3011,7 +3022,7 @@ class SongSelect{
 			}
 		})
 
-		query = editedSplit.join(" ").trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+		query = this.normalizeSearch(editedSplit.join(" ").trim())
 
 		var totalFilters = Object.keys(filters).length
 		for(var i = 0; i < assets.songs.length; i++){
