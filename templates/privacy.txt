@@ -23,10 +23,7 @@ You can use the Google Drive integration to let Taiko Web make your Taiko chart 
 
 Applications that integrate with a Google account must declare their intent by requesting permissions. These permissions to your account must be granted in order for Taiko Web to integrate with Google accounts. Below is a list of these permissions and why they are required. At no time will Taiko Web request or have access to your Google account password.
 
-3.1 "Associate you with your personal info on Google" Permission
-Required for Google Sign-In to provide Taiko Web with a non-identifiable user authentication token. No other information provided by this permission is used.
-
-3.2 "See and download all your Google Drive files" Permission
+3.1 "See and download all your Google Drive files" Permission
 When selecting a folder with the Google Drive file picker, Taiko Web instructs your Browser to recursively download all the files of that folder directly into your computer's memory. Limitation of Google Drive's permission model requires us to request access to all your Google Drive files, however, Taiko Web will only access the selected folder and its children, and only when requested. File parsing is handled locally; none of your Google Drive files is ever sent to our servers or third parties.
 {% endif %}{% if config.email %}
 {% if integration %}4{% else %}3{% endif %}. Contact Info
