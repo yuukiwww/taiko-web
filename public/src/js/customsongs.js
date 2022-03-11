@@ -516,6 +516,9 @@ class CustomSongs{
 			pageEvents.remove(document, ["dragover", "dragleave", "drop"])
 			delete this.dropzone
 		}
+		if(gpicker){
+			gpicker.tokenResolve = null
+		}
 		delete this.browse
 		delete this.linkLocalFolder
 		delete this.linkGdriveFolder
