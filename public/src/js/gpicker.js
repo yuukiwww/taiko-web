@@ -9,6 +9,7 @@ class Gpicker{
 		this.scope = "https://www.googleapis.com/auth/drive.readonly"
 		this.folder = "application/vnd.google-apps.folder"
 		this.filesUrl = "https://www.googleapis.com/drive/v3/files/"
+		this.discoveryDocs = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"]
 		this.resolveQueue = []
 		this.queueActive = false
 	}
@@ -138,7 +139,9 @@ class Gpicker{
 		if(!this.auth){
 			return new Promise((resolve, reject) => {
 				gapi.auth2.init({
+					apiKey: this.apiKey,
 					clientId: this.oauthClientId,
+					discoveryDocs: this.discoveryDocs,
 					fetch_basic_profile: false,
 					scope: this.scope
 				}).then(() => {
@@ -164,22 +167,30 @@ class Gpicker{
 			return Promise.resolve()
 		}
 		return this.getAuth(errorCallback).then(auth => {
-			var user = force || auth.currentUser.get()
-			if(force || !this.checkScope(user)){
+			if(!force && auth.isSignedIn.get() && this.checkScope()){
+				return Promise.resolve()
+			}else{
 				lockedCallback(false)
-				return auth.signIn(force ? {
-					prompt: "select_account"
-				} : undefined).then(user => {
-					if(this.checkScope(user)){
-						lockedCallback(true)
-					}else{
-						return Promise.reject("cancel")
-					}
-				}, () => Promise.reject("cancel"))
+				return new Promise((resolve, reject) =>
+					auth.signIn({
+						prompt: force ? "select_account" : "consent",
+						scope: this.scope
+					}).then(resolve, reject)
+				)
 			}
+		}).then(() => {
+			if(this.checkScope()){
+				lockedCallback(true)
+			}else{
+				return Promise.reject("cancel")
+			}
+		}, e => {
+			console.error(e)
+			Promise.reject("cancel")
 		})
 	}
-	checkScope(user){
+	checkScope(){
+		var user = this.auth.currentUser.get()
 		if(user.hasGrantedScopes(this.scope)){
 			this.oauthToken = user.getAuthResponse(true).access_token
 			return this.oauthToken

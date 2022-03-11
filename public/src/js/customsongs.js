@@ -313,8 +313,10 @@ class CustomSongs{
 				return Promise.reject(e)
 			}
 		}).finally(() => {
-			var addRemove = !gpicker || !gpicker.oauthToken ? "add" : "remove"
-			this.linkGdriveAccount.classList[addRemove]("hiddenbtn")
+			if(this.linkGdriveAccount){
+				var addRemove = !gpicker || !gpicker.oauthToken ? "add" : "remove"
+				this.linkGdriveAccount.classList[addRemove]("hiddenbtn")
+			}
 		})
 	}
 	gdriveAccount(event){
