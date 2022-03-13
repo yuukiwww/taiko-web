@@ -68,6 +68,7 @@
 					
 					inSong = true
 					if(!hasSong || name === "start" && courses[courseName] && courses[courseName].startName !== "start"){
+						hasSong = false
 						if(!(courseName in courses)){
 							courses[courseName] = {}
 						}
