@@ -11,6 +11,7 @@ class Gpicker{
 		this.filesUrl = "https://www.googleapis.com/drive/v3/files/"
 		this.resolveQueue = []
 		this.queueActive = false
+		this.clientCallbackBind = this.clientCallback.bind(this)
 	}
 	browse(lockedCallback, errorCallback){
 		return this.loadApi()
@@ -123,9 +124,12 @@ class Gpicker{
 		if(window.gapi && gapi.client && gapi.client.drive){
 			return Promise.resolve()
 		}
-		return loader.loadScript("https://apis.google.com/js/api.js")
-		.then(() => new Promise((resolve, reject) =>
-			gapi.load("auth2:picker:client", {
+		var promises = [
+			loader.loadScript("https://apis.google.com/js/api.js"),
+			loader.loadScript("https://accounts.google.com/gsi/client")
+		]
+		return Promise.all(promises).then(() => new Promise((resolve, reject) =>
+			gapi.load("picker:client", {
 				callback: resolve,
 				onerror: reject
 			})
@@ -134,58 +138,53 @@ class Gpicker{
 			gapi.client.load("drive", "v3").then(resolve, reject)
 		))
 	}
-	getAuth(errorCallback=()=>{}){
-		if(!this.auth){
-			return new Promise((resolve, reject) => {
-				gapi.auth2.init({
-					clientId: this.oauthClientId,
-					fetch_basic_profile: false,
-					scope: this.scope
-				}).then(() => {
-					this.auth = gapi.auth2.getAuthInstance()
-					resolve(this.auth)
-				}, e => {
-					if(e.details){
-						var errorStr = strings.gpicker.authError.replace("%s", e.details)
-						if(/cookie/i.test(e.details)){
-							errorStr += "\n\n" + strings.gpicker.cookieError
-						}
-						errorCallback(errorStr)
-					}
-					reject(e)
-				})
-			})
+	getClient(errorCallback=()=>{}, force){
+		var obj = {
+			client_id: this.oauthClientId,
+			scope: this.scope,
+			callback: this.clientCallbackBind
+		}
+		if(force){
+			if(!this.clientForce){
+				obj.select_account = true
+				this.clientForce = google.accounts.oauth2.initTokenClient(obj)
+			}
+			return this.clientForce
 		}else{
-			return Promise.resolve(this.auth)
+			if(!this.client){
+				this.client = google.accounts.oauth2.initTokenClient(obj)
+			}
+			return this.client
+		}
+	}
+	clientCallback(tokenResponse){
+		this.tokenResponse = tokenResponse
+		this.oauthToken = tokenResponse.access_token
+		if(this.oauthToken && this.tokenResolve){
+			this.tokenResolve()
 		}
 	}
 	getToken(lockedCallback=()=>{}, errorCallback=()=>{}, force){
 		if(this.oauthToken && !force){
 			return Promise.resolve()
 		}
-		return this.getAuth(errorCallback).then(auth => {
-			var user = force || auth.currentUser.get()
-			if(force || !this.checkScope(user)){
-				lockedCallback(false)
-				return auth.signIn(force ? {
-					prompt: "select_account"
-				} : undefined).then(user => {
-					if(this.checkScope(user)){
-						lockedCallback(true)
-					}else{
-						return Promise.reject("cancel")
-					}
-				}, () => Promise.reject("cancel"))
+		var client = this.getClient(errorCallback, force)
+		var promise = new Promise(resolve => {
+			this.tokenResolve = resolve
+		})
+		lockedCallback(false)
+		client.requestAccessToken()
+		return promise.then(() => {
+			this.tokenResolve = null
+			if(this.checkScope()){
+				lockedCallback(true)
+			}else{
+				return Promise.reject("cancel")
 			}
 		})
 	}
-	checkScope(user){
-		if(user.hasGrantedScopes(this.scope)){
-			this.oauthToken = user.getAuthResponse(true).access_token
-			return this.oauthToken
-		}else{
-			return false
-		}
+	checkScope(){
+		return google.accounts.oauth2.hasGrantedAnyScope(this.tokenResponse, this.scope)
 	}
 	switchAccounts(lockedCallback, errorCallback){
 		return this.loadApi().then(() => this.getToken(lockedCallback, errorCallback, true))

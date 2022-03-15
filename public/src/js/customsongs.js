@@ -313,8 +313,10 @@ class CustomSongs{
 				return Promise.reject(e)
 			}
 		}).finally(() => {
-			var addRemove = !gpicker || !gpicker.oauthToken ? "add" : "remove"
-			this.linkGdriveAccount.classList[addRemove]("hiddenbtn")
+			if(this.linkGdriveAccount){
+				var addRemove = !gpicker || !gpicker.oauthToken ? "add" : "remove"
+				this.linkGdriveAccount.classList[addRemove]("hiddenbtn")
+			}
 		})
 	}
 	gdriveAccount(event){
@@ -513,6 +515,9 @@ class CustomSongs{
 		if(DataTransferItem.prototype.webkitGetAsEntry){
 			pageEvents.remove(document, ["dragover", "dragleave", "drop"])
 			delete this.dropzone
+		}
+		if(gpicker){
+			gpicker.tokenResolve = null
 		}
 		delete this.browse
 		delete this.linkLocalFolder
