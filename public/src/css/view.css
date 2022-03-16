@@ -452,3 +452,20 @@ kbd{
 #dropzone.dragover{
 	opacity: 1;
 }
+.plugin-browse-button{
+	position: relative;
+}
+#plugin-browse{
+	position: absolute;
+	font-size: inherit;
+	top: -0.1em;
+	left: -0.1em;
+	right: -0.1em;
+	bottom: -0.1em;
+	border-radius: 0.5em;
+	opacity: 0;
+	cursor: pointer;
+}
+#plugin-browse::-webkit-file-upload-button{
+	cursor: pointer;
+}

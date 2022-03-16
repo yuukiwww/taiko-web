@@ -97,7 +97,7 @@ var plugins
 var noResizeRoot = false
 
 pageEvents.add(root, ["touchstart", "touchmove", "touchend"], event => {
-	if(event.cancelable && cancelTouch && event.target.tagName !== "SELECT"){
+	if(event.cancelable && cancelTouch && event.target.tagName !== "SELECT" && (event.target.tagName !== "INPUT" || event.target.type !== "file")){
 		event.preventDefault()
 	}
 })

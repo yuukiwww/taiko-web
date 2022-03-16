@@ -384,23 +384,21 @@ class SettingsView{
 		if(this.customSettings){
 			var form = document.createElement("form")
 			this.browse = document.createElement("input")
-			this.browse.id = "browse"
+			this.browse.id = "plugin-browse"
 			this.browse.type = "file"
 			this.browse.multiple = true
 			this.browse.accept = ".taikoweb.js"
 			pageEvents.add(this.browse, "change", this.browseChange.bind(this))
 			form.appendChild(this.browse)
-			loader.screen.appendChild(form)
 			this.browseButton = document.createElement("div")
-			this.browseButton.classList.add("taibtn", "stroke-sub")
+			this.browseButton.classList.add("taibtn", "stroke-sub", "plugin-browse-button")
+			this.browseText = document.createTextNode("")
+			this.browseButton.appendChild(this.browseText)
+			this.browseButton.appendChild(form)
 			this.defaultButton.parentNode.insertBefore(this.browseButton, this.defaultButton)
 			this.items.push({
 				id: "browse",
 				settingBox: this.browseButton
-			})
-			this.addTouch(this.browseButton, () => {
-				this.playSound("se_don")
-				this.browse.click()
 			})
 		}
 		this.showDefault = !this.customSettings || plugins.allPlugins.filter(obj => obj.plugin.imported).length
@@ -1189,7 +1187,8 @@ class SettingsView{
 		this.setAltText(this.viewTitle, this.customSettings ? strings.plugins.title : strings.gameSettings)
 		this.setAltText(this.endButton, strings.settings.ok)
 		if(this.customSettings){
-			this.setAltText(this.browseButton, strings.plugins.browse)
+			this.browseText.data = strings.plugins.browse
+			this.browseButton.setAttribute("alt", strings.plugins.browse)
 		}else{
 			this.setAltText(this.gamepadTitle, strings.settings.gamepadLayout.name)
 			this.setAltText(this.gamepadEndButton, strings.settings.ok)
@@ -1263,9 +1262,9 @@ class SettingsView{
 		}
 		if(this.customSettings){
 			pageEvents.remove(this.browse, "change")
-			this.removeTouch(this.browseButton)
 			delete this.browse
 			delete this.browseButton
+			delete this.browseText
 		}else{
 			this.removeTouch(this.gamepadSettings)
 			this.removeTouch(this.gamepadEndButton)
