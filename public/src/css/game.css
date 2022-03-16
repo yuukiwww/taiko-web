@@ -127,3 +127,15 @@
 #song-lyrics rt{
 	line-height: 1;
 }
+.pixelated #canvas,
+.pixelated .donbg>div,
+.pixelated #songbg>div,
+.pixelated #song-stage,
+.pixelated #touch-drum-img,
+.pixelated #flowers1-in,
+.pixelated #flowers2-in,
+.pixelated #mikoshi-in,
+.pixelated #tetsuo-in,
+.pixelated #hana-in{
+	image-rendering: pixelated;
+}

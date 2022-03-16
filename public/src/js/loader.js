@@ -61,12 +61,6 @@ class Loader{
 				stylesheet.href = "/src/css/" + name + this.queryString
 				document.head.appendChild(stylesheet)
 			})
-			assets.assetsCss.forEach(name => {
-				var stylesheet = document.createElement("link")
-				stylesheet.rel = "stylesheet"
-				stylesheet.href = gameConfig.assets_baseurl + name + this.queryString
-				document.head.appendChild(stylesheet)
-			})
 			var checkStyles = () => {
 				if(document.styleSheets.length >= cssCount){
 					resolve()
@@ -84,9 +78,10 @@ class Loader{
 			}), url)
 		}
 		
-		assets.img.forEach(name=>{
+		assets.img.forEach(name => {
 			var id = this.getFilename(name)
 			var image = document.createElement("img")
+			image.crossOrigin = "anonymous"
 			var url = gameConfig.assets_baseurl + "img/" + name
 			this.addPromise(pageEvents.load(image), url)
 			image.id = name
@@ -94,6 +89,37 @@ class Loader{
 			this.assetsDiv.appendChild(image)
 			assets.image[id] = image
 		})
+		
+		var css = []
+		for(let selector in assets.cssBackground){
+			let name = assets.cssBackground[selector]
+			var url = gameConfig.assets_baseurl + "img/" + name
+			this.addPromise(loader.ajax(url, request => {
+				request.responseType = "blob"
+			}).then(blob => {
+				var id = this.getFilename(name)
+				var image = document.createElement("img")
+				let blobUrl = URL.createObjectURL(blob)
+				var promise = pageEvents.load(image).then(() => {
+					var gradient = ""
+					if(selector === ".pattern-bg"){
+						loader.screen.style.backgroundImage = "url(\"" + blobUrl + "\")"
+					}else if(selector === "#song-search"){
+						gradient = "linear-gradient(to top, rgba(245, 246, 252, 0.08), #ff5963), "
+					}
+					css.push(this.cssRuleset({
+						[selector]: {
+							"background-image": gradient + "url(\"" + blobUrl + "\")"
+						}
+					}))
+				})
+				image.id = name
+				image.src = blobUrl
+				this.assetsDiv.appendChild(image)
+				assets.image[id] = image
+				return promise
+			}), url)
+		}
 		
 		assets.views.forEach(name => {
 			var id = this.getFilename(name)
@@ -147,6 +173,10 @@ class Loader{
 				return
 			}
 			
+			var style = document.createElement("style")
+			style.appendChild(document.createTextNode(css.join("\n")))
+			document.head.appendChild(style)
+			
 			this.addPromise(this.ajax("/api/songs").then(songs => {
 				songs = JSON.parse(songs)
 				songs.forEach(song => {
@@ -179,16 +209,22 @@ class Loader{
 				.filter(cat => cat.songSkin && cat.songSkin.bg_img)
 				.forEach(cat => {
 					let name = cat.songSkin.bg_img
-					var id = this.getFilename(name)
-					var image = document.createElement("img")
 					var url = gameConfig.assets_baseurl + "img/" + name
-					categoryPromises.push(pageEvents.load(image).catch(response => {
+					categoryPromises.push(loader.ajax(url, request => {
+						request.responseType = "blob"
+					}).then(blob => {
+						var id = this.getFilename(name)
+						var image = document.createElement("img")
+						let blobUrl = URL.createObjectURL(blob)
+						var promise = pageEvents.load(image)
+						image.id = name
+						image.src = blobUrl
+						this.assetsDiv.appendChild(image)
+						assets.image[id] = image
+						return promise
+					}).catch(response => {
 						return this.errorMsg(response, url)
 					}))
-					image.id = name
-					image.src = url
-					this.assetsDiv.appendChild(image)
-					assets.image[id] = image
 				})
 			this.addPromise(Promise.all(categoryPromises))
 			
@@ -356,6 +392,7 @@ class Loader{
 					this.canvasTest.clean()
 					this.clean()
 					this.callback(songId)
+					this.ready = true
 					pageEvents.send("ready", readyEvent)
 				}, () => this.errorMsg())
 			}, () => this.errorMsg())
@@ -407,7 +444,7 @@ class Loader{
 				if(!lang){
 					lang = "en"
 				}
-				loader.screen.getElementsByClassName("view-content")[0].innerText = allStrings[lang].errorOccured
+				loader.screen.getElementsByClassName("view-content")[0].innerText = allStrings[lang] && allStrings[lang].errorOccured || allStrings.en.errorOccured
 			}
 			var loaderError = loader.screen.getElementsByClassName("loader-error-div")[0]
 			loaderError.style.display = "flex"
@@ -471,6 +508,19 @@ class Loader{
 	changePage(name, patternBg){
 		this.screen.innerHTML = assets.pages[name]
 		this.screen.classList[patternBg ? "add" : "remove"]("pattern-bg")
+	}
+	cssRuleset(rulesets){
+		var css = []
+		for(var selector in rulesets){
+			var declarationsObj = rulesets[selector]
+			var declarations = []
+			for(var property in declarationsObj){
+				var value = declarationsObj[property]
+				declarations.push("\t" + property + ": " + value + ";")
+			}
+			css.push(selector + "{\n" + declarations.join("\n") + "\n}")
+		}
+		return css.join("\n")
 	}
 	ajax(url, customRequest, customResponse){
 		var request = new XMLHttpRequest()

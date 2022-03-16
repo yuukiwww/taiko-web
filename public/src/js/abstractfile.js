@@ -59,7 +59,9 @@ class RemoteFile{
 		}
 	}
 	blob(){
-		return this.arrayBuffer().then(response => new Blob([response]))
+		return loader.ajax(this.url, request => {
+			request.responseType = "blob"
+		})
 	}
 }
 class LocalFile{
@@ -113,7 +115,7 @@ class GdriveFile{
 		this.url = gpicker.filesUrl + this.id + "?alt=media"
 	}
 	arrayBuffer(){
-		return gpicker.downloadFile(this.id, true)
+		return gpicker.downloadFile(this.id, "arraybuffer")
 	}
 	read(encoding){
 		if(encoding){
@@ -123,7 +125,7 @@ class GdriveFile{
 		}
 	}
 	blob(){
-		return this.arrayBuffer().then(response => new Blob([response]))
+		return gpicker.downloadFile(this.id, "blob")
 	}
 }
 class CachedFile{
@@ -144,6 +146,6 @@ class CachedFile{
 		return this.arrayBuffer()
 	}
 	blob(){
-		return this.arrayBuffer().then(response => new Blob([response]))
+		return this.arrayBuffer()
 	}
 }
