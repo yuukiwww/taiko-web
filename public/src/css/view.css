@@ -454,6 +454,7 @@ kbd{
 }
 .plugin-browse-button{
 	position: relative;
+	overflow: hidden;
 }
 #plugin-browse{
 	position: absolute;
