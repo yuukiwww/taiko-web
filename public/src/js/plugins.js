@@ -582,6 +582,12 @@ class EditFunction extends EditValue{
 		if(this.name){
 			this.original = this.name[0][this.name[1]]
 		}
+		if(typeof this.original !== "function"){
+			console.error(this.loadCallback)
+			var error = new Error()
+			error.stack = "Error editing the function value of " + this.getName() + ": Original value is not a function"
+			throw error
+		}
 		var args = plugins.argsFromFunc(this.original)
 		try{
 			var output = this.loadCallback(plugins.strFromFunc(this.original), args)
@@ -618,8 +624,13 @@ class EditFunction extends EditValue{
 }
 
 class Patch{
-	edits = []
-	addedLanguages = []
+	constructor(...args){
+		this.init(...args)
+	}
+	init(){
+		this.edits = []
+		this.addedLanguages = []
+	}
 	addEdits(...args){
 		args.forEach(arg => this.edits.push(arg))
 	}

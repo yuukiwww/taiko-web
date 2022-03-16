@@ -12,8 +12,9 @@
 		if(noSmoothing){
 			this.ctx.imageSmoothingEnabled = false
 		}
-		if(resolution === "lowest"){
-			this.canvas.style.imageRendering = "pixelated"
+		this.multiplayer = this.controller.multiplayer
+		if(this.multiplayer !== 2 && resolution === "lowest"){
+			document.getElementById("game").classList.add("pixelated")
 		}
 		
 		this.gameDiv = document.getElementById("game")
@@ -97,7 +98,6 @@
 		this.branchCache = new CanvasCache(noSmoothing)
 		this.nameplateCache = new CanvasCache(noSmoothing)
 		
-		this.multiplayer = this.controller.multiplayer
 		if(this.multiplayer === 2){
 			this.player = p2.player === 2 ? 1 : 2
 		}else{

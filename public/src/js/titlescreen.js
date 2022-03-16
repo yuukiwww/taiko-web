@@ -8,6 +8,7 @@ class Titlescreen{
 		
 		if(!songId){
 			loader.changePage("titlescreen", false)
+			loader.screen.style.backgroundImage = ""
 			
 			this.titleScreen = document.getElementById("title-screen")
 			this.proceed = document.getElementById("title-proceed")
@@ -75,8 +76,9 @@ class Titlescreen{
 				}
 				pageEvents.remove(p2, "message")
 				if(this.customFolder && !fromP2 && !assets.customSongs){
-					var customSongs = new CustomSongs(this.touched, true)
+					var customSongs = new CustomSongs(this.touched, true, true)
 					var soundPlayed = false
+					var noError = true
 					var promises = []
 					var allFiles = []
 					this.customFolder.forEach(file => {
@@ -95,6 +97,13 @@ class Titlescreen{
 						setTimeout(() => {
 							new SongSelect(false, false, this.touched, this.songId)
 						}, 500)
+						noError = false
+					}).then(() => {
+						if(noError){
+							setTimeout(() => {
+								new SongSelect("customSongs", false, this.touchEnabled)
+							}, 500)
+						}
 					})
 				}else{
 					setTimeout(() => {

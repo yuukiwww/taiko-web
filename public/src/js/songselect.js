@@ -92,22 +92,6 @@ class SongSelect{
 		}
 		this.songSkin["default"].sort = songSkinLength + 1
 		
-		this.searchStyle = document.createElement("style")
-		var searchCss = []
-		Object.keys(this.songSkin).forEach(key => {
-			var skin = this.songSkin[key]
-			if("id" in skin || key === "default"){
-				var id = "id" in skin ? ("cat" + skin.id) : key
-				
-				searchCss.push('.song-search-' + id + ' { background-color: ' + skin.background + ' }')
-				searchCss.push('.song-search-' + id + '::before { border: 0.4em solid ' + skin.border[0] + ' ; border-bottom-color: ' + skin.border[1] + ' ; border-right-color: ' + skin.border[1] + ' }')
-				searchCss.push('.song-search-' + id + ' .song-search-result-title::before { -webkit-text-stroke: 0.4em ' + skin.outline + ' }')
-				searchCss.push('.song-search-' + id + ' .song-search-result-subtitle::before { -webkit-text-stroke: 0.4em ' + skin.outline + ' }')
-			}
-		})
-		this.searchStyle.appendChild(document.createTextNode(searchCss.join("\n")))
-		loader.screen.appendChild(this.searchStyle)
-
 		this.font = strings.font
 		
 		this.songs = []
@@ -194,14 +178,12 @@ class SongSelect{
 				category: strings.random
 			})
 		}
-		if(plugins.hasSettings()){
-			this.songs.push({
-				title: strings.plugins.title,
-				skin: this.songSkin.plugins,
-				action: "plugins",
-				category: strings.random
-			})
-		}
+		this.songs.push({
+			title: strings.plugins.title,
+			skin: this.songSkin.plugins,
+			action: "plugins",
+			category: strings.random
+		})
 		
 		this.songs.push({
 			title: strings.back,
@@ -246,6 +228,8 @@ class SongSelect{
 		this.currentSongCache = new CanvasCache(noSmoothing)
 		this.nameplateCache = new CanvasCache(noSmoothing)
 		
+		this.search = new Search(this)
+		
 		this.difficulty = [strings.easy, strings.normal, strings.hard, strings.oni]
 		this.difficultyId = ["easy", "normal", "hard", "oni", "ura"]
 		
@@ -257,7 +241,6 @@ class SongSelect{
 		this.selectedSong = 0
 		this.selectedDiff = 0
 		this.lastCurrentSong = {}
-		this.searchEnabled = true
 		this.lastRandom = false
 		assets.sounds["bgm_songsel"].playLoop(0.1, false, 0, 1.442, 3.506)
 		
@@ -434,44 +417,14 @@ class SongSelect{
 				this.state.showWarning = false
 				this.showWarning = false
 			}
-		}else if (this.search){
-			if(name === "back" || (event && event.keyCode && event.keyCode === 70 && ctrl)) {
-				this.removeSearch(true)
-				if(event){ event.preventDefault() }
-			}else if(name === "down" && this.search.results.length){
-				if(this.search.input == document.activeElement && this.search.results){
-					this.searchSetActive(0)
-				}else if(this.search.active === this.search.results.length-1){
-					this.searchSetActive(null)
-					this.search.input.focus()
-				}else if(Number.isInteger(this.search.active)){
-					this.searchSetActive(this.search.active+1)
-				}else{
-					this.searchSetActive(0)
-				}
-			}else if(name === "up" && this.search.results.length){
-				if(this.search.input == document.activeElement && this.search.results){
-					this.searchSetActive(this.search.results.length-1)
-				}else if(this.search.active === 0){
-					this.searchSetActive(null)
-					this.search.input.focus()
-					setTimeout(() => {
-						this.search.input.setSelectionRange(this.search.input.value.length, this.search.input.value.length)
-					}, 0)
-				}else if(Number.isInteger(this.search.active)){
-					this.searchSetActive(this.search.active-1)
-				}else{
-					this.searchSetActive(this.search.results.length-1)
-				}	
-			}else if(name === "confirm"){
-				if(Number.isInteger(this.search.active)){
-					this.searchProceed(parseInt(this.search.results[this.search.active].dataset.songId))
-				}
-			}
+		}else if(this.search.opened){
+			this.search.keyPress(pressed, name, event, repeat)
 		}else if(this.state.screen === "song"){
 			if(event && event.keyCode && event.keyCode === 70 && ctrl){
-				this.displaySearch()
-				if(event){ event.preventDefault() }
+				this.search.display()
+				if(event){
+					event.preventDefault()
+				}
 			}else if(name === "confirm"){
 				this.toSelectDifficulty()
 			}else if(name === "back"){
@@ -504,8 +457,10 @@ class SongSelect{
 			}
 		}else if(this.state.screen === "difficulty"){
 			if(event && event.keyCode && event.keyCode === 70 && ctrl){
-				this.displaySearch()
-				if(event){ event.preventDefault() }
+				this.search.display()
+				if(event){
+					event.preventDefault()
+				}
 			}else if(name === "confirm"){
 				if(this.selectedDiff === 0){
 					this.toSongSelect()
@@ -528,8 +483,10 @@ class SongSelect{
 			}
 		}else if(this.state.screen === "title" || this.state.screen === "titleFadeIn"){
 			if(event && event.keyCode && event.keyCode === 70 && ctrl){
-				this.displaySearch()
-				if(event){ event.preventDefault() }
+				this.search.display()
+				if(event){
+					event.preventDefault()
+				}
 			}
 		}
 	}
@@ -627,7 +584,7 @@ class SongSelect{
 			if(408 < mouse.x && mouse.x < 872 && 470 < mouse.y && mouse.y < 550){
 				moveTo = "showWarning"
 			}
-		}else if(this.state.screen === "song" && !this.search){
+		}else if(this.state.screen === "song" && !this.search.opened){
 			if(20 < mouse.y && mouse.y < 90 && 410 < mouse.x && mouse.x < 880 && (mouse.x < 540 || mouse.x > 750)){
 				moveTo = mouse.x < 640 ? "categoryPrev" : "categoryNext"
 			}else if(!p2.session && 60 < mouse.x && mouse.x < 332 && 640 < mouse.y && mouse.y < 706 && gameConfig.accounts){
@@ -792,7 +749,7 @@ class SongSelect{
 				}
 			}
 		}else if(this.state.locked === 0 || fromP2){
-			this.removeSearch()
+			this.search.remove()
 			if(currentSong.courses){
 				if(currentSong.unloaded){
 					return
@@ -815,7 +772,6 @@ class SongSelect{
 				}
 				pageEvents.send("song-select-difficulty", currentSong)
 			}else if(currentSong.action === "back"){
-				this.clean()
 				this.toTitleScreen()
 			}else if(currentSong.action === "random"){
 				do{
@@ -827,7 +783,7 @@ class SongSelect{
 				this.toSelectDifficulty(false, playVoice=false)
 				pageEvents.send("song-select-random")
 			}else if(currentSong.action === "search"){
-				this.displaySearch(true)
+				this.search.display(true)
 			}else if(currentSong.action === "tutorial"){
 				this.toTutorial()
 			}else if(currentSong.action === "about"){
@@ -1116,8 +1072,8 @@ class SongSelect{
 			
 			this.selectableText = ""
 			
-			if(this.search && this.searchContainer){
-				this.searchInput()
+			if(this.search.opened && this.search.container){
+				this.search.onInput()
 			}
 		}else if(!document.hasFocus() && !p2.session){
 			if(this.state.focused){
@@ -1146,15 +1102,7 @@ class SongSelect{
 		var screen = this.state.screen
 		var selectedWidth = this.songAsset.width
 		
-		if(this.search && this.searchContainer){
-			var vmin = Math.min(innerWidth, lastHeight) / 100
-			if(this.vmin !== vmin){
-				this.searchContainer.style.setProperty("--vmin", vmin + "px")
-				this.vmin = vmin
-			}
-		}else{
-			this.vmin = null
-		}
+		this.search.redraw()
 		
 		if(this.wheelScrolls !== 0 && !this.state.locked && ms >= this.wheelTimer + 20) {
 			if(p2.session){
@@ -2726,520 +2674,6 @@ class SongSelect{
 		}
 		return addedSong
 	}
-
-	createSearchResult(result, resultWidth, fontSize){
-		var song = result.obj
-		var title = this.getLocalTitle(song.title, song.title_lang)
-		var subtitle = this.getLocalTitle(title === song.title ? song.subtitle : "", song.subtitle_lang)
-
-		var id = "default"
-		if(song.category_id){
-			var cat = assets.categories.find(cat => cat.id === song.category_id)
-			if(cat && "id" in cat){
-				id = "cat" + cat.id
-			}
-		}
-
-		var resultDiv = document.createElement("div")
-		resultDiv.classList.add("song-search-result", "song-search-" + id)
-		resultDiv.dataset.songId = song.id
-
-		var resultInfoDiv = document.createElement("div")
-		resultInfoDiv.classList.add("song-search-result-info")
-		var resultInfoTitle = document.createElement("span")
-		resultInfoTitle.classList.add("song-search-result-title")
-		
-		resultInfoTitle.appendChild(this.highlightResult(title, result[0]))
-		resultInfoTitle.setAttribute("alt", title)
-		
-		resultInfoDiv.appendChild(resultInfoTitle)
-
-		if(subtitle){
-			resultInfoDiv.appendChild(document.createElement("br"))
-			var resultInfoSubtitle = document.createElement("span")
-			resultInfoSubtitle.classList.add("song-search-result-subtitle")
-			
-			resultInfoSubtitle.appendChild(this.highlightResult(subtitle, result[1]))
-			resultInfoSubtitle.setAttribute("alt", subtitle)
-			
-			resultInfoDiv.appendChild(resultInfoSubtitle)
-		}
-
-		resultDiv.appendChild(resultInfoDiv)
-
-		var courses = ["easy", "normal", "hard", "oni", "ura"]
-		courses.forEach(course => {
-			var courseDiv = document.createElement("div")
-			courseDiv.classList.add("song-search-result-course", "song-search-result-" + course)
-			if (song.courses[course]) {
-				var crown = "noclear"
-				if (scoreStorage.scores[song.hash]) {
-					if (scoreStorage.scores[song.hash][course]) {
-						crown = scoreStorage.scores[song.hash][course].crown || "noclear"
-					}
-				}
-				var courseCrown = document.createElement("div")
-				courseCrown.classList.add("song-search-result-crown", "song-search-result-" + crown)
-				var courseStars = document.createElement("div")
-				courseStars.classList.add("song-search-result-stars")
-				courseStars.innerText = song.courses[course].stars + '★'
-
-				courseDiv.appendChild(courseCrown)
-				courseDiv.appendChild(courseStars)
-			} else {
-				courseDiv.classList.add("song-search-result-hidden")
-			}
-
-			resultDiv.appendChild(courseDiv)
-		})
-
-		this.ctx.font = (1.2 * fontSize) + "px " + strings.font
-		var titleWidth = this.ctx.measureText(title).width
-		var titleRatio = resultWidth / titleWidth
-		if(titleRatio < 1){
-			resultInfoTitle.style.transform = "scale(" + titleRatio + ", 1)"
-		}
-		if(subtitle){
-			this.ctx.font =  (0.8 * 1.2 * fontSize) + "px " + strings.font
-			var subtitleWidth = this.ctx.measureText(subtitle).width
-			var subtitleRatio = resultWidth / subtitleWidth
-			if(subtitleRatio < 1){
-				resultInfoSubtitle.style.transform = "scale(" + subtitleRatio + ", 1)"
-			}
-		}
-		
-		return resultDiv
-	}
-	
-	highlightResult(text, result){
-		var fragment = document.createDocumentFragment()
-		var ranges = (result ? result.ranges : null) || []
-		var lastIdx = 0
-		ranges.forEach(range => {
-			if(lastIdx !== range[0]){
-				fragment.appendChild(document.createTextNode(text.slice(lastIdx, range[0])))
-			}
-			var span = document.createElement("span")
-			span.classList.add("highlighted-text")
-			span.innerText = text.slice(range[0], range[1] + 1)
-			fragment.appendChild(span)
-			lastIdx = range[1] + 1
-		})
-		if(text.length !== lastIdx){
-			fragment.appendChild(document.createTextNode(text.slice(lastIdx)))
-		}
-		return fragment
-	}
-
-	searchSetActive(idx){
-		this.playSound("se_ka")
-		var active = this.search.div.querySelector(":scope .song-search-result-active")
-		if(active){
-			active.classList.remove("song-search-result-active")
-		}
-
-		if(idx === null){
-			this.search.active = null
-			return			
-		}
-
-		var el = this.search.results[idx]
-		this.search.input.blur()
-		el.classList.add("song-search-result-active")
-		this.scrollTo(el)
-
-		this.search.active = idx
-	}
-	
-	scrollTo(element){
-		var parentNode = element.parentNode
-		var selected = element.getBoundingClientRect()
-		var parent = parentNode.getBoundingClientRect()
-		var scrollY = parentNode.scrollTop
-		var selectedPosTop = selected.top - selected.height / 2
-		if(Math.floor(selectedPosTop) < Math.floor(parent.top)){
-			parentNode.scrollTop += selectedPosTop - parent.top
-		}else{
-			var selectedPosBottom = selected.top + selected.height * 1.5 - parent.top
-			if(Math.floor(selectedPosBottom) > Math.floor(parent.height)){
-				parentNode.scrollTop += selectedPosBottom - parent.height
-			}
-		}
-	}
-
-	displaySearch(fromButton=false){
-		if(!this.searchEnabled){
-			return
-		}
-		if(this.search){
-			return this.removeSearch(true)
-		}
-
-		this.search = {results: []}
-		this.search.div = document.createElement("div")
-		this.search.div.innerHTML = assets.pages["search"]
-		
-		this.searchContainer = this.search.div.querySelector(":scope #song-search-container")
-		if(this.touchEnabled){
-			this.searchContainer.classList.add("touch-enabled")
-		}
-		pageEvents.add(this.searchContainer, ["mousedown", "touchstart"], this.searchClick.bind(this))
-
-		this.search.input = this.search.div.querySelector(":scope #song-search-input")
-		this.search.input.setAttribute("placeholder", strings.search.searchInput)
-		pageEvents.add(this.search.input, ["input"], this.searchInput.bind(this))
-
-		this.playSound("se_pause")
-		loader.screen.appendChild(this.search.div)
-		this.setSearchTip()
-		cancelTouch = false
-		noResizeRoot = true
-		if(this.songs[this.selectedSong].courses){
-			snd.previewGain.setVolumeMul(0.5)
-		}else if(this.bgmEnabled){
-			snd.musicGain.setVolumeMul(0.5)
-		}
-
-		setTimeout(() => {
-			this.search.input.focus()
-			this.search.input.setSelectionRange(0, this.search.input.value.length)
-		}, 10)
-
-		var lastQuery = localStorage.getItem("lastSearchQuery")
-		if(lastQuery){
-			this.search.input.value = lastQuery
-			this.search.input.dispatchEvent(new Event('input', {value: lastQuery}))
-		}
-	}
-
-	removeSearch(byUser=false){
-		if(this.search){
-			if(byUser){
-				this.playSound("se_cancel")
-			}
-
-			pageEvents.remove(this.search.div.querySelector(":scope #song-search-container"),
-			["mousedown", "touchstart"])
-			pageEvents.remove(this.search.input, ["input"])
-
-			this.search.div.remove()
-			delete this.search
-			cancelTouch = true
-			noResizeRoot = false
-			if(this.songs[this.selectedSong].courses){
-				snd.previewGain.setVolumeMul(1)
-			}else if(this.bgmEnabled){
-				snd.musicGain.setVolumeMul(1)
-			}
-		}
-	}
-
-	setSearchTip(tip, error=false){
-		if(this.search.tip){
-			this.search.tip.remove()
-			delete this.search.tip
-		}
-
-		if(!tip){
-			tip = strings.search.tip + " " + strings.search.tips[Math.floor(Math.random() * strings.search.tips.length)]
-		}
-
-		var resultsDiv = this.search.div.querySelector(":scope #song-search-results")
-		resultsDiv.innerHTML = ""
-		this.search.results = []
-
-		this.search.tip = document.createElement("div")
-		this.search.tip.setAttribute("id", "song-search-tip")
-		this.search.tip.innerText = tip
-		this.search.div.querySelector(":scope #song-search").appendChild(this.search.tip)
-
-		if(error){
-			this.search.tip.classList.add("song-search-tip-error")
-		}
-	}
-
-	parseRange(string){
-		var range = string.split("-")
-		if(range.length == 1){
-			var min = parseInt(range[0]) || 0
-			return min > 0 ? {min: min, max: min} : false
-		} else if(range.length == 2){
-			var min = parseInt(range[0]) || 0
-			var max = parseInt(range[1]) || 0
-			return min > 0 && max > 0 ? {min: min, max: max} : false
-		}
-	}
-
-	performSearch(query){
-		var results = []
-		var filters = {}
-
-		var querySplit = query.split(" ")
-		var editedSplit = query.split(" ")
-		querySplit.forEach(word => {
-			if(word.length > 0){
-				var parts = word.toLowerCase().split(":")
-				if(parts.length > 1){
-					switch(parts[0]){
-						case "easy":
-						case "normal":
-						case "hard":
-						case "oni":
-						case "ura":
-							var range = this.parseRange(parts[1])
-							if (range) { filters[parts[0]] = range }
-							break
-						case "extreme":
-							var range = this.parseRange(parts[1])
-							if (range) { filters.oni = this.parseRange(parts[1]) }
-							break
-						case "clear":
-						case "silver":
-						case "gold":
-						case "genre":
-						case "lyrics":
-						case "creative":
-						case "played":
-						case "maker":
-						case "diverge":
-							filters[parts[0]] = parts[1]
-							break
-					}
-
-					editedSplit.splice(editedSplit.indexOf(word), 1)
-				}
-			}
-		})
-
-		query = editedSplit.join(" ").trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-
-		var totalFilters = Object.keys(filters).length
-		for(var i = 0; i < assets.songs.length; i++){
-			var song = assets.songs[i]
-			var passedFilters = 0
-
-			Object.keys(filters).forEach(filter => {
-				var value = filters[filter]
-				switch(filter){
-					case "easy":
-					case "normal":
-					case "hard":
-					case "oni":
-					case "ura":
-						if(song.courses[filter] && song.courses[filter].stars >= value.min && song.courses[filter].stars <= value.max){
-							passedFilters++
-						}
-						break
-					case "clear":
-					case "silver":
-					case "gold":
-						if(value === "any"){
-							var score = scoreStorage.scores[song.hash]
-							scoreStorage.difficulty.forEach(difficulty => {
-								if(score && score[difficulty] && score[difficulty].crown && (filter === "clear" || score[difficulty].crown === filter)){
-									passedFilters++
-								}
-							})
-						} else {
-							var score = scoreStorage.scores[song.hash]
-							if(score && score[value] && score[value].crown && (filter === "clear" || score[value].crown === filter)){
-								passedFilters++
-							}
-						}
-						break
-					case "played":
-						var score = scoreStorage.scores[song.hash]
-						if((value === "yes" && score) || (value === "no" && !score)){
-							passedFilters++
-						}
-						break
-					case "lyrics":
-						if((value === "yes" && song.lyrics) || (value === "no" && !song.lyrics)){
-							passedFilters++
-						}
-						break
-					case "creative":
-						if((value === "yes" && song.maker) || (value === "no" && !song.maker)){
-							passedFilters++
-						}
-						break
-					case "maker":
-						if(song.maker && song.maker.name.toLowerCase().includes(value.toLowerCase())){
-							passedFilters++
-						}
-						break
-					case "genre":
-						var cat = assets.categories.find(cat => cat.id === song.category_id)
-						var aliases = cat.aliases ? cat.aliases.concat([cat.title]) : [cat.title]
-						
-						if(aliases.find(alias => alias.toLowerCase() === value.toLowerCase())){
-							passedFilters++
-						}
-						break
-					case "diverge":
-						var branch = Object.values(song.courses).find(course => course && course.branch)
-						if((value === "yes" && branch) || (value === "no" && !branch)){
-							passedFilters++
-						}
-						break
-				}
-			})
-
-			if(passedFilters === totalFilters){
-				results.push(song)
-			}
-		}
-
-		var maxResults = totalFilters > 0 && !query ? 100 : 50
-
-		if(query){
-			results = fuzzysort.go(query, results, {
-				keys: ["titlePrepared", "subtitlePrepared"],
-				allowTypo: true,
-				limit: maxResults,
-				scoreFn: a => {
-					if(a[0]){
-						var score0 = a[0].score
-						a[0].ranges = this.indexesToRanges(a[0].indexes)
-						if(a[0].indexes.length > 1){
-							var rangeAmount = a[0].ranges.length
-							var lastIdx = -3
-							a[0].ranges.forEach(range => {
-								if(range[0] - lastIdx <= 2){
-									rangeAmount--
-									score0 -= 1000
-								}
-								lastIdx = range[1]
-							})
-							var index = a[0].target.toLowerCase().indexOf(query)
-							if(index !== -1){
-								a[0].ranges = [[index, index + query.length - 1]]
-							}else if(rangeAmount > a[0].indexes.length / 2){
-								score0 = -Infinity
-								a[0].ranges = null
-							}else if(rangeAmount !== 1){
-								score0 -= 9000
-							}
-						}
-					}
-					if(a[1]){
-						var score1 = a[1].score - 1000
-						a[1].ranges = this.indexesToRanges(a[1].indexes)
-						if(a[1].indexes.length > 1){
-							var rangeAmount = a[1].ranges.length
-							var lastIdx = -3
-							a[1].ranges.forEach(range => {
-								if(range[0] - lastIdx <= 2){
-									rangeAmount--
-									score1 -= 1000
-								}
-								lastIdx = range[1]
-							})
-							var index = a[1].target.indexOf(query)
-							if(index !== -1){
-								a[1].ranges = [[index, index + query.length - 1]]
-							}else if(rangeAmount > a[1].indexes.length / 2){
-								score1 = -Infinity
-								a[1].ranges = null
-							}else if(rangeAmount !== 1){
-								score1 -= 9000
-							}
-						}
-					}
-					if(a[0]){
-						return a[1] ? Math.max(score0, score1) : score0
-					}else{
-						return a[1] ? score1 : -Infinity
-					}
-				}
-			})
-		}else{
-			results = results.map(result => {
-				return {obj: result}
-			}).slice(0, maxResults)
-		}
-
-		return results
-	}
-	
-	indexesToRanges(indexes){
-		var ranges = []
-		var range
-		indexes.forEach(idx => {
-			if(range && range[1] === idx - 1){
-				range[1] = idx
-			}else{
-				range = [idx, idx]
-				ranges.push(range)
-			}
-		})
-		return ranges
-	}
-
-	searchInput(){
-		var text = this.search.input.value
-		localStorage.setItem("lastSearchQuery", text)
-		text = text.toLowerCase()
-
-		if(text.length === 0){
-			this.setSearchTip()
-			return
-		}
-
-		var new_results = this.performSearch(text)
-
-		if (new_results.length === 0) {
-			this.setSearchTip(strings.search.noResults, true)
-			return
-		} else if (this.search.tip) {
-			this.search.tip.remove()
-			delete this.search.tip
-		}
-
-		var resultsDiv = this.search.div.querySelector(":scope #song-search-results")
-		resultsDiv.innerHTML = ""
-		this.search.results = []
-		
-		var fontSize = parseFloat(getComputedStyle(this.search.div.querySelector(":scope #song-search")).fontSize.slice(0, -2))
-		var resultsWidth = parseFloat(getComputedStyle(resultsDiv).width.slice(0, -2))
-		var vmin = Math.min(innerWidth, lastHeight) / 100
-		var courseWidth = Math.min(3 * fontSize * 1.2, 7 * vmin)
-		var resultWidth = resultsWidth - 1.8 * fontSize - 0.8 * fontSize - (courseWidth + 0.4 * fontSize * 1.2) * 5 - 0.6 * fontSize
-		
-		this.ctx.save()
-		
-		var fragment = document.createDocumentFragment()
-		new_results.forEach(result => {
-			var result = this.createSearchResult(result, resultWidth, fontSize)
-			fragment.appendChild(result)
-			this.search.results.push(result)
-		})
-		resultsDiv.appendChild(fragment)
-		
-		this.ctx.restore()
-	}
-
-	searchClick(e){
-		if((e.target.id === "song-search-container" || e.target.id === "song-search-close") && e.which === 1){
-			this.removeSearch(true)
-		}else if(e.which === 1){
-			var songEl = e.target.closest(".song-search-result")
-			if(songEl){
-				var songId = parseInt(songEl.dataset.songId)
-				this.searchProceed(songId)
-			}
-		}
-	}
-
-	searchProceed(songId){
-		var song = this.songs.find(song => song.id === songId)
-		this.removeSearch()
-		this.playBgm(false)
-
-		var songIndex = this.songs.findIndex(song => song.id === songId)
-		this.setSelectedSong(songIndex)
-		this.toSelectDifficulty()
-	}
 	
 	onusers(response){
 		var p2InSong = false
@@ -3268,17 +2702,17 @@ class SongSelect{
 							if(this.state.screen !== "difficulty"){
 								this.toSelectDifficulty({player: response.value.player})
 							}
-							this.searchEnabled = false
+							this.search.enabled = false
 							p2InSong = true
-							this.removeSearch()
+							this.search.remove()
 						}
 					}
 				}
 			})
 		}
 
-		if(!this.searchEnabled && !p2InSong){
-			this.searchEnabled = true
+		if(!this.search.enabled && !p2InSong){
+			this.search.enabled = true
 		}
 	}
 	onsongsel(response){
@@ -3404,6 +2838,7 @@ class SongSelect{
 		this.sessionCache.clean()
 		this.currentSongCache.clean()
 		this.nameplateCache.clean()
+		this.search.clean()
 		assets.sounds["bgm_songsel"].stop()
 		if(!this.bgmEnabled){
 			snd.musicGain.fadeIn()
@@ -3425,13 +2860,8 @@ class SongSelect{
 			pageEvents.remove(this.touchFullBtn, "click")
 			delete this.touchFullBtn
 		}
-		if(this.searchStyle){
-			loader.screen.removeChild(this.searchStyle)
-		}
 		delete this.selectable
 		delete this.ctx
 		delete this.canvas
-		delete this.searchContainer
-		delete this.searchStyle
 	}
 }

@@ -38,7 +38,8 @@ var assets = {
 		"customsongs.js",
 		"abstractfile.js",
 		"idb.js",
-		"plugins.js"
+		"plugins.js",
+		"search.js"
 	],
 	"css": [
 		"main.css",
@@ -50,20 +51,13 @@ var assets = {
 		"view.css",
 		"search.css"
 	],
-	"assetsCss": [
-		"img/img.css"
-	],
 	"img": [
-		"title-screen.png",
 		"notes.png",
 		"notes_drumroll.png",
 		"notes_hit.png",
 		"notes_explosion.png",
 		"balloon.png",
 		"taiko.png",
-		"dancing-don.gif",
-		"bg-pattern-1.png",
-		"difficulty.png",
 		"don_anim_normal_a.png",
 		"don_anim_normal_b1.png",
 		"don_anim_normal_b2.png",
@@ -81,24 +75,26 @@ var assets = {
 		"don_anim_clear_b2.png",
 		"fire_anim.png",
 		"fireworks_anim.png",
-		"bg_genre_def.png",
 		"bg_score_p1.png",
 		"bg_score_p2.png",
-		"bg_settings.png",
 		"bg_pause.png",
 		"badge_auto.png",
-		"touch_pause.png",
-		"touch_fullscreen.png",
-		"mimizu.png",
-		"results_flowers.png",
-		"results_mikoshi.png",
-		"results_tetsuohana.png",
-		"results_tetsuohana2.png",
-		"settings_gamepad.png",
-		"crown.png",
-		"miss.png",
-		"bg_search.png"
+		"mimizu.png"
 	],
+	"cssBackground": {
+		"#title-screen": "title-screen.png",
+		"#loading-don": "dancing-don.gif",
+		".pattern-bg": "bg-pattern-1.png",
+		".song-search-result-course::before": "difficulty.png",
+		"#song-select": "bg_genre_def.png",
+		".settings-outer": "bg_settings.png",
+		"#touch-pause-btn": "touch_pause.png",
+		"#touch-full-btn": "touch_fullscreen.png",
+		"#gamepad-bg, #gamepad-buttons": "settings_gamepad.png",
+		".song-search-result-crown": "crown.png",
+		".song-search-tip-error": "miss.png",
+		"#song-search": "bg_search.png"
+	},
 	"audioSfx": [
 		"se_pause.ogg",
 		"se_calibration.ogg",

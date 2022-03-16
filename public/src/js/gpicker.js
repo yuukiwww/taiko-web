@@ -159,7 +159,7 @@ class Gpicker{
 	}
 	clientCallback(tokenResponse){
 		this.tokenResponse = tokenResponse
-		this.oauthToken = tokenResponse.access_token
+		this.oauthToken = tokenResponse && tokenResponse.access_token
 		if(this.oauthToken && this.tokenResolve){
 			this.tokenResolve()
 		}
@@ -220,12 +220,12 @@ class Gpicker{
 			.build()
 			.setVisible(true)
 	}
-	downloadFile(id, arrayBuffer, retry){
+	downloadFile(id, responseType, retry){
 		var url = this.filesUrl + id + "?alt=media"
 		return this.queue().then(this.getToken.bind(this)).then(() =>
 			loader.ajax(url, request => {
-				if(arrayBuffer){
-					request.responseType = "arraybuffer"
+				if(responseType){
+					request.responseType = responseType
 				}
 				request.setRequestHeader("Authorization", "Bearer " + this.oauthToken)
 			}, true).then(event => {
@@ -238,7 +238,7 @@ class Gpicker{
 						var e = response.error
 						if(e && e.errors[0].reason === "authError"){
 							delete this.oauthToken
-							return this.downloadFile(id, arrayBuffer, true)
+							return this.downloadFile(id, responseType, true)
 						}else{
 							return reject()
 						}

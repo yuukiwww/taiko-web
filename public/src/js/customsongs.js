@@ -2,7 +2,7 @@ class CustomSongs{
 	constructor(...args){
 		this.init(...args)
 	}
-	init(touchEnabled, noPage){
+	init(touchEnabled, noPage, noLoading){
 		this.loaderDiv = document.createElement("div")
 		this.loaderDiv.innerHTML = assets.pages["loadsong"]
 		var loadingText = this.loaderDiv.querySelector("#loading-text")
@@ -13,6 +13,7 @@ class CustomSongs{
 		
 		if(noPage){
 			this.noPage = true
+			this.noLoading = noLoading
 			return
 		}
 		
@@ -262,11 +263,13 @@ class CustomSongs{
 		
 		var importSongs = new ImportSongs()
 		return importSongs.load(files).then(this.songsLoaded.bind(this), e => {
-			this.browse.parentNode.reset()
+			if(!this.noPage){
+				this.browse.form.reset()
+			}
 			this.locked = false
 			this.loading(false)
 			if(e === "nosongs"){
-				this.showError(strings.customSongs.noSongs)
+				this.showError(strings.customSongs.noSongs, "nosongs")
 			}else if(e !== "cancel"){
 				return Promise.reject(e)
 			}
@@ -308,7 +311,7 @@ class CustomSongs{
 			this.locked = false
 			this.loading(false)
 			if(e === "nosongs"){
-				this.showError(strings.customSongs.noSongs)
+				this.showError(strings.customSongs.noSongs, "nosongs")
 			}else if(e !== "cancel"){
 				return Promise.reject(e)
 			}
@@ -371,7 +374,7 @@ class CustomSongs{
 		open("privacy")
 	}
 	loading(show){
-		if(this.noPage){
+		if(this.noLoading){
 			return
 		}
 		if(show){
@@ -387,14 +390,16 @@ class CustomSongs{
 			assets.customSongs = true
 			assets.customSelected = this.noPage ? +localStorage.getItem("customSelected") : 0
 		}
-		if(!this.noPage){
+		if(this.noPage){
+			pageEvents.send("import-songs", length)
+		}else{
 			assets.sounds["se_don"].play()
+			setTimeout(() => {
+				new SongSelect("customSongs", false, this.touchEnabled)
+				pageEvents.send("import-songs", length)
+			}, 500)
 		}
 		this.clean()
-		setTimeout(() => {
-			new SongSelect("customSongs", false, this.touchEnabled)
-			pageEvents.send("import-songs", length)
-		}, 500)
 		return songs && songs.length
 	}
 	keyPressed(pressed, name){
@@ -474,10 +479,14 @@ class CustomSongs{
 			resolve()
 		}, 500))
 	}
-	showError(text){
+	showError(text, errorName){
 		this.locked = false
 		this.loading(false)
-		if(this.noPage || this.mode === "error"){
+		if(this.noPage){
+			var error = new Error(text)
+			error.name = errorName
+			throw error
+		}else if(this.mode === "error"){
 			return
 		}
 		this.mode = "error"

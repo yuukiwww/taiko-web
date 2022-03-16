@@ -26,6 +26,8 @@
     padding: 1em 1em 0 1em;
     z-index: 1;
     box-sizing: border-box;
+    background-size: auto, 3.12em;
+    background-position: 0%, -2%;
 }
 
 #song-search-container.touch-enabled{
@@ -96,6 +98,7 @@
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
+    border: 0.4em solid;
 }
 
 .song-search-result:last-of-type {
@@ -133,6 +136,7 @@
     content: attr(alt);
     position: absolute;
     z-index: -1;
+    -webkit-text-stroke-width: 0.4em;
 }
 
 .song-search-result-course {
