@@ -2,8 +2,6 @@
 set -euo pipefail
 
 sudo apt update
-sudo apt upgrade -y
-
 sudo apt install -y git python3-pip python3-virtualenv nginx ffmpeg redis supervisor
 
 if [[ -r /etc/os-release ]]; then
@@ -57,7 +55,7 @@ sudo service supervisor restart
 sudo systemctl enable mongod.service
 sudo service mongod start
 
-IP="$(dig +short txt ch whoami.cloudflare @1.0.0.1)"
+IP=$(dig +short txt ch whoami.cloudflare @1.0.0.1)
 echo
 echo "Setup complete! You should be able to access your taiko-web instance at http://$IP"
 echo
