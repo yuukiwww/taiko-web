@@ -55,7 +55,7 @@ sudo service supervisor restart
 sudo systemctl enable mongod.service
 sudo service mongod start
 
-IP=$(dig +short txt ch whoami.cloudflare @1.0.0.1)
+IP=$(dig +short txt ch whoami.cloudflare @1.0.0.1 | tr -d '"')
 echo
 echo "Setup complete! You should be able to access your taiko-web instance at http://$IP"
 echo
