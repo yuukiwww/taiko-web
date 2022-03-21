@@ -2,7 +2,7 @@
 set -euo pipefail
 
 sudo apt update
-sudo apt install -y git python3-pip python3-virtualenv nginx ffmpeg redis supervisor
+sudo apt install -y git python3-pip python3-virtualenv python3-venv nginx ffmpeg redis supervisor
 
 if [[ -r /etc/os-release ]]; then
     . /etc/os-release
@@ -45,7 +45,8 @@ sudo sed -i 's/^\(\s\{0,\}\)\(include \/etc\/nginx\/sites-enabled\/\*;\)$/\1#\2/
 sudo sed -i 's/}/    application\/wasm wasm;\n}/g' /etc/nginx/mime.types
 sudo nginx -s reload
 
-virtualenv -p python3 .venv
+python3 -m venv .venv
+.venv/bin/pip install --upgrade pip wheel setuptools
 .venv/bin/pip install -r requirements.txt
 
 sudo mkdir -p /var/log/taiko-web
