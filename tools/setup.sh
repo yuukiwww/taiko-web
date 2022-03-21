@@ -4,11 +4,14 @@ set -euo pipefail
 sudo apt update
 sudo apt upgrade -y
 
-sudo apt install -y unzip git python3-pip python3-virtualenv nginx ffmpeg redis supervisor
+sudo apt install -y git python3-pip python3-virtualenv nginx ffmpeg redis supervisor
 
 if [[ -r /etc/os-release ]]; then
     . /etc/os-release
     if [[ $ID = ubuntu ]]; then
+        if [[ $VERSION_CODENAME = impish ]]; then
+            VERSION_CODENAME=focal # MongoDB does not provide packages for Ubuntu 21.10
+        fi
         REPO="https://repo.mongodb.org/apt/ubuntu $VERSION_CODENAME/mongodb-org/5.0 multiverse"
     elif [[ $ID = debian ]]; then
         if [[ $VERSION_CODENAME = bullseye ]]; then
