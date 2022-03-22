@@ -217,15 +217,18 @@ class SettingsView{
 	constructor(...args){
 		this.init(...args)
 	}
-	init(touchEnabled, tutorial, songId, toSetting, settingsItems){
+	init(touchEnabled, tutorial, songId, toSetting, settingsItems, noSoundStart){
 		this.touchEnabled = touchEnabled
 		this.tutorial = tutorial
 		this.songId = songId
 		this.customSettings = !!settingsItems
 		this.settingsItems = settingsItems || settings.items
+		this.locked = false
 		
 		loader.changePage("settings", tutorial)
-		assets.sounds["bgm_settings"].playLoop(0.1, false, 0, 1.392, 26.992)
+		if(!noSoundStart){
+			assets.sounds["bgm_settings"].playLoop(0.1, false, 0, 1.392, 26.992)
+		}
 		this.defaultButton = document.getElementById("settings-default")
 		this.viewOuter = this.getElement("view-outer")
 		if(touchEnabled){
@@ -377,16 +380,46 @@ class SettingsView{
 			this.items.push(outputObject)
 			this.getValue(i, valueDiv)
 		}
-		this.items.push({
-			id: "default",
-			settingBox: this.defaultButton
-		})
-		this.addTouch(this.defaultButton, this.defaultSettings.bind(this))
+		var selectBack = this.items.length === 0
+		if(this.customSettings){
+			var form = document.createElement("form")
+			this.browse = document.createElement("input")
+			this.browse.id = "plugin-browse"
+			this.browse.type = "file"
+			this.browse.multiple = true
+			this.browse.accept = ".taikoweb.js"
+			pageEvents.add(this.browse, "change", this.browseChange.bind(this))
+			form.appendChild(this.browse)
+			this.browseButton = document.createElement("div")
+			this.browseButton.classList.add("taibtn", "stroke-sub", "plugin-browse-button")
+			this.browseText = document.createTextNode("")
+			this.browseButton.appendChild(this.browseText)
+			this.browseButton.appendChild(form)
+			this.defaultButton.parentNode.insertBefore(this.browseButton, this.defaultButton)
+			this.items.push({
+				id: "browse",
+				settingBox: this.browseButton
+			})
+		}
+		this.showDefault = !this.customSettings || plugins.allPlugins.filter(obj => obj.plugin.imported).length
+		if(this.showDefault){
+			this.items.push({
+				id: "default",
+				settingBox: this.defaultButton
+			})
+			this.addTouch(this.defaultButton, this.defaultSettings.bind(this))
+		}else{
+			this.defaultButton.parentNode.removeChild(this.defaultButton)
+		}
 		this.items.push({
 			id: "back",
 			settingBox: this.endButton
 		})
 		this.addTouch(this.endButton, this.onEnd.bind(this))
+		if(selectBack){
+			this.selected = this.items.length - 1
+			this.endButton.classList.add("selected")
+		}
 		
 		if(!this.customSettings){
 			this.gamepadSettings = document.getElementById("settings-gamepad")
@@ -606,6 +639,9 @@ class SettingsView{
 		valueDiv.innerText = value
 	}
 	setValue(name){
+		if(this.locked){
+			return
+		}
 		var promise
 		var current = this.settingsItems[name]
 		if(current.getItem){
@@ -674,6 +710,9 @@ class SettingsView{
 		})
 	}
 	keyPressed(pressed, name, event, repeat){
+		if(this.locked){
+			return
+		}
 		if(pressed){
 			if(!this.pressedKeys[name]){
 				this.pressedKeys[name] = this.getMS() + 300
@@ -693,6 +732,11 @@ class SettingsView{
 					this.onEnd()
 				}else if(selected.id === "default"){
 					this.defaultSettings()
+				}else if(selected.id === "browse"){
+					if(event){
+						this.playSound("se_don")
+						this.browse.click()
+					}
 				}else{
 					this.setValue(selected.id)
 				}
@@ -700,7 +744,7 @@ class SettingsView{
 				selected.settingBox.classList.remove("selected")
 				do{
 					this.selected = this.mod(this.items.length, this.selected + ((name === "right" || name === "down") ? 1 : -1))
-				}while(this.items[this.selected].id === "default" && name !== "left")
+				}while((this.items[this.selected].id === "default" || this.items[this.selected].id === "browse") && name !== "left")
 				selected = this.items[this.selected]
 				selected.settingBox.classList.add("selected")
 				this.scrollTo(selected.settingBox)
@@ -1027,7 +1071,9 @@ class SettingsView{
 	defaultSettings(){
 		if(this.customSettings){
 			plugins.unloadImported()
-			return this.onEnd()
+			this.clean(true)
+			this.playSound("se_don")
+			return setTimeout(() => this.restart(), 500)
 		}
 		if(this.mode === "keyboard"){
 			this.keyboardBack(this.items[this.selected])
@@ -1046,6 +1092,31 @@ class SettingsView{
 		this.drumSounds = settings.getItem("latency").drumSounds
 		this.playSound("se_don")
 	}
+	browseChange(event){
+		this.locked = true
+		var files = []
+		for(var i = 0; i < event.target.files.length; i++){
+			files.push(new LocalFile(event.target.files[i]))
+		}
+		var customSongs = new CustomSongs(this.touchEnabled, true)
+		customSongs.importLocal(files).then(() => {
+			this.clean(true)
+			return this.restart()
+		}).catch(e => {
+			if(e){
+				var message = e.message
+				if(e.name === "nosongs"){
+					message = strings.plugins.noPlugins
+				}
+				if(message){
+					alert(message)
+				}
+			}
+			this.locked = false
+			this.browse.form.reset()
+			return Promise.resolve()
+		})
+	}
 	onEnd(){
 		if(this.mode === "number"){
 			this.numberBack(this.items[this.selected])
@@ -1062,6 +1133,12 @@ class SettingsView{
 				new SongSelect(this.tutorial ? false : this.customSettings ? "plugins" : "settings", false, this.touched, this.songId)
 			}
 		}, 500)
+	}
+	restart(){
+		if(this.mode === "number"){
+			this.numberBack(this.items[this.selected])
+		}
+		return new SettingsView(this.touchEnabled, this.tutorial, this.songId, undefined, this.customSettings ? plugins.getSettings() : undefined, true)
 	}
 	getLocalTitle(title, titleLang){
 		if(titleLang){
@@ -1109,14 +1186,19 @@ class SettingsView{
 	setStrings(){
 		this.setAltText(this.viewTitle, this.customSettings ? strings.plugins.title : strings.gameSettings)
 		this.setAltText(this.endButton, strings.settings.ok)
-		if(!this.customSettings){
+		if(this.customSettings){
+			this.browseText.data = strings.plugins.browse
+			this.browseButton.setAttribute("alt", strings.plugins.browse)
+		}else{
 			this.setAltText(this.gamepadTitle, strings.settings.gamepadLayout.name)
 			this.setAltText(this.gamepadEndButton, strings.settings.ok)
 			this.setAltText(this.latencyTitle, strings.settings.latency.name)
 			this.setAltText(this.latencyDefaultButton, strings.settings.default)
 			this.setAltText(this.latencyEndButton, strings.settings.ok)
 		}
-		this.setAltText(this.defaultButton, this.customSettings ? strings.plugins.unloadAll : strings.settings.default)
+		if(this.showDefault){
+			this.setAltText(this.defaultButton, this.customSettings ? strings.plugins.unloadAll : strings.settings.default)
+		}
 	}
 	setAltText(element, text){
 		element.innerText = text
@@ -1154,11 +1236,13 @@ class SettingsView{
 	getMS(){
 		return Date.now()
 	}
-	clean(){
+	clean(noSoundStop){
 		this.redrawRunning = false
 		this.keyboard.clean()
 		this.gamepad.clean()
-		assets.sounds["bgm_settings"].stop()
+		if(!noSoundStop){
+			assets.sounds["bgm_settings"].stop()
+		}
 		pageEvents.remove(window, ["mouseup", "touchstart", "touchmove", "touchend", "blur"], this.windowSymbol)
 		if(this.customSettings){
 			pageEvents.remove(window, "language-change", this.windowSymbol)
@@ -1176,7 +1260,12 @@ class SettingsView{
 		if(this.defaultButton){
 			delete this.defaultButton
 		}
-		if(!this.customSettings){
+		if(this.customSettings){
+			pageEvents.remove(this.browse, "change")
+			delete this.browse
+			delete this.browseButton
+			delete this.browseText
+		}else{
 			this.removeTouch(this.gamepadSettings)
 			this.removeTouch(this.gamepadEndButton)
 			this.removeTouch(this.gamepadBox)
@@ -1204,8 +1293,12 @@ class SettingsView{
 		delete this.latencyEndButton
 		if(this.resolution !== settings.getItem("resolution")){
 			for(var i in assets.image){
-				if(i === "touch_drum" || i.startsWith("bg_song_") || i.startsWith("bg_stage_") || i.startsWith("bg_don_")){
-					URL.revokeObjectURL(assets.image[i].src)
+				if(i === "touch_drum" || i.startsWith("bg_song_") || i.startsWith("bg_stage_") || i.startsWith("bg_don_") || i.startsWith("results_")){
+					var img = assets.image[i]
+					URL.revokeObjectURL(img.src)
+					if(img.parentNode){
+						img.parentNode.removeChild(img)
+					}
 					delete assets.image[i]
 				}
 			}

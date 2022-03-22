@@ -1331,6 +1331,17 @@ var translations = {
 		version: {
 			ja: "Ver. %s",
 			en: "Version %s"
+		},
+		browse: {
+			ja: "参照する…",
+			en: "Browse...",
+			cn: "浏览…",
+			tw: "開啟檔案…",
+			ko: "찾아보기…"
+		},
+		noPlugins: {
+			ja: null,
+			en: "No .taikoweb.js plugin files have been found in the provided file list."
 		}
 	},
 	search: {

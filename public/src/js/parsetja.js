@@ -67,13 +67,15 @@
 				if((name === "start" || name === "start p1") && !inSong){
 					
 					inSong = true
-					if(!hasSong){
+					if(!hasSong || name === "start" && courses[courseName] && courses[courseName].startName !== "start"){
+						hasSong = false
 						if(!(courseName in courses)){
 							courses[courseName] = {}
 						}
-						for(var name in currentCourse){
-							if(name !== "branch"){
-								courses[courseName][name] = currentCourse[name]
+						courses[courseName].startName = name
+						for(var opt in currentCourse){
+							if(opt !== "branch"){
+								courses[courseName][opt] = currentCourse[opt]
 							}
 						}
 						courses[courseName].start = lineNum + 1
