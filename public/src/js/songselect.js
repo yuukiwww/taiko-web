@@ -94,12 +94,14 @@ class SongSelect{
 		
 		this.font = strings.font
 		
+		this.search = new Search(this)
+
 		this.songs = []
 		for(let song of assets.songs){
 			var title = this.getLocalTitle(song.title, song.title_lang)
-			song.titlePrepared = title ? fuzzysort.prepare(title.normalize("NFD").replace(/[\u0300-\u036f]/g, "")) : null
+			song.titlePrepared = title ? fuzzysort.prepare(this.search.normalizeString(title)) : null
 			var subtitle = this.getLocalTitle(title === song.title ? song.subtitle : "", song.subtitle_lang)
-			song.subtitlePrepared = subtitle ? fuzzysort.prepare(subtitle.normalize("NFD").replace(/[\u0300-\u036f]/g, "")) : null
+			song.subtitlePrepared = subtitle ? fuzzysort.prepare(this.search.normalizeString(subtitle)) : null
 			this.songs.push(this.addSong(song))
 		}
 		this.songs.sort((a, b) => {
@@ -228,7 +230,6 @@ class SongSelect{
 		this.currentSongCache = new CanvasCache(noSmoothing)
 		this.nameplateCache = new CanvasCache(noSmoothing)
 		
-		this.search = new Search(this)
 		
 		this.difficulty = [strings.easy, strings.normal, strings.hard, strings.oni]
 		this.difficultyId = ["easy", "normal", "hard", "oni", "ura"]
