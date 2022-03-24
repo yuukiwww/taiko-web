@@ -9,6 +9,7 @@ import sys
 
 parser = argparse.ArgumentParser(description='Run the taiko-web multiplayer server.')
 parser.add_argument('port', type=int, metavar='PORT', nargs='?', default=34802, help='Port to listen on.')
+parser.add_argument('-b', '--bind-address', default='localhost', help='Bind server to address.')
 parser.add_argument('-o', '--allow-origin', action='append', help='Limit incoming connections to the specified origin. Can be specified multiple times.')
 args = parser.parse_args()
 
@@ -382,7 +383,7 @@ port = args.port
 print('Starting server on port %d' % port)
 loop = asyncio.get_event_loop()
 tasks = asyncio.gather(
-	websockets.serve(connection, "localhost", port, origins=args.allow_origin)
+	websockets.serve(connection, args.bind_address, port, origins=args.allow_origin)
 )
 try:
 	loop.run_until_complete(tasks)

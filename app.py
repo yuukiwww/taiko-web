@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import base64
 import bcrypt
 import hashlib
@@ -22,6 +23,12 @@ from flask_wtf.csrf import CSRFProtect, generate_csrf, CSRFError
 from ffmpy import FFmpeg
 from pymongo import MongoClient
 from redis import Redis
+
+parser = argparse.ArgumentParser(description='Run the taiko-web development server.')
+parser.add_argument('port', type=int, metavar='PORT', nargs='?', default=34801, help='Port to listen on.')
+parser.add_argument('-b', '--bind-address', default='localhost', help='Bind server to address.')
+parser.add_argument('-d', '--debug', action='store_true', help='Enable debug mode.')
+args = parser.parse_args()
 
 def take_config(name, required=False):
     if hasattr(config, name):
@@ -717,4 +724,5 @@ if __name__ == '__main__':
     def send_assets(path):
         return send_from_directory('public/assets', path)
 
-    app.run(port=34801)
+    app.run(host=args.bind_address, port=args.port, debug=args.debug)
+
