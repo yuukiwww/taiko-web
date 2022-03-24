@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
 
+import argparse
 import asyncio
 import websockets
 import json
 import random
 import sys
+
+parser = argparse.ArgumentParser(description='Run the taiko-web multiplayer server.')
+parser.add_argument('port', type=int, metavar='PORT', nargs='?', default=34802, help='Port to listen on.')
+parser.add_argument('-o', '--allow-origin', action='append', help='Limit incoming connections to the specified origin. Can be specified multiple times.')
+args = parser.parse_args()
 
 server_status = {
 	"waiting": {},
@@ -372,11 +378,11 @@ async def connection(ws, path):
 		elif user["action"] == "invite" and user["session"] in server_status["invites"]:
 			del server_status["invites"][user["session"]]
 
-port = int(sys.argv[1]) if len(sys.argv) > 1 else 34802
+port = args.port
 print('Starting server on port %d' % port)
 loop = asyncio.get_event_loop()
 tasks = asyncio.gather(
-	websockets.serve(connection, "localhost", port)
+	websockets.serve(connection, "localhost", port, origins=args.allow_origin)
 )
 try:
 	loop.run_until_complete(tasks)

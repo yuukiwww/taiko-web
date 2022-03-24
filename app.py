@@ -135,7 +135,8 @@ def get_config(credentials=False):
         'accounts': take_config('ACCOUNTS'),
         'custom_js': take_config('CUSTOM_JS'),
         'plugins': take_config('PLUGINS') and [x for x in take_config('PLUGINS') if x['url']],
-        'preview_type': take_config('PREVIEW_TYPE') or 'mp3'
+        'preview_type': take_config('PREVIEW_TYPE') or 'mp3',
+        'multiplayer_url': take_config('MULTIPLAYER_URL')
     }
     if credentials:
         google_credentials = take_config('GOOGLE_CREDENTIALS')
