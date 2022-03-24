@@ -128,13 +128,15 @@ class SongSelect{
 				skin: this.songSkin.random,
 				action: "random",
 				category: strings.random,
-				canJump: true
+				canJump: true,
+				p2Enabled: true
 			})
 			this.songs.push({
 				title: strings.search.search,
 				skin: this.songSkin.search,
 				action: "search",
 				category: strings.random,
+				p2Enabled: true
 			})
 		}
 		if(touchEnabled){
@@ -419,7 +421,7 @@ class SongSelect{
 				this.showWarning = false
 			}
 		}else if(this.search.opened){
-			this.search.keyPress(pressed, name, event, repeat)
+			this.search.keyPress(pressed, name, event, repeat, ctrl)
 		}else if(this.state.screen === "song"){
 			if(event && event.keyCode && event.keyCode === 70 && ctrl){
 				this.search.display()
@@ -738,7 +740,7 @@ class SongSelect{
 	
 	toSelectDifficulty(fromP2, playVoice=true){
 		var currentSong = this.songs[this.selectedSong]
-		if(p2.session && !fromP2 && currentSong.action !== "random"){
+		if(p2.session && !fromP2 && (!currentSong.action || !currentSong.p2Enabled)){
 			if(this.songs[this.selectedSong].courses){
 				if(!this.state.selLock){
 					this.state.selLock = true
@@ -1390,7 +1392,7 @@ class SongSelect{
 					y: songTop,
 					song: this.songs[index],
 					highlight: highlight,
-					disabled: p2.session && this.songs[index].action && this.songs[index].action !== "random"
+					disabled: p2.session && this.songs[index].action && !this.songs[index].p2Enabled
 				})
 			}
 			var startFrom
@@ -1415,7 +1417,7 @@ class SongSelect{
 					y: songTop,
 					song: this.songs[index],
 					highlight: highlight,
-					disabled: p2.session && this.songs[index].action && this.songs[index].action !== "random"
+					disabled: p2.session && this.songs[index].action && !this.songs[index].p2Enabled
 				})
 			}
 		}
@@ -1473,7 +1475,7 @@ class SongSelect{
 			animateMS: Math.max(this.state.moveMS, this.state.mouseMoveMS),
 			cached: selectedWidth === this.songAsset.fullWidth ? 3 : (selectedWidth === this.songAsset.selectedWidth ? 2 : (selectedWidth === this.songAsset.width ? 1 : 0)),
 			frameCache: this.songFrameCache,
-			disabled: p2.session && currentSong.action && currentSong.action !== "random",
+			disabled: p2.session && currentSong.action && !currentSong.p2Enabled,
 			innerContent: (x, y, w, h) => {
 				ctx.strokeStyle = "#000"
 				if(screen === "title" || screen === "titleFadeIn" || screen === "song"){
@@ -2755,6 +2757,7 @@ class SongSelect{
 						this.setSelectedSong(song)
 						this.state.move = 0
 						if(this.state.screen !== "difficulty"){
+							this.playBgm(false)
 							this.toSelectDifficulty({player: response.value.player})
 						}
 					}

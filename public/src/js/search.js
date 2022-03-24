@@ -587,7 +587,7 @@ class Search{
 		}
 	}
 	
-	keyPress(pressed, name, event, repeat){
+	keyPress(pressed, name, event, repeat, ctrl){
 		if(name === "back" || (event && event.keyCode && event.keyCode === 70 && ctrl)) {
 			this.remove(true)
 			if(event){
