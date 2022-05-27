@@ -885,13 +885,13 @@ var translations = {
 				ja: "背景で鳴っている音を聴いてみましょう。\n\n音が聞こえたら、太鼓の面（%sまたは%s）をたたこう！",
 				en: "Listen to a sound playing in the background.\n\nHit the surface of the drum (%s or %s) as you hear it!",
 				tw: "仔細聆聽背景播放的音效。\n\n聽到音效就敲打鼓面 (%s 或 %s)！",
-				ko: "소리에 맞춰 북(%s나 %s)을 쳐주세요!"
+				ko: "배경에서 들리는 소리에 귀를 기울여주세요.\n\n소리가 들리면 북(%s 나 %s)을 쳐주세요!"
 			},
 			contentAlt: {
 				ja: "背景で鳴っている音を聴いてみましょう。\n\n音が聞こえたら、太鼓の面をたたこう！",
 				en: "Listen to a sound playing in the background.\n\nHit the surface of the drum as you hear it!",
 				tw: "仔細聆聽背景播放的音效。\n\n聽到音效就敲打鼓面！",
-				ko: "소리에 맞춰 북을 쳐주세요!"
+				ko: "배경에서 들리는 소리에 귀를 기울여주세요.\n\n소리가 들리면 북을 쳐주세요!"
 			}
 		},
 		audioComplete: {
@@ -931,7 +931,7 @@ var translations = {
 				ja: "オーディオ・レイテンシー: %s\nビデオ・レイテンシ: %s\n\nこれらのレイテンシーの値は、設定で設定することができます。",
 				en: "Audio latency: %s\nVideo latency: %s\n\nYou can configure these latency values in the settings.",
 				tw: "聲音延遲 :%s\n畫面延遲: %s\n\n您可以在設定中調整這些數值。",
-				ko: "오디오 레이턴시: %s\n 레이턴시: %s\n설정에서 레이턴시 값들을 조절할 수 있습니다."
+				ko: "오디오 레이턴시: %s\n비디오 레이턴시: %s\n\n설정에서 레이턴시 값들을 조절할 수 있습니다."
 			}
 		}
 	},
@@ -1178,7 +1178,7 @@ var translations = {
 			ja: "このパスワードは使用できません。新しいパスワードが6文字以上であることを確認してください",
 			en: "Cannot use this password, please check that your new password is at least 6 characters long",
 			tw: "無法使用此密碼，您的新密碼長度至少要 6 個字",
-			ko: "해당 비밀번호를 사용할 수 없습니다. 비밀번호가 6자를 넘어가도록 설정하시기 바랍니다."
+			ko: "해당 비밀번호를 사용할 수 없습니다. 비밀번호가 6자 이상인지 확인해주시기 바랍니다."
 		},
 		verify_password_invalid: {
 			ja: "確認用パスワードが一致しない",
@@ -1371,7 +1371,7 @@ var translations = {
 		warning: {
 			ja: "%sを読み込もうとしています。プラグインは信頼できる場合のみ読み込むようにしてください。続行しますか？",
 			en: "You are about to load %s. Plugins should only be loaded if you trust them. Continue?",
-			ko: "%s를 로드하려고 합니다. 신뢰할 수 있는 플러그인만 로드하시기 바랍니다. 계속할까요?"
+			ko: "%s을 로드하려고 합니다. 신뢰할 수 있는 플러그인만 로드하시기 바랍니다. 계속할까요?"
 		},
 		plugin: {
 			ja: {
@@ -1464,7 +1464,7 @@ var translations = {
 				"\"ura:1-5\" 같은 키워드로 여러 난이도를 선택할 수 있어요!",
 				"풀 콤보한 곡을 찾아보고 싶나요? \"gold:any\", \"gold:oni\" 등의 키워드로 검색할 수 있습니다!",
 				"창작 채보 곡들을 검색하고 싶나요? \"creative:yes\" 키워드를 사용하세요!",
-				"\"lyrics:yes\" 키워드로 가사가 있는 곡들을 선택할 수 있어요!!",
+				"\"lyrics:yes\" 키워드로 가사가 있는 곡들을 선택할 수 있어요!",
 				"새로운 곡들을 플레이해보고 싶나요? \"played:no\" 키워드로 아직 플레이하지 않은 곡들만을 볼 수 있어요!",
 				"특정 창작자가 만든 채보를 검색하고 싶으신가요? \"maker:<창작자 이름>\" 키워드를 사용하세요!"
 			]
