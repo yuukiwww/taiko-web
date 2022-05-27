@@ -221,7 +221,7 @@ var translations = {
 	accessNotGrantedError: {
 		ja: "ファイルへのアクセス権が拒否されました",
 		en: "Permission to access the file was not granted",
-		ko: "파일에 할 수 있는 권한이 부여되지 않았습니다."
+		ko: "파일에 접근할 수 있는 권한이 부여되지 않았습니다."
 	},
 	loading: {
 		ja: "ロード中...",
@@ -1305,7 +1305,8 @@ var translations = {
 		importError: {
 			ja: "インポートエラー",
 			en: "Import Error",
-			tw: "匯入失敗"
+			tw: "匯入失敗",
+			ko: "불러오기 오류"
 		},
 		noSongs: {
 			ja: "提供されたフォルダーに太鼓譜面ファイルは見つかりませんでした。",
