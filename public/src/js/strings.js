@@ -1135,7 +1135,7 @@ var translations = {
 		invalid_username: {
 			ja: "ユーザー名が無効です。ユーザー名には、文字、数字、アンダースコアのみを使用でき、3文字以上20文字以下である必要があります。",
 			en: "Invalid username, a username can only contain letters, numbers, and underscores, and must be between 3 and 20 characters long",
-			tw: "使用者名稱無效，使用者名稱只能由字母、數字、及底線組成，且長度必須介於 3 到 20 個字之間".
+			tw: "使用者名稱無效，使用者名稱只能由字母、數字、及底線組成，且長度必須介於 3 到 20 個字之間",
 			ko: "유효하지 않은 아이디. 아이디에는 글자, 숫자, 밑줄만 들어갈 수 있으며, 길이는 3자와 20자 사이여야 합니다."
 		},
 		username_in_use: {
