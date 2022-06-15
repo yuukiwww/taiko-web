@@ -67,13 +67,13 @@ class Gamepad{
 					force.lsd = force.lsd || axes[1] >= 0.5
 				}
 				if(axes.length >= 10){
-					// TaTaCon left D-Pad
+					// TaTaCon left D-Pad, DualSense D-Pad
 					for(var pov = 0; pov < 8; pov++){
 						if(Math.abs(axes[9] - (pov / 3.5 - 1)) <= 0.01){
-							force.lsu = force.lsu || pov === 7 || pov === 0 || pov === 1
-							force.lsr = force.lsr || pov === 1 || pov === 2 || pov === 3
-							force.lsd = force.lsd || pov === 3 || pov === 4 || pov === 5
-							force.lsl = force.lsl || pov === 5 || pov === 6 || pov === 7
+							force.u = force.u || pov === 7 || pov === 0 || pov === 1
+							force.r = force.r || pov === 1 || pov === 2 || pov === 3
+							force.d = force.d || pov === 3 || pov === 4 || pov === 5
+							force.l = force.l || pov === 5 || pov === 6 || pov === 7
 							break
 						}
 					}
