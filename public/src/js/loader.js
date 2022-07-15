@@ -9,6 +9,7 @@ class Loader{
 		this.screen = document.getElementById("screen")
 		this.startTime = Date.now()
 		this.errorMessages = []
+		this.songSearchGradient = "linear-gradient(to top, rgba(245, 246, 252, 0.08), #ff5963), "
 		
 		var promises = []
 		
@@ -105,7 +106,7 @@ class Loader{
 					if(selector === ".pattern-bg"){
 						loader.screen.style.backgroundImage = "url(\"" + blobUrl + "\")"
 					}else if(selector === "#song-search"){
-						gradient = "linear-gradient(to top, rgba(245, 246, 252, 0.08), #ff5963), "
+						gradient = this.songSearchGradient
 					}
 					css.push(this.cssRuleset({
 						[selector]: {
@@ -377,9 +378,9 @@ class Loader{
 								plugin.loadErrors = true
 								promises.push(plugin.load(true).then(() => {
 									if(obj.start){
-										plugin.start()
+										return plugin.start(false, true)
 									}
-								}, response => {
+								}).catch(response => {
 									return this.errorMsg(response, obj.url)
 								}))
 							}
@@ -394,14 +395,14 @@ class Loader{
 					this.callback(songId)
 					this.ready = true
 					pageEvents.send("ready", readyEvent)
-				}, () => this.errorMsg())
-			}, () => this.errorMsg())
+				}, e => this.errorMsg(e))
+			}, e => this.errorMsg(e))
 		})
 	}
 	addPromise(promise, url){
 		this.promises.push(promise)
 		promise.then(this.assetLoaded.bind(this), response => {
-			this.errorMsg(response, url)
+			return this.errorMsg(response, url)
 		})
 	}
 	soundUrl(name){
@@ -417,9 +418,20 @@ class Loader{
 		return name.slice(0, name.lastIndexOf("."))
 	}
 	errorMsg(error, url){
+		var rethrow
 		if(url || error){
+			if(typeof error === "object" && error.constructor === Error){
+				rethrow = error
+				error = error.stack || ""
+				var index = error.indexOf("\n    ")
+				if(index !== -1){
+					error = error.slice(0, index)
+				}
+			}else if(Array.isArray(error)){
+				error = error[0]
+			}
 			if(url){
-				error = (Array.isArray(error) ? error[0] + ": " : (error ? error + ": " : "")) + url
+				error = (error ? error + ": " : "") + url
 			}
 			this.errorMessages.push(error)
 			pageEvents.send("loader-error", url || error)
@@ -495,7 +507,10 @@ class Loader{
 		}
 		var percentage = Math.floor(this.loadedAssets * 100 / (this.promises.length + this.afterJSCount))
 		this.errorTxt.element[this.errorTxt.method] = "```\n" + this.errorMessages.join("\n") + "\nPercentage: " + percentage + "%\n```"
-		return Promise.reject(error)
+		if(rethrow || error){
+			console.error(rethrow || error)
+		}
+		return Promise.reject()
 	}
 	assetLoaded(){
 		if(!this.error){

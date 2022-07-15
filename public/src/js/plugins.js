@@ -373,6 +373,7 @@ class PluginLoader{
 				}
 			}, e => {
 				this.error()
+				plugins.remove(this.name)
 				if(e.name === "SyntaxError"){
 					var error = new SyntaxError()
 					error.stack = "Error in plugin syntax: " + this.name + "\n" + e.stack
@@ -388,7 +389,7 @@ class PluginLoader{
 			})
 		}
 	}
-	start(orderChange){
+	start(orderChange, startErrors){
 		if(!orderChange){
 			plugins.startOrder.push(this.name)
 		}
@@ -403,10 +404,15 @@ class PluginLoader{
 						this.module.start()
 					}
 				}catch(e){
+					this.error()
 					var error = new Error()
 					error.stack = "Error in plugin start: " + this.name + "\n" + e.stack
-					console.error(error)
-					this.error()
+					if(startErrors){
+						return Promise.reject(error)
+					}else{
+						console.error(error)
+						return Promise.resolve()
+					}
 				}
 			}
 		})

@@ -14,6 +14,10 @@ function browserSupport(){
 			eval("class a{}")
 			return true
 		},
+		"Class field declarations": function(){
+			eval("class a{a=1}")
+			return true
+		},
 		"Array.find": function(){
 			return "find" in Array.prototype && "findIndex" in Array.prototype
 		},

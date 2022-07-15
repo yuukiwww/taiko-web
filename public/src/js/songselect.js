@@ -412,7 +412,7 @@ class SongSelect{
 		if(name === "ctrl" || name === "shift" || !this.redrawRunning){
 			return
 		}
-		var ctrl = this.pressedKeys["ctrl"] || this.pressedKeys["ctrlGamepad"]
+		var ctrl = event ? event.ctrlKey : (this.pressedKeys["ctrl"] || this.pressedKeys["ctrlGamepad"])
 		var shift = event ? event.shiftKey : this.pressedKeys["shift"]
 		if(this.state.showWarning){
 			if(name === "confirm"){
@@ -1076,12 +1076,13 @@ class SongSelect{
 			this.selectableText = ""
 			
 			if(this.search.opened && this.search.container){
-				this.search.onInput()
+				this.search.onInput(true)
 			}
 		}else if(!document.hasFocus() && !p2.session){
 			if(this.state.focused){
 				this.state.focused = false
 				this.songSelect.classList.add("unfocused")
+				this.pressedKeys = {}
 			}
 			return
 		}else{
@@ -2046,7 +2047,8 @@ class SongSelect{
 						fontSize: 40,
 						fontFamily: this.font,
 						selectable: this.selectable,
-						selectableScale: this.ratio / this.pixelRatio
+						selectableScale: this.ratio / this.pixelRatio,
+						selectableX: Math.max(0, innerWidth / 2 - lastHeight * 16 / 9)
 					})
 					this.selectable.style.display = ""
 					this.selectableText = currentSong.title

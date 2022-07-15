@@ -49,9 +49,7 @@ class Search{
 		var results = []
 		var filters = {}
 		
-		var querySplit = query.split(" ")
-		var editedSplit = query.split(" ")
-		querySplit.forEach(word => {
+		var querySplit = query.split(" ").filter(word => {
 			if(word.length > 0){
 				var parts = word.toLowerCase().split(":")
 				if(parts.length > 1){
@@ -82,19 +80,23 @@ class Search{
 						case "maker":
 						case "diverge":
 						case "random":
+						case "all":
 							filters[parts[0]] = parts[1]
 							break
+						default:
+							return true
 					}
-					
-					editedSplit.splice(editedSplit.indexOf(word), 1)
+					return false
 				}
 			}
+			return true
 		})
 		
-		query = this.normalizeString(editedSplit.join(" ").trim())
+		query = this.normalizeString(querySplit.join(" ").trim())
 		
 		var totalFilters = Object.keys(filters).length
 		var random = false
+		var allResults = false
 		for(var i = 0; i < assets.songs.length; i++){
 			var song = assets.songs[i]
 			var passedFilters = 0
@@ -169,6 +171,12 @@ class Search{
 							passedFilters++
 						}
 						break
+					case "all":
+						if(value === "yes" || value === "no"){
+							allResults = value === "yes"
+							passedFilters++
+						}
+						break
 				}
 			})
 			
@@ -177,7 +185,7 @@ class Search{
 			}
 		}
 		
-		var maxResults = totalFilters > 0 && !query ? 100 : 50
+		var maxResults = allResults ? Infinity : (totalFilters > 0 && !query ? 100 : 50)
 		
 		if(query){
 			results = fuzzysort.go(query, results, {
@@ -233,6 +241,15 @@ class Search{
 							}
 						}
 					}
+					if(random){
+						var rand = Math.random() * -9000
+						if(score0 !== -Infinity){
+							score0 = rand
+						}
+						if(score1 !== -Infinity){
+							score1 = rand
+						}
+					}
 					if(a[0]){
 						return a[1] ? Math.max(score0, score1) : score0
 					}else{
@@ -241,17 +258,17 @@ class Search{
 				}
 			})
 		}else{
+			if(random){
+				for(var i = results.length - 1; i > 0; i--){
+					var j = Math.floor(Math.random() * (i + 1))
+					var temp = results[i]
+					results[i] = results[j]
+					results[j] = temp
+				}
+			}
 			results = results.slice(0, maxResults).map(result => {
 				return {obj: result}
 			})
-		}
-		if(random){
-			for(var i = results.length - 1; i > 0; i--){
-				var j = Math.floor(Math.random() * (i + 1))
-				var temp = results[i]
-				results[i] = results[j]
-				results[j] = temp
-			}
 		}
 		
 		return results
@@ -402,7 +419,7 @@ class Search{
 		
 		this.input = this.div.querySelector(":scope #song-search-input")
 		this.input.setAttribute("placeholder", strings.search.searchInput)
-		pageEvents.add(this.input, ["input"], this.onInput.bind(this))
+		pageEvents.add(this.input, ["input"], () => this.onInput())
 		
 		this.songSelect.playSound("se_pause")
 		loader.screen.appendChild(this.div)
@@ -484,6 +501,9 @@ class Search{
 		var song = this.songSelect.songs.find(song => song.id === songId)
 		this.remove()
 		this.songSelect.playBgm(false)
+		if(this.songSelect.previewing === "muted"){
+			this.songSelect.previewing = null
+		}
 		
 		var songIndex = this.songSelect.songs.findIndex(song => song.id === songId)
 		this.songSelect.setSelectedSong(songIndex)
@@ -532,13 +552,15 @@ class Search{
 		return ranges
 	}
 	
-	onInput(){
+	onInput(resize){
 		var text = this.input.value
 		localStorage.setItem("lastSearchQuery", text)
 		text = text.toLowerCase()
 		
 		if(text.length === 0){
-			this.setTip()
+			if(!resize){
+				this.setTip()
+			}
 			return
 		}
 		
@@ -623,6 +645,9 @@ class Search{
 				this.proceed(parseInt(this.results[this.active].dataset.songId))
 			}else{
 				this.onInput()
+				if(event.keyCode === 13 && this.songSelect.touchEnabled){
+					this.input.blur()
+				}
 			}
 		}
 	}

@@ -172,36 +172,47 @@ class Game{
 				var measure = measures[i]
 				if(measure.ms > ms){
 					break
-				}else if(measure.nextBranch && !measure.gameChecked){
-					measure.gameChecked = true
-					var branch = measure.nextBranch
-					if(branch.type){
-						var accuracy = 0
-						if(branch.type === "drumroll"){
-							if(force.branch){
-								var accuracy = Math.max(0, branch.requirement[force.branch])
-							}else{
-								var accuracy = this.sectionDrumroll
+				}else{
+					if(measure.nextBranch && !measure.gameChecked){
+						measure.gameChecked = true
+						var branch = measure.nextBranch
+						if(branch.type){
+							var accuracy = 0
+							if(branch.type === "drumroll"){
+								if(force.branch){
+									var accuracy = Math.max(0, branch.requirement[force.branch])
+								}else{
+									var accuracy = this.sectionDrumroll
+								}
+							}else if(this.sectionNotes.length !== 0){
+								if(force.branch){
+									var accuracy = Math.max(0, Math.min(100, branch.requirement[force.branch]))
+								}else{
+									var accuracy = this.sectionNotes.reduce((a, b) => a + b) / this.sectionNotes.length * 100
+								}
 							}
-						}else if(this.sectionNotes.length !== 0){
-							if(force.branch){
-								var accuracy = Math.max(0, Math.min(100, branch.requirement[force.branch]))
+							if(accuracy >= branch.requirement.master){
+								this.setBranch(branch, "master")
+							}else if(accuracy >= branch.requirement.advanced){
+								this.setBranch(branch, "advanced")
 							}else{
-								var accuracy = this.sectionNotes.reduce((a, b) => a + b) / this.sectionNotes.length * 100
+								this.setBranch(branch, "normal")
 							}
+						}else if(this.controller.multiplayer === 1){
+							p2.send("branch", "normal")
 						}
-						if(accuracy >= branch.requirement.master){
-							this.setBranch(branch, "master")
-						}else if(accuracy >= branch.requirement.advanced){
-							this.setBranch(branch, "advanced")
-						}else{
-							this.setBranch(branch, "normal")
-						}
-					}else if(this.controller.multiplayer === 1){
-						p2.send("branch", "normal")
+					}
+					if(!measure.branch){
+						this.controller.lyrics.branch = null
+					}else if(measure.branch.active){
+						this.controller.lyrics.branch = measure.branch.name
 					}
 				}
 			}
+		}
+		
+		if(this.controller.lyrics){
+			this.controller.lyrics.update(ms)
 		}
 	}
 	fixNoteStream(keysDon){
