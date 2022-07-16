@@ -367,7 +367,7 @@ class SettingsView{
 					if(event.target.tagName !== "SPAN"){
 						this.setValue(i)
 					}
-				})
+				}, true)
 			}else{
 				this.addTouchEnd(settingBox, event => this.setValue(i))
 			}
@@ -494,9 +494,9 @@ class SettingsView{
 				}
 				this.addTouch(settingBox, event => {
 					if(event.target.tagName !== "SPAN"){
-						this.latencySetValue(current, event.type === "touchstart")
+						this.latencySetValue(current, event.type === "touchend")
 					}
-				})
+				}, true)
 				if(current !== "calibration"){
 					outputObject.valueDiv = valueDiv
 					outputObject.valueText = valueText
@@ -543,7 +543,9 @@ class SettingsView{
 		var touchEvent = end ? "touchend" : "touchstart"
 		pageEvents.add(element, ["mousedown", touchEvent], event => {
 			if(event.type === touchEvent){
-				event.preventDefault()
+				if(event.cancelable){
+					event.preventDefault()
+				}
 				this.touched = true
 			}else if(event.which !== 1){
 				return
@@ -594,7 +596,11 @@ class SettingsView{
 		if(current.type === "language"){
 			value = allStrings[value].name + " (" + value + ")"
 		}else if(current.type === "select" || current.type === "gamepad"){
-			value = strings.settings[name][value]
+			if(current.options_lang && current.options_lang[value]){
+				value = this.getLocalTitle(value, current.options_lang[value])
+			}else if(!current.getItem){
+				value = strings.settings[name][value]
+			}
 		}else if(current.type === "toggle"){
 			value = value ? strings.settings.on : strings.settings.off
 		}else if(current.type === "keyboard"){

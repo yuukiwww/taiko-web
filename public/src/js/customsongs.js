@@ -89,6 +89,11 @@ class CustomSongs{
 			var dropContent = this.dropzone.getElementsByClassName("view-content")[0]
 			dropContent.innerText = strings.customSongs.dropzone
 			this.dragging = false
+			this.dragTarget = null
+			pageEvents.add(document, "dragenter", event => {
+				event.preventDefault()
+				this.dragTarget = event.target
+			})
 			pageEvents.add(document, "dragover", event => {
 				event.preventDefault()
 				if(!this.locked){
@@ -100,8 +105,11 @@ class CustomSongs{
 				}
 			})
 			pageEvents.add(document, "dragleave", () => {
-				this.dropzone.classList.remove("dragover")
-				this.dragging = false
+				if(this.dragTarget === event.target){
+					event.preventDefault()
+					this.dropzone.classList.remove("dragover")
+					this.dragging = false
+				}
 			})
 			pageEvents.add(document, "drop", this.filesDropped.bind(this))
 		}
@@ -522,8 +530,9 @@ class CustomSongs{
 		pageEvents.remove(this.errorDiv, ["mousedown", "touchstart"])
 		pageEvents.remove(this.errorEnd, ["mousedown", "touchstart"])
 		if(DataTransferItem.prototype.webkitGetAsEntry){
-			pageEvents.remove(document, ["dragover", "dragleave", "drop"])
+			pageEvents.remove(document, ["dragenter", "dragover", "dragleave", "drop"])
 			delete this.dropzone
+			delete this.dragTarget
 		}
 		if(gpicker){
 			gpicker.tokenResolve = null

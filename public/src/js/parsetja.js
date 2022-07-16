@@ -48,7 +48,7 @@
 		this.beatInfo = {}
 		this.events = []
 		if(!metaOnly){
-			this.circles = this.parseCircles()
+			this.circles = this.parseCircles(difficulty)
 		}
 	}
 	parseMetadata(){
@@ -135,13 +135,15 @@
 		}
 		return [string.slice(0, index), string.slice(index + delimiter.length)]
 	}
-	parseCircles(){
-		var meta = this.metadata[this.difficulty] || {}
+	parseCircles(difficulty, lyricsOnly){
+		var meta = this.metadata[difficulty] || {}
 		var ms = (meta.offset || 0) * -1000 + this.offset
 		var bpm = Math.abs(meta.bpm) || 120
 		var scroll = 1
 		var measure = 4
-		this.beatInfo.beatInterval = 60000 / bpm
+		if(!lyricsOnly){
+			this.beatInfo.beatInterval = 60000 / bpm
+		}
 		var gogo = false
 		var barLine = true
 		
@@ -150,6 +152,7 @@
 		
 		var lastDrumroll = false
 		
+		var branches
 		var branch = false
 		var branchObj = {}
 		var currentBranch = false
@@ -158,12 +161,17 @@
 		var sectionBegin = true
 		var lastBpm = bpm
 		var lastGogo = gogo
+		var lyrics
+		var lyricsIndex = null
 		var lyricsLine = null
+		var lyricsCopy = false
 		
+		var measures = []
 		var currentMeasure = []
 		var firstNote = true
 		var circles = []
 		var circleID = 0
+		var events = []
 		var regexAZ = /[A-Z]/
 		var regexSpace = /\s/
 		var regexLinebreak = /\\n/g
@@ -200,14 +208,16 @@
 			}else{
 				var speed = bpm * scroll / 60
 			}
-			this.measures.push({
-				ms: ms,
-				originalMS: ms,
-				speed: speed,
-				visible: barLine,
-				branch: currentBranch,
-				branchFirst: branchFirstMeasure
-			})
+			if(!lyricsOnly){
+				measures.push({
+					ms: ms,
+					originalMS: ms,
+					speed: speed,
+					visible: barLine,
+					branch: currentBranch,
+					branchFirst: branchFirstMeasure
+				})
+			}
 			branchFirstMeasure = false
 			if(currentMeasure.length){
 				for(var i = 0; i < currentMeasure.length; i++){
@@ -229,63 +239,79 @@
 				}
 				var note_chain = [];
 				for (var i = 0; i < currentMeasure.length; i++){
-					//console.log(note_chain.length);
 					var note = currentMeasure[i]
-					circleID++
-					var circleObj = new Circle({
-						id: circleID,
-						start: note.start,
-						type: note.type,
-						txt: note.txt,
-						speed: note.bpm * note.scroll / 60,
-						gogoTime: note.gogo,
-						endTime: note.endTime,
-						requiredHits: note.requiredHits,
-						beatMS: 60000 / note.bpm,
-						branch: currentBranch,
-						section: note.section
-					})
-					if (note.type) {
-						if (note.type === "don" || note.type === "ka" || note.type === "daiDon" || note.type === "daiKa") {
-							note_chain.push(circleObj);
-						} else { 
-							if (note_chain.length > 1 && currentMeasure.length >= 8) { 
-								checkChain(note_chain, currentMeasure.length, false);
+					if(!lyricsOnly){
+						circleID++
+						var circleObj = new Circle({
+							id: circleID,
+							start: note.start,
+							type: note.type,
+							txt: note.txt,
+							speed: note.bpm * note.scroll / 60,
+							gogoTime: note.gogo,
+							endTime: note.endTime,
+							requiredHits: note.requiredHits,
+							beatMS: 60000 / note.bpm,
+							branch: currentBranch,
+							section: note.section
+						})
+						if(note.type){
+							if(note.type === "don" || note.type === "ka" || note.type === "daiDon" || note.type === "daiKa"){
+								note_chain.push(circleObj)
+							}else{
+								if(note_chain.length > 1 && currentMeasure.length >= 8){
+									checkChain(note_chain, currentMeasure.length, false)
+								}
+								note_chain = []
 							}
-							note_chain = [];
-						} 
-						if (lastDrumroll === note) {
-							lastDrumroll = circleObj
+							if (lastDrumroll === note) {
+								lastDrumroll = circleObj
+							}
+							
+							if(note.type !== "event"){
+								circles.push(circleObj)
+							}
+						}else if(
+							(currentMeasure.length < 24 ||
+								currentMeasure[i + 1]
+								&& !currentMeasure[i + 1].type
+							) && (currentMeasure.length < 48 ||
+								currentMeasure[i + 2]
+								&& !currentMeasure[i + 2].type
+								&& currentMeasure[i + 3]
+								&& !currentMeasure[i + 3].type
+							)
+						){
+							if(note_chain.length > 1 && currentMeasure.length >= 8){
+								checkChain(note_chain, currentMeasure.length, true)
+							}
+							note_chain = []
 						}
-						
-						if(note.type !== "event"){
-							circles.push(circleObj)
+						if(note.event){
+							events.push(circleObj)
 						}
-					} else if (!(currentMeasure.length >= 24 && (!currentMeasure[i + 1] || currentMeasure[i + 1].type))
-						&& !(currentMeasure.length >= 48 && (!currentMeasure[i + 2] || currentMeasure[i + 2].type || !currentMeasure[i + 3] || currentMeasure[i + 3].type))) { 
-						if (note_chain.length > 1 && currentMeasure.length >= 8) { 
-							checkChain(note_chain, currentMeasure.length, true);
-						}
-						note_chain = [];
 					}
-					if(note.event){
-						this.events.push(circleObj)
-					}
+					var lyricsObj = null
 					if("lyricsLine" in note){
-						if(!this.lyrics){
-							this.lyrics = []
-						}
-						if(this.lyrics.length !== 0){
-							this.lyrics[this.lyrics.length - 1].end = note.start
-						}
-						this.lyrics.push({
+						lyricsObj = {
 							start: note.start,
 							text: note.lyricsLine
-						})
+						}
+					}else if(note.lyricsCopy){
+						lyricsObj = {
+							start: note.start,
+							copy: true
+						}
+					}
+					if(lyricsObj){
+						if(currentBranch){
+							lyricsObj.branch = currentBranch.name
+						}
+						insertLyrics(lyricsObj)
 					}
 				}
-				if (note_chain.length > 1 && currentMeasure.length >= 8) { 
-					checkChain(note_chain, currentMeasure.length, false);
+				if(!lyricsOnly && note_chain.length > 1 && currentMeasure.length >= 8){
+					checkChain(note_chain, currentMeasure.length, false)
 				}
 			}else{
 				var msPerMeasure = 60000 * measure / bpm
@@ -302,7 +328,10 @@
 				if(lyricsLine !== null){
 					circleObj.lyricsLine = lyricsLine
 					lyricsLine = null
+				}else if(lyricsCopy){
+					circleObj.lyricsCopy = true
 				}
+				lyricsCopy = false
 				currentMeasure.push(circleObj)
 			}
 		}
@@ -322,16 +351,31 @@
 				if(lyricsLine !== null){
 					circleObj2.lyricsLine = lyricsLine
 					lyricsLine = null
+				}else if(lyricsCopy){
+					circleObj2.lyricsCopy = true
 				}
+				lyricsCopy = false
 				currentMeasure.push(circleObj2)
 			}
 			if(circleObj){
 				if(lyricsLine !== null){
 					circleObj.lyricsLine = lyricsLine
 					lyricsLine = null
+				}else if(lyricsCopy){
+					circleObj.lyricsCopy = true
 				}
+				lyricsCopy = false
 				currentMeasure.push(circleObj)
 			}
+		}
+		var insertLyrics = obj => {
+			if(!lyrics){
+				lyrics = []
+			}else if(lyricsIndex !== null){
+				lyrics[lyricsIndex].end = obj.start
+			}
+			lyricsIndex = lyrics.length
+			lyrics.push(obj)
 		}
 		
 		for(var lineNum = meta.start; lineNum < meta.end; lineNum++){
@@ -377,11 +421,18 @@
 							gogo: gogo,
 							bpm: bpm,
 							scroll: scroll,
-							sectionBegin: sectionBegin
+							sectionBegin: sectionBegin,
+							lyricsCopy: !!lyrics
 						}
+						if(lyrics && lyricsIndex !== null){
+							var line = lyrics[lyricsIndex]
+							line.end = ms
+						}
+						lyricsIndex = null
+						
 						value = value.split(",")
-						if(!this.branches){
-							this.branches = []
+						if(!branches){
+							branches = []
 						}
 						var req = {
 							advanced: parseFloat(value[1]) || 0,
@@ -399,12 +450,12 @@
 							type: value[0].trim().toLowerCase() === "r" ? "drumroll" : "accuracy",
 							requirement: req
 						}
-						this.branches.push(branchObj)
-						if(this.measures.length === 1 && branchObj.type === "drumroll"){
+						branches.push(branchObj)
+						if(measures.length === 1 && branchObj.type === "drumroll"){
 							for(var i = circles.length; i--;){
 								var circle = circles[i]
-								if(circle.endTime && circle.type === "drumroll" || circle.type === "daiDrumroll" || circle.type === "balloon"){
-									this.measures.push({
+								if(circle.endTime && (circle.type === "drumroll" || circle.type === "daiDrumroll" || circle.type === "balloon")){
+									measures.push({
 										ms: circle.endTime,
 										originalMS: circle.endTime,
 										speed: circle.bpm * circle.scroll / 60,
@@ -415,13 +466,14 @@
 								}
 							}
 						}
-						if(this.measures.length !== 0){
-							this.measures[this.measures.length - 1].nextBranch = branchObj
+						if(measures.length !== 0){
+							measures[measures.length - 1].nextBranch = branchObj
 						}
 						break
 					case "branchend":
 						branch = false
 						currentBranch = false
+						lyricsCopy = lyricsCopy || !!lyrics
 						break
 					case "section":
 						sectionBegin = true
@@ -433,11 +485,19 @@
 						if(!branch){
 							break
 						}
+						if(lyrics){
+							if(lyricsIndex !== null){
+								var line = lyrics[lyricsIndex]
+								line.end = ms
+							}
+							lyricsIndex = null
+						}
 						ms = branchSettings.ms
 						gogo = branchSettings.gogo
 						bpm = branchSettings.bpm
 						scroll = branchSettings.scroll
 						sectionBegin = branchSettings.sectionBegin
+						lyricsCopy = branchSettings.lyricsCopy
 						branchFirstMeasure = true
 						var branchName = name === "m" ? "master" : (name === "e" ? "advanced" : "normal")
 						currentBranch = {
@@ -556,30 +616,51 @@
 				
 			}
 		}
-		pushMeasure()
 		if(lastDrumroll){
 			lastDrumroll.endTime = ms
 			lastDrumroll.originalEndTime = ms
 		}
+		if(lyricsLine !== null){
+			insertLyrics({
+				start: ms,
+				text: lyricsLine
+			})
+		}
+		pushMeasure()
 		
-		if(this.branches){
-			circles.sort((a, b) => a.ms > b.ms ? 1 : -1)
-			this.measures.sort((a, b) => a.ms > b.ms ? 1 : -1)
-			circles.forEach((circle, i) => circle.id = i + 1)
+		if(!lyricsOnly){
+			if(branches){
+				circles.sort((a, b) => a.ms > b.ms ? 1 : -1)
+				measures.sort((a, b) => a.ms > b.ms ? 1 : -1)
+				circles.forEach((circle, i) => circle.id = i + 1)
+			}
+			this.measures = measures
+			this.events = events
+			this.branches = branches
+			this.scoreinit = meta.scoreinit
+			this.scorediff = meta.scorediff
+			if(this.scoreinit && this.scorediff){
+				this.scoremode = meta.scoremode || 1
+			}else{
+				this.scoremode = meta.scoremode || 2
+				var autoscore = new AutoScore(difficulty, this.stars, this.scoremode, circles)
+				this.scoreinit = autoscore.ScoreInit
+				this.scorediff = autoscore.ScoreDiff
+			}
 		}
-		this.scoreinit = meta.scoreinit;
-		this.scorediff = meta.scorediff;
-		if (this.scoreinit && this.scorediff) {
-			this.scoremode = meta.scoremode || 1;
-		} else { 
-			this.scoremode = meta.scoremode || 2;
-			var autoscore = new AutoScore(this.difficulty, this.stars, this.scoremode, circles);
-			this.scoreinit = autoscore.ScoreInit;
-			this.scorediff = autoscore.ScoreDiff;
-		}
-		if(this.lyrics){
-			var line = this.lyrics[this.lyrics.length - 1]
+		if(lyrics && lyricsIndex !== null){
+			var line = lyrics[lyricsIndex]
 			line.end = Math.max(ms, line.start) + 5000
+		}
+		if(lyrics){
+			this.lyrics = lyrics
+		}else if(!lyricsOnly){
+			for(var courseName in this.metadata){
+				if(this.metadata[courseName].inlineLyrics){
+					this.parseCircles(courseName, true)
+					break
+				}
+			}
 		}
 		return circles
 	}

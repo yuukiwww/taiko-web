@@ -255,10 +255,6 @@
 			this.setDonBgHeight()
 		}
 		
-		if(this.controller.lyrics){
-			this.controller.lyrics.update(ms)
-		}
-		
 		ctx.save()
 		ctx.translate(0, frameTop)
 		

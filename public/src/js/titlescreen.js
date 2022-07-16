@@ -101,7 +101,7 @@ class Titlescreen{
 					}).then(() => {
 						if(noError){
 							setTimeout(() => {
-								new SongSelect("customSongs", false, this.touchEnabled)
+								new SongSelect("customSongs", false, this.touched)
 							}, 500)
 						}
 					})

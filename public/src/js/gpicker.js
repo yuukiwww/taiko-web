@@ -14,7 +14,7 @@ class Gpicker{
 		this.clientCallbackBind = this.clientCallback.bind(this)
 	}
 	browse(lockedCallback, errorCallback){
-		return this.loadApi()
+		return this.loadApi(lockedCallback, errorCallback)
 		.then(() => this.getToken(lockedCallback, errorCallback))
 		.then(() => new Promise((resolve, reject) => {
 			this.displayPicker(data => {
@@ -120,7 +120,7 @@ class Gpicker{
 			})
 		}))
 	}
-	loadApi(){
+	loadApi(lockedCallback=()=>{}, errorCallback=()=>{}){
 		if(window.gapi && gapi.client && gapi.client.drive){
 			return Promise.resolve()
 		}
@@ -128,15 +128,27 @@ class Gpicker{
 			loader.loadScript("https://apis.google.com/js/api.js"),
 			loader.loadScript("https://accounts.google.com/gsi/client")
 		]
+		var apiLoaded = false
 		return Promise.all(promises).then(() => new Promise((resolve, reject) =>
 			gapi.load("picker:client", {
 				callback: resolve,
 				onerror: reject
 			})
 		))
-		.then(() => new Promise((resolve, reject) =>
-			gapi.client.load("drive", "v3").then(resolve, reject)
-		))
+		.then(() => new Promise((resolve, reject) => {
+			setTimeout(() => {
+				if(!apiLoaded){
+					lockedCallback(false)
+				}
+			}, 3000)
+			return gapi.client.load("drive", "v3").then(resolve, reject)
+		})).then(() => {
+			apiLoaded = true
+			lockedCallback(true)
+		}).catch(e => {
+			errorCallback(Array.isArray(e) ? e[0] : e)
+			return Promise.reject("cancel")
+		})
 	}
 	getClient(errorCallback=()=>{}, force){
 		var obj = {

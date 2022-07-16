@@ -462,8 +462,8 @@
 			config.selectable.innerHTML = ""
 			var scale = config.selectableScale
 			var style = config.selectable.style
-			style.left = (config.x - config.width / 2) * scale + "px"
-			style.top = config.y * scale + "px"
+			style.left = ((config.x - config.width / 2) * scale + (config.selectableX || 0)) + "px"
+			style.top = (config.y * scale + (config.selectableY || 0)) + "px"
 			style.width = config.width * scale + "px"
 			style.height = (drawnHeight+15) * scale + "px"
 			style.fontSize = 40 * mul * scale + "px"

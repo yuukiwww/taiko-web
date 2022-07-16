@@ -37,17 +37,14 @@
 				}
 			}
 		})
-		this.assetSelectors = {
-			"bg-pattern-1": ".pattern-bg",
-			"bg_genre_0": "#song-select",
-			"title-screen": "#title-screen",
-			"dancing-don": "#loading-don",
-			"touch_drum": "#touch-drum-img",
-			"touch_fullscreen": "#touch-full-btn",
-			"touch_pause": "#touch-pause-btn",
-			"bg_stage_1": ".song-stage-1",
-			"bg_stage_2": ".song-stage-2",
-			"bg_stage_3": ".song-stage-3"
+		this.assetSelectors = {}
+		for(var selector in assets.cssBackground){
+			var filename = assets.cssBackground[selector]
+			var index = filename.lastIndexOf(".")
+			if(index !== -1){
+				filename = filename.slice(0, index)
+			}
+			this.assetSelectors[filename] = selector
 		}
 		this.comboVoices = ["v_combo_50"].concat(Array.from(Array(50), (d, i) => "v_combo_" + ((i + 1) * 100)))
 	}
@@ -64,7 +61,7 @@
 			var file = files[i]
 			var name = file.name.toLowerCase()
 			var path = file.path.toLowerCase()
-			if(name.endsWith(".tja")){
+			if(name.endsWith(".tja") || name.endsWith(".tjf")){
 				this.tjaFiles.push({
 					file: file,
 					index: i
@@ -292,9 +289,9 @@
 					if(gt === maker.length - 1){
 						var lt = maker.lastIndexOf("<")
 						if(lt !== -1 && lt !== gt - 2){
-							url = maker.slice(lt + 2, gt)
+							url = maker.slice(lt + 1, gt).trim()
 							if(url.startsWith("http://") || url.startsWith("https://")){
-								maker = maker.slice(0, lt).trim()
+								maker = maker.slice(0, lt)
 							}else{
 								url = null
 							}
@@ -452,12 +449,20 @@
 					vectors = JSON.parse(response)
 				}))
 			}
-			if(name.endsWith(".png")){
+			if(name.endsWith(".png") || name.endsWith(".gif")){
 				let image = document.createElement("img")
 				promises.push(pageEvents.load(image).then(() => {
 					if(id in this.assetSelectors){
 						var selector = this.assetSelectors[id]
-						this.stylesheet.push(selector + '{background-image:url("' + image.src + '")}')
+						var gradient = ""
+						if(selector === "#song-search"){
+							gradient = loader.songSearchGradient
+						}
+						this.stylesheet.push(loader.cssRuleset({
+							[selector]: {
+								"background-image": gradient + "url(\"" + image.src + "\")"
+							}
+						}))
 					}
 				}))
 				image.id = name
