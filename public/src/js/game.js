@@ -202,10 +202,12 @@ class Game{
 							p2.send("branch", "normal")
 						}
 					}
-					if(!measure.branch){
-						this.controller.lyrics.branch = null
-					}else if(measure.branch.active){
-						this.controller.lyrics.branch = measure.branch.name
+					if(this.controller.lyrics){
+						if(!measure.branch){
+							this.controller.lyrics.branch = null
+						}else if(measure.branch.active){
+							this.controller.lyrics.branch = measure.branch.name
+						}
 					}
 				}
 			}
