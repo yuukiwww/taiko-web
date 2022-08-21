@@ -32,7 +32,7 @@ class P2Connection{
 		if(this.closed && !this.disabled){
 			this.closed = false
 			var wsProtocol = location.protocol == "https:" ? "wss:" : "ws:"
-			this.socket = new WebSocket(gameConfig.multiplayer_url ? gameConfig.multiplayer_url : wsProtocol + "//" + location.host + "/p2")
+			this.socket = new WebSocket(gameConfig.multiplayer_url ? gameConfig.multiplayer_url : wsProtocol + "//" + location.host + location.pathname + "p2")
 			pageEvents.race(this.socket, "open", "close").then(response => {
 				if(response.type === "open"){
 					return this.openEvent()
