@@ -16,7 +16,11 @@
 		"info_fill": "#004d68",
 		"bg_img": "bg_genre_0.png"
 	},
-	"aliases": null
+	"aliases": [
+		"jpop",
+		"j-pop",
+		"pops"
+	]
 },{
 	"id": 2,
 	"title": "Anime",
@@ -55,6 +59,7 @@
 		"ボーカロイド曲",
 		"ボーカロイド",
 		"vocaloid music",
+		"vocaloidmusic",
 		"vocaloid"
 	]
 },{
@@ -123,7 +128,10 @@
 		"info_fill": "#4f2886",
 		"bg_img": "bg_genre_5.png"
 	},
-	"aliases": null
+	"aliases": [
+		"game",
+		"gamemusic"
+	]
 },{
 	"id": 7,
 	"title": "NAMCO Original",
@@ -142,5 +150,8 @@
 		"info_fill": "#961e00",
 		"bg_img": "bg_genre_6.png"
 	},
-	"aliases": null
+	"aliases": [
+		"namco",
+		"namcooriginal"
+	]
 }]
