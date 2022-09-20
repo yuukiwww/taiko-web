@@ -43,7 +43,7 @@ sudo cp tools/nginx.conf /etc/nginx/conf.d/taiko-web.conf
 
 sudo sed -i 's/^\(\s\{0,\}\)\(include \/etc\/nginx\/sites-enabled\/\*;\)$/\1#\2/g' /etc/nginx/nginx.conf
 sudo sed -i 's/}/    application\/wasm wasm;\n}/g' /etc/nginx/mime.types
-sudo nginx -s reload
+sudo service nginx restart
 
 python3 -m venv .venv
 .venv/bin/pip install --upgrade pip wheel setuptools
