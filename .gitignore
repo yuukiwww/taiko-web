@@ -53,3 +53,4 @@ config.py
 public/assets/song_skins
 .venv
 public/src/js/plugin
+.hidden

@@ -1,3 +1,6 @@
+# The base URL for Taiko Web, with trailing slash.
+BASEDIR = '/'
+
 # The full URL base asset URL, with trailing slash.
 ASSETS_BASEURL = '/assets/'
 
@@ -6,6 +9,11 @@ SONGS_BASEURL = '/songs/'
 
 # Multiplayer websocket URL. Defaults to /p2 if blank.
 MULTIPLAYER_URL = ''
+
+# Send static files for custom error pages
+ERROR_PAGES = {
+    404: ''
+}
 
 # The email address to display in the "About Simulator" menu.
 EMAIL = None

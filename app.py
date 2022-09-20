@@ -15,7 +15,7 @@ import os
 import time
 
 from functools import wraps
-from flask import Flask, g, jsonify, render_template, request, abort, redirect, session, flash, make_response
+from flask import Flask, g, jsonify, render_template, request, abort, redirect, session, flash, make_response, send_from_directory
 from flask_caching import Cache
 from flask_session import Session
 from flask_wtf.csrf import CSRFProtect, generate_csrf, CSRFError
@@ -33,6 +33,7 @@ def take_config(name, required=False):
 
 app = Flask(__name__)
 client = MongoClient(host=take_config('MONGO', required=True)['host'])
+basedir = take_config('BASEDIR') or '/'
 
 app.secret_key = take_config('SECRET_KEY') or 'change-me'
 app.config['SESSION_TYPE'] = 'redis'
@@ -79,8 +80,8 @@ def generate_hash(id, form):
                 raise HashException('Invalid response from %s (status code %s)' % (resp.url, resp.status_code))
             md5.update(resp.content)
         else:
-            if url.startswith("/"):
-                url = url[1:]
+            if url.startswith(basedir):
+                url = url[len(basedir):]
             path = os.path.normpath(os.path.join("public", url))
             if not os.path.isfile(path):
                 raise HashException("File not found: %s" % (os.path.abspath(path)))
@@ -129,6 +130,7 @@ def before_request_func():
 
 def get_config(credentials=False):
     config_out = {
+        'basedir': basedir,
         'songs_baseurl': take_config('SONGS_BASEURL', required=True),
         'assets_baseurl': take_config('ASSETS_BASEURL', required=True),
         'email': take_config('EMAIL'),
@@ -138,6 +140,10 @@ def get_config(credentials=False):
         'preview_type': take_config('PREVIEW_TYPE') or 'mp3',
         'multiplayer_url': take_config('MULTIPLAYER_URL')
     }
+    relative_urls = ['songs_baseurl', 'assets_baseurl']
+    for name in relative_urls:
+        if not config_out[name].startswith("/") and not config_out[name].startswith("http://") and not config_out[name].startswith("https://"):
+            config_out[name] = basedir + config_out[name]
     if credentials:
         google_credentials = take_config('GOOGLE_CREDENTIALS')
         min_level = google_credentials['min_level'] or 0
@@ -200,24 +206,24 @@ def is_hex(input):
         return False
 
 
-@app.route('/')
+@app.route(basedir)
 def route_index():
     version = get_version()
     return render_template('index.html', version=version, config=get_config())
 
 
-@app.route('/api/csrftoken')
+@app.route(basedir + 'api/csrftoken')
 def route_csrftoken():
     return jsonify({'status': 'ok', 'token': generate_csrf()})
 
 
-@app.route('/admin')
+@app.route(basedir + 'admin')
 @admin_required(level=50)
 def route_admin():
-    return redirect('/admin/songs')
+    return redirect(basedir + 'admin/songs')
 
 
-@app.route('/admin/songs')
+@app.route(basedir + 'admin/songs')
 @admin_required(level=50)
 def route_admin_songs():
     songs = sorted(list(db.songs.find({})), key=lambda x: x['id'])
@@ -226,7 +232,7 @@ def route_admin_songs():
     return render_template('admin_songs.html', songs=songs, admin=user, categories=list(categories), config=get_config())
 
 
-@app.route('/admin/songs/<int:id>')
+@app.route(basedir + 'admin/songs/<int:id>')
 @admin_required(level=50)
 def route_admin_songs_id(id):
     song = db.songs.find_one({'id': id})
@@ -242,7 +248,7 @@ def route_admin_songs_id(id):
         song=song, categories=categories, song_skins=song_skins, makers=makers, admin=user, config=get_config())
 
 
-@app.route('/admin/songs/new')
+@app.route(basedir + 'admin/songs/new')
 @admin_required(level=100)
 def route_admin_songs_new():
     categories = list(db.categories.find({}))
@@ -254,7 +260,7 @@ def route_admin_songs_new():
     return render_template('admin_song_new.html', categories=categories, song_skins=song_skins, makers=makers, config=get_config(), id=seq_new)
 
 
-@app.route('/admin/songs/new', methods=['POST'])
+@app.route(basedir + 'admin/songs/new', methods=['POST'])
 @admin_required(level=100)
 def route_admin_songs_new_post():
     output = {'title_lang': {}, 'subtitle_lang': {}, 'courses': {}}
@@ -303,10 +309,10 @@ def route_admin_songs_new_post():
     
     db.seq.update_one({'name': 'songs'}, {'$set': {'value': seq_new}}, upsert=True)
     
-    return redirect('/admin/songs/%s' % str(seq_new))
+    return redirect(basedir + 'admin/songs/%s' % str(seq_new))
 
 
-@app.route('/admin/songs/<int:id>', methods=['POST'])
+@app.route(basedir + 'admin/songs/<int:id>', methods=['POST'])
 @admin_required(level=50)
 def route_admin_songs_id_post(id):
     song = db.songs.find_one({'id': id})
@@ -356,10 +362,10 @@ def route_admin_songs_id_post(id):
     if not hash_error:
         flash('Changes saved.')
     
-    return redirect('/admin/songs/%s' % id)
+    return redirect(basedir + 'admin/songs/%s' % id)
 
 
-@app.route('/admin/songs/<int:id>/delete', methods=['POST'])
+@app.route(basedir + 'admin/songs/<int:id>/delete', methods=['POST'])
 @admin_required(level=100)
 def route_admin_songs_id_delete(id):
     song = db.songs.find_one({'id': id})
@@ -368,10 +374,10 @@ def route_admin_songs_id_delete(id):
 
     db.songs.delete_one({'id': id})
     flash('Song deleted.')
-    return redirect('/admin/songs')
+    return redirect(basedir + 'admin/songs')
 
 
-@app.route('/admin/users')
+@app.route(basedir + 'admin/users')
 @admin_required(level=50)
 def route_admin_users():
     user = db.users.find_one({'username': session.get('username')})
@@ -379,7 +385,7 @@ def route_admin_users():
     return render_template('admin_users.html', config=get_config(), max_level=max_level, username='', level='')
 
 
-@app.route('/admin/users', methods=['POST'])
+@app.route(basedir + 'admin/users', methods=['POST'])
 @admin_required(level=50)
 def route_admin_users_post():
     admin_name = session.get('username')
@@ -411,7 +417,7 @@ def route_admin_users_post():
     return render_template('admin_users.html', config=get_config(), max_level=max_level, username=username, level=level)
 
 
-@app.route('/api/preview')
+@app.route(basedir + 'api/preview')
 @app.cache.cached(timeout=15, query_string=True)
 def route_api_preview():
     song_id = request.args.get('id', None)
@@ -432,7 +438,7 @@ def route_api_preview():
     return redirect(get_config()['songs_baseurl'] + '%s/preview.mp3' % song_id)
 
 
-@app.route('/api/songs')
+@app.route(basedir + 'api/songs')
 @app.cache.cached(timeout=15)
 def route_api_songs():
     songs = list(db.songs.find({'enabled': True}, {'_id': False, 'enabled': False}))
@@ -460,20 +466,20 @@ def route_api_songs():
 
     return jsonify(songs)
 
-@app.route('/api/categories')
+@app.route(basedir + 'api/categories')
 @app.cache.cached(timeout=15)
 def route_api_categories():
     categories = list(db.categories.find({},{'_id': False}))
     return jsonify(categories)
 
-@app.route('/api/config')
+@app.route(basedir + 'api/config')
 @app.cache.cached(timeout=15)
 def route_api_config():
     config = get_config(credentials=True)
     return jsonify(config)
 
 
-@app.route('/api/register', methods=['POST'])
+@app.route(basedir + 'api/register', methods=['POST'])
 def route_api_register():
     data = request.get_json()
     if not schema.validate(data, schema.register):
@@ -514,7 +520,7 @@ def route_api_register():
     return jsonify({'status': 'ok', 'username': username, 'display_name': username, 'don': don})
 
 
-@app.route('/api/login', methods=['POST'])
+@app.route(basedir + 'api/login', methods=['POST'])
 def route_api_login():
     data = request.get_json()
     if not schema.validate(data, schema.login):
@@ -541,14 +547,14 @@ def route_api_login():
     return jsonify({'status': 'ok', 'username': result['username'], 'display_name': result['display_name'], 'don': don})
 
 
-@app.route('/api/logout', methods=['POST'])
+@app.route(basedir + 'api/logout', methods=['POST'])
 @login_required
 def route_api_logout():
     session.clear()
     return jsonify({'status': 'ok'})
 
 
-@app.route('/api/account/display_name', methods=['POST'])
+@app.route(basedir + 'api/account/display_name', methods=['POST'])
 @login_required
 def route_api_account_display_name():
     data = request.get_json()
@@ -568,7 +574,7 @@ def route_api_account_display_name():
     return jsonify({'status': 'ok', 'display_name': display_name})
 
 
-@app.route('/api/account/don', methods=['POST'])
+@app.route(basedir + 'api/account/don', methods=['POST'])
 @login_required
 def route_api_account_don():
     data = request.get_json()
@@ -593,7 +599,7 @@ def route_api_account_don():
     return jsonify({'status': 'ok', 'don': {'body_fill': don_body_fill, 'face_fill': don_face_fill}})
 
 
-@app.route('/api/account/password', methods=['POST'])
+@app.route(basedir + 'api/account/password', methods=['POST'])
 @login_required
 def route_api_account_password():
     data = request.get_json()
@@ -621,7 +627,7 @@ def route_api_account_password():
     return jsonify({'status': 'ok'})
 
 
-@app.route('/api/account/remove', methods=['POST'])
+@app.route(basedir + 'api/account/remove', methods=['POST'])
 @login_required
 def route_api_account_remove():
     data = request.get_json()
@@ -640,7 +646,7 @@ def route_api_account_remove():
     return jsonify({'status': 'ok'})
 
 
-@app.route('/api/scores/save', methods=['POST'])
+@app.route(basedir + 'api/scores/save', methods=['POST'])
 @login_required
 def route_api_scores_save():
     data = request.get_json()
@@ -663,7 +669,7 @@ def route_api_scores_save():
     return jsonify({'status': 'ok'})
 
 
-@app.route('/api/scores/get')
+@app.route(basedir + 'api/scores/get')
 @login_required
 def route_api_scores_get():
     username = session.get('username')
@@ -680,7 +686,7 @@ def route_api_scores_get():
     return jsonify({'status': 'ok', 'scores': scores, 'username': user['username'], 'display_name': user['display_name'], 'don': don})
 
 
-@app.route('/privacy')
+@app.route(basedir + 'privacy')
 def route_api_privacy():
     last_modified = time.strftime('%d %B %Y', time.gmtime(os.path.getmtime('templates/privacy.txt')))
     integration = take_config('GOOGLE_CREDENTIALS')['gdrive_enabled'] if take_config('GOOGLE_CREDENTIALS') else False
@@ -706,10 +712,26 @@ def make_preview(song_id, song_type, song_ext, preview):
 
     return prev_path
 
+error_pages = take_config('ERROR_PAGES') or {}
+
+def create_error_page(code, url):
+    if url.startswith("http://") or url.startswith("https://"):
+        resp = requests.get(url)
+        if resp.status_code == 200:
+            app.register_error_handler(code, lambda e: (resp.content, code))
+    else:
+        if url.startswith(basedir):
+            url = url[len(basedir):]
+        path = os.path.normpath(os.path.join("public", url))
+        if os.path.isfile(path):
+            app.register_error_handler(code, lambda e: (send_from_directory(".", path), code))
+
+for code in error_pages:
+    if error_pages[code]:
+        create_error_page(code, error_pages[code])
 
 if __name__ == '__main__':
     import argparse
-    from flask import send_from_directory
 
     parser = argparse.ArgumentParser(description='Run the taiko-web development server.')
     parser.add_argument('port', type=int, metavar='PORT', nargs='?', default=34801, help='Port to listen on.')
@@ -717,11 +739,11 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--debug', action='store_true', help='Enable debug mode.')
     args = parser.parse_args()
 
-    @app.route('/src/<path:path>')
+    @app.route(basedir + 'src/<path:path>')
     def send_src(path):
         return send_from_directory('public/src', path)
 
-    @app.route('/assets/<path:path>')
+    @app.route(basedir + 'assets/<path:path>')
     def send_assets(path):
         return send_from_directory('public/assets', path)
 

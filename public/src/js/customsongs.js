@@ -300,7 +300,7 @@ class CustomSongs{
 		this.loading(true)
 		var importSongs = new ImportSongs(true)
 		if(!gpicker){
-			var gpickerPromise = loader.loadScript("/src/js/gpicker.js").then(() => {
+			var gpickerPromise = loader.loadScript("src/js/gpicker.js").then(() => {
 				gpicker = new Gpicker()
 			})
 		}else{

@@ -13,11 +13,11 @@ class Loader{
 		
 		var promises = []
 		
-		promises.push(this.ajax("/src/views/loader.html").then(page => {
+		promises.push(this.ajax("src/views/loader.html").then(page => {
 			this.screen.innerHTML = page
 		}))
 		
-		promises.push(this.ajax("/api/config").then(conf => {
+		promises.push(this.ajax("api/config").then(conf => {
 			gameConfig = JSON.parse(conf)
 		}))
 		
@@ -39,7 +39,7 @@ class Loader{
 			assets.js.push("lib/oggmented-wasm.js")
 		}
 		assets.js.forEach(name => {
-			this.addPromise(this.loadScript("/src/js/" + name), "/src/js/" + name)
+			this.addPromise(this.loadScript("src/js/" + name), "src/js/" + name)
 		})
 		
 		var pageVersion = versionLink.href
@@ -59,7 +59,7 @@ class Loader{
 			assets.css.forEach(name => {
 				var stylesheet = document.createElement("link")
 				stylesheet.rel = "stylesheet"
-				stylesheet.href = "/src/css/" + name + this.queryString
+				stylesheet.href = "src/css/" + name + this.queryString
 				document.head.appendChild(stylesheet)
 			})
 			var checkStyles = () => {
@@ -124,13 +124,13 @@ class Loader{
 		
 		assets.views.forEach(name => {
 			var id = this.getFilename(name)
-			var url = "/src/views/" + name + this.queryString
+			var url = "src/views/" + name + this.queryString
 			this.addPromise(this.ajax(url).then(page => {
 				assets.pages[id] = page
 			}), url)
 		})
 		
-		this.addPromise(this.ajax("/api/categories").then(cats => {
+		this.addPromise(this.ajax("api/categories").then(cats => {
 			assets.categories = JSON.parse(cats)
 			assets.categories.forEach(cat => {
 				if(cat.song_skin){
@@ -150,7 +150,7 @@ class Loader{
 					infoFill: "#656565"
 				}
 			})
-		}), "/api/categories")
+		}), "api/categories")
 		
 		var url = gameConfig.assets_baseurl + "img/vectors.json" + this.queryString
 		this.addPromise(this.ajax(url).then(response => {
@@ -159,7 +159,7 @@ class Loader{
 		
 		this.afterJSCount =
 			[
-				"/api/songs",
+				"api/songs",
 				"blurPerformance",
 				"categories"
 			].length +
@@ -178,7 +178,7 @@ class Loader{
 			style.appendChild(document.createTextNode(css.join("\n")))
 			document.head.appendChild(style)
 			
-			this.addPromise(this.ajax("/api/songs").then(songs => {
+			this.addPromise(this.ajax("api/songs").then(songs => {
 				songs = JSON.parse(songs)
 				songs.forEach(song => {
 					var directory = gameConfig.songs_baseurl + song.id + "/"
@@ -203,7 +203,7 @@ class Loader{
 				})
 				assets.songsDefault = songs
 				assets.songs = assets.songsDefault
-			}), "/api/songs")
+			}), "api/songs")
 			
 			var categoryPromises = []
 			assets.categories //load category backgrounds to DOM
@@ -276,7 +276,7 @@ class Loader{
 			}), "blurPerformance")
 			
 			if(gameConfig.accounts){
-				this.addPromise(this.ajax("/api/scores/get").then(response => {
+				this.addPromise(this.ajax("api/scores/get").then(response => {
 					response = JSON.parse(response)
 					if(response.status === "ok"){
 						account.loggedIn = true
@@ -286,7 +286,7 @@ class Loader{
 						scoreStorage.load(response.scores)
 						pageEvents.send("login", account.username)
 					}
-				}), "/api/scores/get")
+				}), "api/scores/get")
 			}
 			
 			settings = new Settings()
