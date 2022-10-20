@@ -8,7 +8,7 @@ if [[ -r /etc/os-release ]]; then
     . /etc/os-release
     if [[ $ID = ubuntu ]]; then
         if [[ $VERSION_CODENAME = impish ]]; then
-            VERSION_CODENAME=focal # MongoDB does not provide packages for Ubuntu 21.10
+            VERSION_CODENAME=focal # MongoDB does not provide packages for Ubuntu 22.04 LTS yet
         fi
         REPO="https://repo.mongodb.org/apt/ubuntu $VERSION_CODENAME/mongodb-org/5.0 multiverse"
     elif [[ $ID = debian ]]; then
