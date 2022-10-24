@@ -7,14 +7,18 @@ sudo apt install -y git python3-pip python3-virtualenv python3-venv nginx ffmpeg
 if [[ -r /etc/os-release ]]; then
     . /etc/os-release
     if [[ $ID = ubuntu ]]; then
-        if [[ $VERSION_CODENAME = impish ]]; then
-            VERSION_CODENAME=focal # MongoDB does not provide packages for Ubuntu 21.10
-        fi
+        # MongoDB supports only LTS and has not released package for Ubuntu 22.04 LTS yet
+        case $VERSION_CODENAME in
+            impish|kinetic|jammy)
+                VERSION_CODENAME=focal ;;
+        esac
         REPO="https://repo.mongodb.org/apt/ubuntu $VERSION_CODENAME/mongodb-org/5.0 multiverse"
     elif [[ $ID = debian ]]; then
-        if [[ $VERSION_CODENAME = bullseye ]]; then
-            VERSION_CODENAME=buster # MongoDB does not provide packages for Debian 11 yet
-        fi
+        # MongoDB does not provide packages for Debian 11 yet
+        case $VERSION_CODENAME in
+            bullseye|bookworm|sid)
+                VERSION_CODENAME=buster ;; 
+        esac
         REPO="https://repo.mongodb.org/apt/debian $VERSION_CODENAME/mongodb-org/5.0 main"
     else
         echo "Unsupported distribution $ID"
@@ -25,7 +29,7 @@ else
     exit 1
 fi
 
-wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
+wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo tee /etc/apt/trusted.gpg.d/mongodb-server-5.0.asc
 echo "deb [ arch=amd64,arm64 ] $REPO" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
 
 sudo apt update
