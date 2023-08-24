@@ -17,6 +17,7 @@ class SongSelect{
 			this.canvas.style.imageRendering = "pixelated"
 		}
 
+		const defaultColor = Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, "0");
 		this.songSkin = {
 			"selected": {
 				background: "#ffdb2c",
@@ -72,10 +73,10 @@ class SongSelect{
 			},
 			"default": {
 				sort: null,
-				background: "#ececec",
-				border: ["#fbfbfb", "#8b8b8b"],
-				outline: "#656565",
-				infoFill: "#656565"
+				background: `#${defaultColor}`,
+				border: [`#${defaultColor}`, `#${defaultColor}`],
+				outline: `#000000`,
+				infoFill: `#${defaultColor}`
 			}
 		}
 		
