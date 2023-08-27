@@ -498,6 +498,10 @@ class Search{
 	}
 	
 	proceed(songId){
+		if (/^-?\d+$/.test(songId)) {
+			songId = parseInt(songId)
+		}
+
 		var song = this.songSelect.songs.find(song => song.id === songId)
 		this.remove()
 		this.songSelect.playBgm(false)
@@ -603,7 +607,7 @@ class Search{
 		}else if(e.which === 1){
 			var songEl = e.target.closest(".song-search-result")
 			if(songEl){
-				var songId = parseInt(songEl.dataset.songId)
+				var songId = songEl.dataset.songId
 				this.proceed(songId)
 			}
 		}
@@ -642,7 +646,7 @@ class Search{
 			}	
 		}else if(name === "confirm"){
 			if(Number.isInteger(this.active)){
-				this.proceed(parseInt(this.results[this.active].dataset.songId))
+				this.proceed(this.results[this.active].dataset.songId)
 			}else{
 				this.onInput()
 				if(event.keyCode === 13 && this.songSelect.touchEnabled){
