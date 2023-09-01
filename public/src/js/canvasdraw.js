@@ -153,7 +153,7 @@
 				y: 5,
 				force: !noForce
 			})
-			ctx.fillStyle = "#000"
+			ctx.fillStyle = "transparent"
 			ctx.fillRect(0, 0, w, h)
 		}
 		if(config.cached){

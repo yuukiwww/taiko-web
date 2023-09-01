@@ -72,10 +72,10 @@ class SongSelect{
 			},
 			"default": {
 				sort: null,
-				background: `#${Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, "0")}`,
-				border: [`#${Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, "0")}`, `#${Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, "0")}`],
-				outline: "#656565",
-				infoFill: `#${Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, "0")}`
+				background: "transparent",
+				border: ["transparent", "transparent"],
+				outline: "transparent",
+				infoFill: "transparent"
 			}
 		}
 		
