@@ -15,7 +15,7 @@ import os
 import time
 
 from functools import wraps
-from flask import Flask, g, jsonify, render_template, request, abort, redirect, session, flash, make_response, send_from_directory
+from flask import Flask, g, jsonify, render_template, request, abort, redirect, session, flash, make_response, send_from_directory, send_file
 from flask_caching import Cache
 from flask_session import Session
 from flask_wtf.csrf import CSRFProtect, generate_csrf, CSRFError
@@ -750,6 +750,10 @@ if __name__ == '__main__':
     @app.route(basedir + 'songs/<path:path>')
     def send_songs(path):
         return send_from_directory('public/songs', path)
+
+    @app.route(basedir + 'manifest.json')
+    def send_manifest_json():
+        return send_file('public/manifest.json')
 
     app.run(host=args.bind_address, port=args.port, debug=args.debug)
 
