@@ -747,5 +747,9 @@ if __name__ == '__main__':
     def send_assets(path):
         return send_from_directory('public/assets', path)
 
+    @app.route(basedir + 'songs/<path:path>')
+    def send_songs(path):
+        return send_from_directory('public/songs', path)
+
     app.run(host=args.bind_address, port=args.port, debug=args.debug)
 
