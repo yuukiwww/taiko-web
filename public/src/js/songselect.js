@@ -70,6 +70,13 @@ class SongSelect{
 				border: ["#fde9df", "#ce7553"],
 				outline: "#ce7553"
 			},
+                        // カスタム曲スキン
+                        "sourceCode": {
+                            sort: 0,
+                            background: "blue",
+                            border: ["lightblue", "darkblue"],
+                            outline: "darkblue",
+                        },
 			"default": {
 				sort: null,
 				background: "rgb(236,236,236,.2)",
@@ -188,6 +195,13 @@ class SongSelect{
 			action: "plugins",
 			category: strings.random
 		})
+
+                // カスタムメニュー
+                this.songs.push({
+                    title: "ソースコード",
+                    skin: this.songSkin.sourceCode,
+                    action: "sourceCode",
+                });
 		
 		this.songs.push({
 			title: strings.back,
@@ -798,6 +812,13 @@ class SongSelect{
 			}else if(currentSong.action === "plugins"){
 				this.toPlugins()
 			}
+                        // カスタムメニューの実行処理
+                        else if (currentSong.action === "sourceCode") {
+                            this.playSound("se_don");
+                            setTimeout(() => {
+                                location.href = "https://codeberg.org/mofusky/play-taiko-web";
+                            }, 500);
+                        }
 		}
 		this.pointer(false)
 	}
