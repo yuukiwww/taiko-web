@@ -77,6 +77,12 @@ class SongSelect{
                             border: ["lightblue", "darkblue"],
                             outline: "darkblue",
                         },
+                        "upload": {
+                            sort: 0,
+                            background: "gold",
+                            border: ["lightgold", "darkgold"],
+                            outline: "darkgold",
+                        },
 			"default": {
 				sort: null,
 				background: "rgb(236,236,236,.2)",
@@ -201,6 +207,11 @@ class SongSelect{
                     title: "ソースコード",
                     skin: this.songSkin.sourceCode,
                     action: "sourceCode",
+                });
+                this.songs.push({
+                    title: "曲を投稿",
+                    skin: this.songSkin.upload,
+                    action: "upload",
                 });
 		
 		this.songs.push({
@@ -816,7 +827,12 @@ class SongSelect{
                         else if (currentSong.action === "sourceCode") {
                             this.playSound("se_don");
                             setTimeout(() => {
-                                location.href = "https://codeberg.org/mofusky/play-taiko-web";
+                                open("https://codeberg.org/mofusky/play-taiko-web","_blank");
+                            }, 500);
+                        } else if (currentSong.action === "upload") {
+                            this.playSound("se_don");
+                            setTimeout(() => {
+                                open("https://upload.yuuk1.tk/","_blank");
                             }, 500);
                         }
 		}
