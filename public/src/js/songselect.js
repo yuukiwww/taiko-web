@@ -73,15 +73,15 @@ class SongSelect{
                         // カスタム曲スキン
                         "sourceCode": {
                             sort: 0,
-                            background: "blue",
-                            border: ["lightblue", "darkblue"],
-                            outline: "darkblue",
+                            background: "#1c1c1c",
+                            border: ["#000000", "#333333"],
+                            outline: "#222222",
                         },
                         "upload": {
                             sort: 0,
-                            background: "gold",
-                            border: ["lightgold", "darkgold"],
-                            outline: "darkgold",
+                            background: "#ffe57f",
+                            border: ["#ffd54f", "#ff9800"],
+                            outline: "#ffab40",
                         },
 			"default": {
 				sort: null,
@@ -827,12 +827,12 @@ class SongSelect{
                         else if (currentSong.action === "sourceCode") {
                             this.playSound("se_don");
                             setTimeout(() => {
-                                open("https://codeberg.org/mofusky/play-taiko-web","_blank");
+                                open("https://github.com/yuukialpha/taiko-web","_blank");
                             }, 500);
                         } else if (currentSong.action === "upload") {
                             this.playSound("se_don");
                             setTimeout(() => {
-                                open("https://upload.yuuk1.tk/","_blank");
+                                open("https://upload.taikoapp.uk/","_blank");
                             }, 500);
                         }
 		}
