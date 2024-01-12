@@ -1059,8 +1059,12 @@
 		var ctx = config.ctx
 		ctx.save()
 		
-		if(config.iconName === "back"){
+		if(config.iconName === "download" ||config.iconName === "back"){
 			ctx.translate(config.x - 21, config.y - 21)
+			if(config.iconName === "download"){
+				ctx.rotate(Math.PI)
+				ctx.translate(-42, -42)
+			}
 			
 			var drawLine = y => {
 				ctx.beginPath()
@@ -1091,8 +1095,8 @@
 			drawLine(11)
 			drawTriangle()
 			ctx.translate(-1.5, -0.5)
-			ctx.fillStyle = "#23a6e1"
-			ctx.strokeStyle = "#23a6e1"
+			ctx.fillStyle = config.iconName === "download" ? "#a08eea" : "#23a6e1"
+			ctx.strokeStyle = config.iconName === "download" ? "#a08eea" : "#23a6e1"
 			ctx.globalCompositeOperation = "darken"
 			drawLine(11)
 			drawTriangle()
