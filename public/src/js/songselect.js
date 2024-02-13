@@ -2948,7 +2948,7 @@ class SongSelect{
 					if(!chartParsed){
 						chartParsed = true
 						if(song.type === "tja"){
-							promise = readFile(blob, false, "sjis").then(dataRaw => {
+							promise = readFile(blob, false, "utf-8").then(dataRaw => {
 								var data = dataRaw ? dataRaw.replace(/\0/g, "").split("\n") : []
 								var tja = new ParseTja(data, "oni", 0, 0, true)
 								for(var diff in tja.metadata){
