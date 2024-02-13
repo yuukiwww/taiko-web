@@ -14,8 +14,10 @@ import schema
 import os
 import time
 
+import flask
+
 from functools import wraps
-from flask import Flask, g, jsonify, render_template, request, abort, redirect, session, flash, make_response, send_from_directory, send_file
+from flask import Flask, g, jsonify, render_template, request, abort, redirect, session, flash, make_response, send_from_directory
 from flask_caching import Cache
 from flask_session import Session
 from flask_wtf.csrf import CSRFProtect, generate_csrf, CSRFError
@@ -32,12 +34,13 @@ def take_config(name, required=False):
         return None
 
 app = Flask(__name__)
-client = MongoClient(host=take_config('MONGO', required=True)['host'])
+client = MongoClient(host=os.environ.get("TAIKO_WEB_MONGO_HOST") or take_config('MONGO', required=True)['host'])
 basedir = take_config('BASEDIR') or '/'
 
 app.secret_key = take_config('SECRET_KEY') or 'change-me'
 app.config['SESSION_TYPE'] = 'redis'
 redis_config = take_config('REDIS', required=True)
+redis_config['CACHE_REDIS_HOST'] = os.environ.get("TAIKO_WEB_REDIS_HOST") or redis_config['CACHE_REDIS_HOST']
 app.config['SESSION_REDIS'] = Redis(
     host=redis_config['CACHE_REDIS_HOST'],
     port=redis_config['CACHE_REDIS_PORT'],
@@ -730,6 +733,28 @@ for code in error_pages:
     if error_pages[code]:
         create_error_page(code, error_pages[code])
 
+def cache_wrap(res_from, secs):
+    res = flask.make_response(res_from)
+    res.headers["Cache-Control"] = f"public, max-age={secs}, s-maxage={secs}"
+    res.headers["CDN-Cache-Control"] = f"max-age={secs}"
+    return res
+
+@app.route(basedir + "src/<path:ref>")
+def send_src(ref):
+    return cache_wrap(send_from_directory("public/src", ref), 3600)
+
+@app.route(basedir + "assets/<path:ref>")
+def send_assets(ref):
+    return cache_wrap(send_from_directory("public/assets", ref), 3600)
+
+@app.route(basedir + "songs/<path:ref>")
+def send_songs(ref):
+    return cache_wrap(send_from_directory("public/songs", ref), 604800)
+
+@app.route(basedir + "manifest.json")
+def send_manifest():
+    return cache_wrap(send_from_directory("public", "manifest.json"), 3600)
+
 if __name__ == '__main__':
     import argparse
 
@@ -738,22 +763,6 @@ if __name__ == '__main__':
     parser.add_argument('-b', '--bind-address', default='localhost', help='Bind server to address.')
     parser.add_argument('-d', '--debug', action='store_true', help='Enable debug mode.')
     args = parser.parse_args()
-
-    @app.route(basedir + 'src/<path:path>')
-    def send_src(path):
-        return send_from_directory('public/src', path)
-
-    @app.route(basedir + 'assets/<path:path>')
-    def send_assets(path):
-        return send_from_directory('public/assets', path)
-
-    @app.route(basedir + 'songs/<path:path>')
-    def send_songs(path):
-        return send_from_directory('public/songs', path)
-
-    @app.route(basedir + 'manifest.json')
-    def send_manifest_json():
-        return send_file('public/manifest.json')
 
     app.run(host=args.bind_address, port=args.port, debug=args.debug)
 
