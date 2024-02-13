@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>太鼓ウェブあっぷろーだー</title>
+    <link rel="stylesheet" href="./style.css">
+    <script src="./upload.js"></script>
+  </head>
+  <body>
+    <h1>太鼓ウェブあっぷろーだー</h1>
+
+    <form id="upload-form" enctype="multipart/form-data">
+      <label for="file_tja">TJA ファイル:</label>
+      <input type="file" name="file_tja" accept=".tja" required><br>
+
+      <label for="file_music">音楽ファイル:</label>
+      <input type="file" name="file_music" accept=".ogg,.mp3,.wav" required><br>
+
+      <br>
+      <button type="button" onclick="uploadFiles()">今すぐ投稿！ (30秒ほどかかる場合があります)</button>
+    </form>
+
+    <br>
+    <div id="error-view"></div>
+  </body>
+</html>
