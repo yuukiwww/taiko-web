@@ -54,3 +54,5 @@ public/assets/song_skins
 .venv
 public/src/js/plugin
 .hidden
+
+/__pycache__
