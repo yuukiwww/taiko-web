@@ -18,8 +18,6 @@
 	<script src="src/js/strings.js?{{version.commit_short}}"></script>
 	<script src="src/js/pageevents.js?{{version.commit_short}}"></script>
 	<script src="src/js/loader.js?{{version.commit_short}}"></script>
-
-	<script src="live2d-widget/autoload.js"></script>
 </head>
 <body>
 	<div id="assets"></div>
@@ -28,7 +26,7 @@
 		{% if version.version and version.commit_short and version.commit %}
 			<a href="{{version.url}}commit/{{version.commit}}" target="_blank" rel="noopener" id="version-link" class="stroke-sub" alt="taiko-web ver.{{version.version}} ({{version.commit_short}})">taiko-web ver.{{version.version}} ({{version.commit_short}})</a>
 		{% else %}
-			<a href="https://ipfs.io/ipfs/QmZz7edZ4oZYmsUXA8pz4ygfEPVjwVKKYgrzcmn9EzUvNj" target="_blank" rel="noopener" id="version-link" class="stroke-sub" alt="taiko-web vRAINBOW++">taiko-web vRAINBOW++</a>
+			<a target="_blank" rel="noopener" id="version-link" class="stroke-sub" alt="taiko-web vRAINBOW-BETA3">taiko-web vRAINBOW-BETA3</a>
 		{% endif %}
 	</div>
 	<script src="src/js/browsersupport.js?{{version.commit_short}}"></script>
