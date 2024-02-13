@@ -82,7 +82,7 @@ var assets = {
 		"mimizu.png"
 	],
 	"cssBackground": {
-		"#title-screen": "title-bad-apple.gif",
+		"#title-screen": "title-screen.png",
 		"#loading-don": "dancing-don.gif",
 		".pattern-bg": "bg-pattern-1.png",
 		".song-search-result-course::before": "difficulty.png",
