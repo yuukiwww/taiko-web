@@ -49,7 +49,7 @@ public/api
 taiko.db
 version.json
 public/index.html
-#config.py
+config.py
 public/assets/song_skins
 .venv
 public/src/js/plugin
