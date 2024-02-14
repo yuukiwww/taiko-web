@@ -473,7 +473,7 @@ def route_api_songs():
             song['song_skin'] = None
         del song['skin_id']
 
-    return jsonify(songs)
+    return cache_wrap(flask.jsonify(songs), 60)
 
 @app.route(basedir + 'api/categories')
 @app.cache.cached(timeout=15)
