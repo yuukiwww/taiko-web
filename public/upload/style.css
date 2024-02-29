@@ -1,3 +1,8 @@
+body > *:not(:last-child) {
+  margin-bottom: 3rem;
+}
+
 #error-view {
+  word-break: break-word;
   white-space: pre-line;
 }

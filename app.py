@@ -761,12 +761,9 @@ def send_songs(ref):
 def send_manifest():
     return cache_wrap(flask.send_from_directory("public", "manifest.json"), 3600)
 
-@app.route("/upload/")
-def send_upload():
-    return cache_wrap(flask.send_from_directory("public/upload", "index.html"), 3600)
-
+@app.route("/upload/", defaults={"ref": "index.html"})
 @app.route("/upload/<path:ref>")
-def send_upload_sub(ref):
+def send_upload(ref):
     return cache_wrap(flask.send_from_directory("public/upload", ref), 3600)
 
 @app.route("/upload", methods=["POST"])
