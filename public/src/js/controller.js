@@ -2,7 +2,7 @@ class Controller{
 	constructor(...args){
 		this.init(...args)
 	}
-	init(selectedSong, songData, autoPlayEnabled, multiplayer, touchEnabled){
+	init(selectedSong, songData, autoPlayEnabled, multiplayer, touchEnabled, baisoku = 1){
 		this.selectedSong = selectedSong
 		this.songData = songData
 		this.autoPlayEnabled = autoPlayEnabled
@@ -82,7 +82,10 @@ class Controller{
 		}
 		
 		this.game = new Game(this, this.selectedSong, this.parsedSongData)
-		this.view = new View(this)
+		this.view = new View(this, baisoku)
+		if (this.view.baisoku > 1) {
+			this.saveScore = false;
+		}
 		this.mekadon = new Mekadon(this, this.game)
 		this.keyboard = new GameInput(this)
 		if(!autoPlayEnabled && this.multiplayer !== 2){

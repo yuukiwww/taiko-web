@@ -2,8 +2,9 @@
 	constructor(...args){
 		this.init(...args)
 	}
-	init(controller){
+	init(controller, baisoku = 1){
 		this.controller = controller
+		this.baisoku = baisoku
 		
 		this.canvas = document.getElementById("canvas")
 		this.ctx = this.canvas.getContext("2d")
@@ -1487,11 +1488,11 @@
 		var measureH = 130 * mul
 		
 		measures.forEach(measure => {
-			var timeForDistance = this.posToMs(distanceForCircle, measure.speed)
+			var timeForDistance = this.posToMs(distanceForCircle, measure.speed * this.baisoku)
 			var startingTime = measure.ms - timeForDistance + this.controller.videoLatency
-			var finishTime = measure.ms + this.posToMs(this.slotPos.x - this.slotPos.paddingLeft + 3, measure.speed) + this.controller.videoLatency
+			var finishTime = measure.ms + this.posToMs(this.slotPos.x - this.slotPos.paddingLeft + 3, measure.speed * this.baisoku) + this.controller.videoLatency
 			if(measure.visible && (!measure.branch || measure.branch.active) && ms >= startingTime && ms <= finishTime){
-				var measureX = this.slotPos.x + this.msToPos(measure.ms - ms + this.controller.videoLatency, measure.speed)
+				var measureX = this.slotPos.x + this.msToPos(measure.ms - ms + this.controller.videoLatency, measure.speed * this.baisoku)
 				this.ctx.strokeStyle = measure.branchFirst ? "#ff0" : "#bdbdbd"
 				this.ctx.lineWidth = 3
 				this.ctx.beginPath()
@@ -1537,7 +1538,7 @@
 		
 		for(var i = circles.length; i--;){
 			var circle = circles[i]
-			var speed = circle.speed
+			var speed = circle.speed * this.baisoku
 			
 			var timeForDistance = this.posToMs(distanceForCircle + this.slotPos.size / 2, speed)
 			var startingTime = circle.ms - timeForDistance + this.controller.videoLatency
@@ -1626,7 +1627,7 @@
 		var circleMs = circle.ms
 		var endTime = circle.endTime
 		var animated = circle.animating
-		var speed = circle.speed
+		var speed = circle.speed * this.baisoku
 		var played = circle.isPlayed
 		var drumroll = 0
 		var endX = 0

@@ -254,7 +254,7 @@ class SongSelect{
 			iconFill: "#e7cbe1",
 			letterSpacing: 4
 		}]
-		this.optionsList = [strings.none, strings.auto, strings.netplay]
+		this.optionsList = [strings.none, strings.auto, strings.netplay, "ばいそく", "さんばい", "よんばい", "ばいそく＋オート", "さんばい＋オート", "よんばい＋オート"]
 		
 		this.draw = new CanvasDraw(noSmoothing)
 		this.songTitleCache = new CanvasCache(noSmoothing)
@@ -347,7 +347,7 @@ class SongSelect{
 			waitPreview: 0
 		}
 		this.songSelecting = {
-			speed: 400,
+			speed: 200,
 			resize: 0.3,
 			scrollDelay: 0.1
 		}
@@ -898,7 +898,21 @@ class SongSelect{
 		}
 		var autoplay = false
 		var multiplayer = false
-		if(p2.session || this.state.options === 2){
+		var baisoku = 1;
+		if (this.state.options >= 3 || this.state.options <= 8) {
+			const mapping = {
+				3: 2,
+				4: 3,
+				5: 4,
+				6: 2,
+				7: 3,
+				8: 4
+			};
+			baisoku = mapping[this.state.options];
+			if (this.state.options >= 6) {
+				autoplay = true
+			}
+		}if(p2.session || this.state.options === 2){
 			multiplayer = true
 		}else if(this.state.options === 1){
 			autoplay = true
@@ -922,7 +936,7 @@ class SongSelect{
 			"stars": selectedSong.courses[diff].stars,
 			"hash": selectedSong.hash,
 			"lyrics": selectedSong.lyrics
-		}, autoplay, multiplayer, touch)
+		}, autoplay, multiplayer, touch, baisoku)
 	}
 	toOptions(moveBy){
 		if(!p2.session){

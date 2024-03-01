@@ -1112,7 +1112,7 @@
 			ctx.fillStyle = "#7e7c76"
 			ctx.fill(this.optionsPath.shadow)
 			ctx.translate(2, -2)
-			ctx.fillStyle = "#d9d6ce"
+			ctx.fillStyle = "gold"
 			ctx.fill(this.optionsPath.main)
 		}
 		
