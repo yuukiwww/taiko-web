@@ -1,0 +1,9 @@
+/.git
+/.gitignore
+
+/Dockerfile
+/.dockerignore
+
+/__pycache__
+
+/public/songs
