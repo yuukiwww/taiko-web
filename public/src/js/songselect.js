@@ -347,7 +347,7 @@ class SongSelect{
 			waitPreview: 0
 		}
 		this.songSelecting = {
-			speed: 200,
+			speed: 666,
 			resize: 0.3,
 			scrollDelay: 0.1
 		}
@@ -845,7 +845,7 @@ class SongSelect{
                             this.playSound("se_don");
                             setTimeout(() => {
                                 window.location.href = "/upload/";
-                            }, 20);
+                            }, 100);
                         }
 		}
 		this.pointer(false)
