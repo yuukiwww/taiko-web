@@ -2,13 +2,13 @@
 
 docker run --detach \
   --name taiko-mongo-debug \
-  --volume taiko-mongo:/data/db \
+  --volume taiko-mongo-debug:/data/db \
   --publish 27017:27017 \
   mongo
 
 docker run --detach \
   --name taiko-redis-debug \
-  --volume taiko-redis:/data \
+  --volume taiko-redis-debug:/data \
   --publish 6379:6379 \
   redis
 
