@@ -19,5 +19,4 @@ docker run --detach \
   --env LETSENCRYPT_HOST=taikoapp.uk \
   --env VIRTUAL_HOST=taikoapp.uk \
   --env VIRTUAL_PORT=8080 \
-  --publish 9999:8080 \
   taiko
