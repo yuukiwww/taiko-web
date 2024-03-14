@@ -1,5 +1,8 @@
 #!/bin/bash
 
+docker kill taiko-mongo taiko-redis taiko
+docker rm -f taiko-mongo taiko-redis taiko
+
 docker run --detach \
   --name taiko-mongo \
   --volume taiko-mongo:/data/db \
