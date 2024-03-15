@@ -85,10 +85,10 @@ class SongSelect{
                         },
 			"default": {
 				sort: null,
-				background: "rgb(236,236,236,.2)",
-				border: ["rgb(251,251,251,.2)", "rgb(139,139,139,.2)"],
-				outline: "rgb(101,101,101,.2)",
-				infoFill: "rgb(101,101,101,.2)"
+				background: "rgb(236,236,236,.5)",
+				border: ["rgb(251,251,251,.5)", "rgb(139,139,139,.5)"],
+				outline: "rgb(101,101,101,.5)",
+				infoFill: "rgb(101,101,101,.5)"
 			}
 		}
 		
