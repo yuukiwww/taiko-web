@@ -3003,15 +3003,15 @@ class SongSelect{
 				blobs.push(musicBlob)
 			}))
 		}
-		if(song.lyricsFile){
-			promises.push(song.lyricsFile.blob().then(blob => {
-				lyricsBlob = {
-					name: song.lyricsFile.name,
-					data: blob
-				}
-				blobs.push(lyricsBlob)
-			}))
-		}
+		// if(song.lyricsFile){
+		// 	promises.push(song.lyricsFile.blob().then(blob => {
+		// 		lyricsBlob = {
+		// 			name: song.lyricsFile.name,
+		// 			data: blob
+		// 		}
+		// 		blobs.push(lyricsBlob)
+		// 	}))
+		// }
 		Promise.all(promises).then(() => {
 			if(musicFilename){
 				if(musicBlob){
