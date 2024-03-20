@@ -266,7 +266,7 @@ class Controller{
 							var chartDiff = this.selectedSong.difficulty
 							chart = chart[chartDiff]
 						}
-						this.addPromise(promises, chart.read(this.selectedSong.type === "tja" ? "sjis" : undefined).then(data => {
+						this.addPromise(promises, chart.read(this.selectedSong.type === "tja" ? "utf-8" : undefined).then(data => {
 							this.songData = data.replace(/\0/g, "").split("\n")
 							return Promise.resolve()
 						}), chart.url)

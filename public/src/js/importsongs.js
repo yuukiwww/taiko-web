@@ -146,7 +146,7 @@
 		var file = fileObj.file
 		var level = fileObj.level
 		var name = file.name.toLowerCase()
-		return file.read(name === "songtitle.txt" ? undefined : "sjis").then(data => {
+		return file.read(name === "songtitle.txt" ? undefined : "utf-8").then(data => {
 			var data = data.replace(/\0/g, "").split("\n")
 			var category
 			if(name === "genre.ini"){
@@ -228,7 +228,7 @@
 		var category = fileObj.category
 		var category_id = fileObj.category_id
 		if(!this.limited){
-			var filePromise = file.read("sjis")
+			var filePromise = file.read("utf-8")
 		}else{
 			var filePromise = Promise.resolve()
 		}

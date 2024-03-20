@@ -2681,7 +2681,7 @@ class SongSelect{
 		var currentSong = this.songs[selectedSong]
 		var file = currentSong.chart
 		var importSongs = new ImportSongs(false, assets.otherFiles)
-		return file.read(currentSong.type === "tja" ? "sjis" : "").then(data => {
+		return file.read(currentSong.type === "tja" ? "utf-8" : "").then(data => {
 			currentSong.chart = new CachedFile(data, file)
 			return importSongs[currentSong.type === "tja" ? "addTja" : "addOsu"]({
 				file: currentSong.chart,
