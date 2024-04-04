@@ -228,7 +228,7 @@
 		var category = fileObj.category
 		var category_id = fileObj.category_id
 		if(!this.limited){
-			var filePromise = file.read("utf-8")
+			var filePromise = file.read("sjis") // utf-8にしたい
 		}else{
 			var filePromise = Promise.resolve()
 		}
