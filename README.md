@@ -61,6 +61,9 @@ docker run --detach \
 今すぐデプロイ！
 
 - https://taikoapp.uk/
+- https://yuuk1.tk/
+- https://yuuk1.uk/
+- https://forgejo.win/
 
 ```bash
 docker run --detach \
@@ -70,8 +73,8 @@ docker run --detach \
   --env TAIKO_WEB_MONGO_HOST=taiko-mongo \
   --env TAIKO_WEB_REDIS_HOST=taiko-redis \
   --volume songs:/app/public/songs \
-  --env LETSENCRYPT_HOST=taikoapp.uk \
-  --env VIRTUAL_HOST=taikoapp.uk \
+  --env LETSENCRYPT_HOST=yuuk1.tk,yuuk1.uk,taikoapp.uk,forgejo.win \
+  --env VIRTUAL_HOST=yuuk1.tk,yuuk1.uk,taikoapp.uk,forgejo.win \
   --env VIRTUAL_PORT=8080 \
   taiko
 ```
