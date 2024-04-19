@@ -600,7 +600,9 @@ class SongSelect{
 				this.toDownload()
 			}else if(moveBy === 3){
 				// ここに削除処理を書く
-				alert("準備はいいですか？ (成功しても反映まで1分ほどかかる場合があります)");
+				if (!confirm("本当に削除しますか？\n成功しても反映まで1分ほどかかる場合があります")) {
+					return;
+				}
 				fetch("/api/delete", {
 					method: "POST",
 					headers: {
