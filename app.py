@@ -17,6 +17,7 @@ import time
 import traceback
 import pprint
 import pathlib
+import shutil
 
 import flask
 import nkf
@@ -817,6 +818,16 @@ def upload_file():
     except Exception as e:
         error_str = ''.join(traceback.TracebackException.from_exception(e).format())
         return flask.jsonify({'error': error_str})
+
+    return flask.jsonify({'success': True})
+
+@app.route("/api/delete", methods=["POST"])
+def delete():
+    id = flask.request.get_json().get('id')
+    client["taiko"]["songs"].delete_one({ "id": id })
+
+    target_dir = pathlib.Path(os.getenv("TAIKO_WEB_SONGS_DIR", "public/songs")) / id
+    shutil.rmtree(target_dir)
 
     return flask.jsonify({'success': True})
 

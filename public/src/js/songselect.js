@@ -208,13 +208,13 @@ class SongSelect{
                 //     skin: this.songSkin.sourceCode,
                 //     action: "sourceCode",
                 // });
-				for (let i = 0; i < 10; i++) {
+				// for (let i = 0; i < 10; i++) {
 				    this.songs.push({
                         title: "曲を投稿！",
                         skin: this.songSkin.upload,
                         action: "upload",
                     });
-                }
+                // }
 		
 		this.songs.push({
 			title: strings.back,
@@ -252,6 +252,12 @@ class SongSelect{
 			fill: "#e7a9da",
 			iconName: "download",
 			iconFill: "#e7cbe1",
+			letterSpacing: 4
+		}, {
+			text: "削除",
+			fill: "silver",
+			iconName: "trash",
+			iconFill: "#111111",
 			letterSpacing: 4
 		}]
 		this.optionsList = [strings.none, strings.auto, strings.netplay, "ばいそく", "さんばい", "よんばい", "ばいそく＋オート", "さんばい＋オート", "よんばい＋オート"]
@@ -421,6 +427,10 @@ class SongSelect{
 	}
 
 	setSelectedSong(songIdx, drawBg=true){
+		if (songIdx < 0) {
+			return;
+		}
+
 		if(drawBg){
 			var cat = this.songs[songIdx].originalCategory
 			if(cat){
@@ -588,6 +598,22 @@ class SongSelect{
 				this.toSongSelect()
 			}else if(moveBy === 2){
 				this.toDownload()
+			}else if(moveBy === 3){
+				// ここに削除処理を書く
+				alert("準備はいいですか？ (成功しても反映まで1分ほどかかる場合があります)");
+				fetch("/api/delete", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						id: this.songs[this.selectedSong].id,
+					})
+				})
+					.then((res) => res.text())
+					.then((text) => {
+						alert(text);
+					});
 			}else if(moveBy === 1){
 				this.toOptions(1)
 			}else if(moveBy === "maker"){
