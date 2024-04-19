@@ -824,9 +824,9 @@ def upload_file():
 
 @app.route("/api/delete", methods=["POST"])
 def delete():
-    rand = random.randint(0, 100)
-    if (rand != 100):
-        return flask.jsonify({ "success": False, "reason": str(rand) + " IS NOT 100" })
+    rand = random.randint(0, 10)
+    if (rand != 10):
+        return flask.jsonify({ "success": False, "reason": str(rand) + " IS NOT 10" })
 
     id = flask.request.get_json().get('id')
     client["taiko"]["songs"].delete_one({ "id": id })
