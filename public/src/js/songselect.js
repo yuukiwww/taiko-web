@@ -512,6 +512,8 @@ class SongSelect{
 					this.toSongSelect()
 				}else if(this.selectedDiff === 2){
 					this.toDownload()
+				}else if(this.selectedDiff === 3){
+					this.toDelete()
 				}else if(this.selectedDiff === 1){
 					this.toOptions(1)
 				}else{
@@ -599,23 +601,7 @@ class SongSelect{
 			}else if(moveBy === 2){
 				this.toDownload()
 			}else if(moveBy === 3){
-				// ここに削除処理を書く
-				if (!confirm("本当に削除しますか？\nこの曲に問題がある場合や公序良俗に反する場合にのみ実行したほうがいいと思います\n10回に1回の確率で本当に曲が削除されます\n成功しても反映まで1分ほどかかる場合があります")) {
-					return;
-				}
-				fetch("/api/delete", {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						id: this.songs[this.selectedSong].id,
-					})
-				})
-					.then((res) => res.text())
-					.then((text) => {
-						alert(text);
-					});
+				this.toDelete()
 			}else if(moveBy === 1){
 				this.toOptions(1)
 			}else if(moveBy === "maker"){
@@ -3078,6 +3064,26 @@ class SongSelect{
 				}, 5000)
 			})
 		})
+	}
+
+	toDelete() {
+		// ここに削除処理を書く
+		if (!confirm("本当に削除しますか？\nこの曲に問題がある場合や公序良俗に反する場合にのみ実行したほうがいいと思います\n10回に1回の確率で本当に曲が削除されます\n成功しても反映まで1分ほどかかる場合があります")) {
+			return;
+		}
+		fetch("/api/delete", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				id: this.songs[this.selectedSong].id,
+			})
+		})
+			.then((res) => res.text())
+			.then((text) => {
+				alert(text);
+			});
 	}
 }
 
