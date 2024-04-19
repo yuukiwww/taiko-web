@@ -3,4 +3,4 @@ COPY . /app
 WORKDIR /app
 RUN pip install -r requirements.txt
 ENV PYTHONUNBUFFERED 1
-CMD ["waitress-serve", "app:app"]
+CMD ["gunicorn", "app:app", "--access-logfile", "-", "--bind", "0.0.0.0"]

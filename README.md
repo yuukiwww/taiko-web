@@ -73,9 +73,9 @@ docker run --detach \
   --env TAIKO_WEB_MONGO_HOST=taiko-mongo \
   --env TAIKO_WEB_REDIS_HOST=taiko-redis \
   --volume songs:/app/public/songs \
-  --env LETSENCRYPT_HOST=yuuk1.tk,yuuk1.uk,taikoapp.uk,forgejo.win \
-  --env VIRTUAL_HOST=yuuk1.tk,yuuk1.uk,taikoapp.uk,forgejo.win \
-  --env VIRTUAL_PORT=8080 \
+  --env LETSENCRYPT_HOST=forgejo.win,yuuk1.tk,yuuk1.uk,taikoapp.uk \
+  --env VIRTUAL_HOST=forgejo.win,yuuk1.tk,yuuk1.uk,taikoapp.uk \
+  --env VIRTUAL_PORT=8000 \
   taiko
 ```
 
