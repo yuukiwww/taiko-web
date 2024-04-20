@@ -14,15 +14,19 @@ import schema
 import os
 import time
 
+# -- カスタム --
 import traceback
 import pprint
 import pathlib
 import shutil
 import random
+import datetime
 
 import flask
 import nkf
 import tjaf
+
+# ----
 
 from functools import wraps
 from flask import Flask, g, jsonify, render_template, request, abort, redirect, session, flash, make_response, send_from_directory
@@ -835,6 +839,67 @@ def delete():
     shutil.rmtree(target_dir)
 
     return flask.jsonify({'success': True})
+
+@app.route("/cloudflare")
+def cloudflare():
+    token = flask.request.headers.get("X-Token")
+    zone_id = flask.request.args.get("zone_id")
+
+    today = datetime.datetime.now()
+    last_month = today - datetime.timedelta(days=30)
+
+    query = """{
+  viewer {
+    zones(filter: {
+      zoneTag: $zoneTag
+    }) {
+      httpRequests1dGroups(
+        orderBy: [date_ASC],
+        limit: $limit,
+        filter: {
+          date_gt: $from,
+          date_leq: $to
+        }
+      ) {
+        dimensions {
+          date
+        }
+        sum {
+          bytes
+          cachedBytes
+        }
+        uniq {
+          uniques
+        }
+      }
+    }
+  }
+}
+"""
+    variables = {
+        "zoneTag": zone_id,
+        "from": last_month.astimezone(datetime.timezone.utc).strftime("%Y-%m-%d"),
+        "to": today.astimezone(datetime.timezone.utc).strftime("%Y-%m-%d"),
+        "limit": 30
+    }
+    data = {
+        "query": query,
+        "variables": variables
+    }
+    result = requests.post(
+        url="https://api.cloudflare.com/client/v4/graphql",
+        headers={
+            "Authorization": f"Bearer {token}"
+        },
+        data=json.dumps(data)
+    )
+
+    return cache_wrap(flask.jsonify(result.json()), 60)
+
+@app.route("/stats/", defaults={"ref": "index.html"})
+@app.route("/stats/<path:ref>")
+def send_stats(ref):
+    return cache_wrap(flask.send_from_directory("public/stats", ref), 3600)
 
 if __name__ == '__main__':
     import argparse

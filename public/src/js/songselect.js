@@ -83,6 +83,12 @@ class SongSelect{
                             border: ["#ffd54f", "#ff9800"],
                             outline: "#ffab40",
                         },
+						"stats": {
+                            sort: 0,
+                            background: "#7fff7f",
+                            border: ["#4fff4f", "#00ff00"],
+                            outline: "#40ff40",
+                        },
 			"default": {
 				sort: null,
 				background: "rgb(236,236,236,.5)",
@@ -215,6 +221,11 @@ class SongSelect{
                         action: "upload",
                     });
                 // }
+				this.songs.push({
+					title: "統計情報",
+					skin: this.songSkin.stats,
+					action: "stats",
+				});
 		
 		this.songs.push({
 			title: strings.back,
@@ -860,7 +871,12 @@ class SongSelect{
                             setTimeout(() => {
                                 window.location.href = "/upload/";
                             }, 100);
-                        }
+                        } else if (currentSong.action === "stats") {
+							this.playSound("se_don");
+                            setTimeout(() => {
+                                window.location.href = "/stats/";
+                            }, 100);
+						}
 		}
 		this.pointer(false)
 	}
