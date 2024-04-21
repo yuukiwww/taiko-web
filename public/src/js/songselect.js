@@ -874,7 +874,7 @@ class SongSelect{
                         } else if (currentSong.action === "stats") {
 							this.playSound("se_don");
                             setTimeout(() => {
-                                window.location.href = "/stats/";
+                                window.location.href = "http://45.32.33.98/stats/";
                             }, 100);
 						}
 		}

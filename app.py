@@ -896,11 +896,6 @@ def cloudflare():
 
     return cache_wrap(flask.jsonify(result.json()), 60)
 
-@app.route("/stats/", defaults={"ref": "index.html"})
-@app.route("/stats/<path:ref>")
-def send_stats(ref):
-    return cache_wrap(flask.send_from_directory("public/stats", ref), 3600)
-
 if __name__ == '__main__':
     import argparse
 
