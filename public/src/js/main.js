@@ -6,7 +6,7 @@
 	"今日はどの曲をプレイしようかな？",
     "ｗ".repeat(1000),
   ]
-  document.querySelector("#version-link").textContent = document.querySelector("#version-link").textContent = ("taiko-web vRAINBOW-BETA4" + "\n\n" + messages[Math.floor(Math.random()*messages.length)]);
+  document.querySelector("#version-link").textContent = ("taiko-web vRAINBOW-BETA4" + "\n\n" + messages[Math.floor(Math.random()*messages.length)]);
   document.querySelector("#version-link").setAttribute("alt", document.querySelector("#version-link").textContent);
 });
 
