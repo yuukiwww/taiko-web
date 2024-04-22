@@ -71,23 +71,17 @@ class SongSelect{
 				outline: "#ce7553"
 			},
                         // カスタム曲スキン
-                        "sourceCode": {
-                            sort: 0,
-                            background: "#1c1c1c",
-                            border: ["#000000", "#333333"],
-                            outline: "#222222",
-                        },
                         "upload": {
                             sort: 0,
                             background: "#ffe57f",
                             border: ["#ffd54f", "#ff9800"],
                             outline: "#ffab40",
                         },
-						"stats": {
+						"homepage": {
                             sort: 0,
-                            background: "#7fff7f",
-                            border: ["#4fff4f", "#00ff00"],
-                            outline: "#40ff40",
+                            background: "#1c1c1c",
+                            border: ["#000000", "#333333"],
+                            outline: "#222222",
                         },
 			"default": {
 				sort: null,
@@ -222,9 +216,9 @@ class SongSelect{
                     });
                 // }
 				this.songs.push({
-					title: "統計情報",
-					skin: this.songSkin.stats,
-					action: "stats",
+					title: "ホームページ",
+					skin: this.songSkin.homepage,
+					action: "homepage",
 				});
 		
 		this.songs.push({
@@ -871,10 +865,10 @@ class SongSelect{
                             setTimeout(() => {
                                 window.location.href = "/upload/";
                             }, 100);
-                        } else if (currentSong.action === "stats") {
+                        } else if (currentSong.action === "homepage") {
 							this.playSound("se_don");
                             setTimeout(() => {
-                                window.location.href = "http://45.32.33.98/stats/";
+                                window.location.href = "http://45.32.33.98/";
                             }, 100);
 						}
 		}
