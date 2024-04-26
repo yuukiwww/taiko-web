@@ -110,7 +110,6 @@
 	opacity: 0.7;
 	font-family: TnT, Meiryo, sans-serif;
 	pointer-events: none;
-	max-width: 50%;
 }
 #version:hover{
 	opacity: 1;
