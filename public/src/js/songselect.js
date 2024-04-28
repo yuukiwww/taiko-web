@@ -868,7 +868,7 @@ class SongSelect{
                         } else if (currentSong.action === "homepage") {
 							this.playSound("se_don");
                             setTimeout(() => {
-                                window.location.href = "http://45.32.33.98/";
+                                window.location.href = "https://homepage-zeta-two.vercel.app/";
                             }, 100);
 						}
 		}
