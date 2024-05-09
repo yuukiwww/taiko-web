@@ -1,11 +1,4 @@
 /.git
-/.gitignore
-
-/Dockerfile
-/.dockerignore
-
 /__pycache__
-
-/README.md
 
 /public/songs

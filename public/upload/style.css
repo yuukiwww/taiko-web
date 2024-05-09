@@ -15,9 +15,9 @@ body * {
 
 body {
   margin: 0;
-  padding: 3rem;
+  padding: 2rem;
 }
 
-body > *:not(:last-child) {
-  margin-bottom: 3rem;
+body > :not(:last-child) {
+  margin-bottom: 2rem;
 }
