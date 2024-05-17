@@ -1,9 +1,4 @@
-﻿addEventListener("load", () => {
-  document.querySelector("#version-link").textContent = "taiko-web vRAINBOW-BETA4";
-  document.querySelector("#version-link").setAttribute("alt", document.querySelector("#version-link").textContent);
-});
-
-addEventListener("error", function(err){
+﻿addEventListener("error", function(err){
 	var stack
 	if("error" in err && err.error){
 		stack = err.error.stack
