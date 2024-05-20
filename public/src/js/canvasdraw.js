@@ -153,7 +153,7 @@
 				y: 5,
 				force: !noForce
 			})
-			ctx.fillStyle = `rgba(0,0,0,.1)`
+			ctx.fillStyle = "rgba(0,0,0,.2)"
 			ctx.fillRect(0, 0, w, h)
 		}
 		if(config.cached){
