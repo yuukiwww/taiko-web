@@ -85,10 +85,10 @@ class SongSelect{
                         },
 			"default": {
 				sort: null,
-				background: "rgb(236,236,236,.5)",
-				border: ["rgb(251,251,251,.5)", "rgb(139,139,139,.5)"],
-				outline: "rgb(101,101,101,.5)",
-				infoFill: "rgb(101,101,101,.5)"
+				background: "rgb(0,0,0,0)",
+				border: ["rgb(0,255,0,.5)", "rgb(0,0,255,.5)"],
+				outline: "#333333",
+				infoFill: "rgb(0,0,0,0)"
 			}
 		}
 		
@@ -1707,7 +1707,7 @@ class SongSelect{
 								})
 							}
 						}
-						if(songSel){
+						if(songSel && !this.state.move){
 							var _x = x + 33 + i * 60
 							var _y = y + 120
 							ctx.fillStyle = currentUra ? "#006279" : "#ff9f18"
