@@ -86,7 +86,7 @@ class SongSelect{
 			"default": {
 				sort: null,
 				background: "rgb(0,0,0,0)",
-				border: ["rgb(0,255,0,.5)", "rgb(0,0,255,.5)"],
+				border: ["gold", "rgb(0,0,0,0)"],
 				outline: "#333333",
 				infoFill: "rgb(0,0,0,0)"
 			}
