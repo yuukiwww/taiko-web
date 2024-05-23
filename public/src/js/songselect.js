@@ -77,7 +77,7 @@ class SongSelect{
                             border: ["#ffd54f", "#ff9800"],
                             outline: "#ffab40",
                         },
-						"homepage": {
+						"keijiban": {
                             sort: 0,
                             background: "#1c1c1c",
                             border: ["#000000", "#333333"],
@@ -216,9 +216,9 @@ class SongSelect{
                     });
                 // }
 				this.songs.push({
-					title: "ホームページ",
-					skin: this.songSkin.homepage,
-					action: "homepage",
+					title: "掲示板",
+					skin: this.songSkin.keijiban,
+					action: "keijiban",
 				});
 		
 		this.songs.push({
@@ -865,10 +865,10 @@ class SongSelect{
                             setTimeout(() => {
                                 window.location.href = "/upload/";
                             }, 100);
-                        } else if (currentSong.action === "homepage") {
+                        } else if (currentSong.action === "keijiban") {
 							this.playSound("se_don");
                             setTimeout(() => {
-                                window.location.href = "https://homepage-zeta-two.vercel.app/";
+                                window.location.href = "https://litey.trade/";
                             }, 100);
 						}
 		}
