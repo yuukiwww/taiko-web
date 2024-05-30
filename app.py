@@ -835,7 +835,11 @@ def delete():
     id = flask.request.get_json().get('id')
     client["taiko"]["songs"].delete_one({ "id": id })
 
-    target_dir = pathlib.Path(os.getenv("TAIKO_WEB_SONGS_DIR", "public/songs")) / id
+    parent_dir = pathlib.Path(os.getenv("TAIKO_WEB_SONGS_DIR", "public/songs"))
+    target_dir = parent_dir / id
+    if target_dir.resolve().relative_to(parent_dir.resolve()) == pathlib.Path("."):
+        return flask.jsonify({ "success": False, "reason": "PARENT IS NOT ALLOWED" })
+
     shutil.rmtree(target_dir)
 
     return flask.jsonify({'success': True})
