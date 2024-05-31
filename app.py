@@ -456,7 +456,7 @@ def route_api_preview():
 @app.route(basedir + 'api/songs')
 @app.cache.cached(timeout=15)
 def route_api_songs():
-    songs = list(db.songs.find({'enabled': True}, {'_id': False, 'enabled': False}).limit(1000))
+    songs = list(db.songs.find({'enabled': True}, {'_id': False, 'enabled': False}).sort({"order":-1}).limit(1000))
     for song in songs:
         if song['maker_id']:
             if song['maker_id'] == 0:
