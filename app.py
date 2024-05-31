@@ -774,7 +774,7 @@ def send_upload(ref):
 
 @app.route("/upload", methods=["POST"])
 def upload_file():
-    if client.taiko.songs.count_documents({}) >= 5000:
+    if client.taiko.songs.count_documents({}) >= 1000:
         return flask.jsonify({"error": "既に追加されている曲が多すぎます"})
 
     try:
@@ -806,6 +806,9 @@ def upload_file():
         msg2.update(music_data)
         music_hash = msg2.hexdigest()
         print("音楽:",music_hash)
+        # ファイルが大きすぎる場合はブロック
+        if len(tja_data) + len(music_data) >= 25 * 1000 ** 2:
+            return flask.jsonify({"error": "ファイルが大きすぎます"})
         # IDを生成
         generated_id = f"{tja_hash}-{music_hash}"
         # MongoDBのデータも作成
