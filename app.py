@@ -456,7 +456,7 @@ def route_api_preview():
 @app.route(basedir + 'api/songs')
 @app.cache.cached(timeout=15)
 def route_api_songs():
-    songs = list(db.songs.find({'enabled': True}, {'_id': False, 'enabled': False}).sort({"order":-1}).limit(1000))
+    songs = list(db.songs.find({'enabled': True}, {'_id': False, 'enabled': False}))
     for song in songs:
         if song['maker_id']:
             if song['maker_id'] == 0:
@@ -774,6 +774,9 @@ def send_upload(ref):
 
 @app.route("/upload", methods=["POST"])
 def upload_file():
+    if client.taiko.songs.count_documents({}) >= 5000:
+        return flask.jsonify({"error": "既に追加されている曲が多すぎます"})
+
     try:
         # POSTリクエストにファイルの部分がない場合
         if 'file_tja' not in flask.request.files or 'file_music' not in flask.request.files:
@@ -843,62 +846,6 @@ def delete():
     shutil.rmtree(target_dir)
 
     return flask.jsonify({'success': True})
-
-@app.route("/cloudflare")
-def cloudflare():
-    token = flask.request.headers.get("X-Token")
-    zone_id = flask.request.args.get("zone_id")
-
-    today = datetime.datetime.now()
-    last_month = today - datetime.timedelta(days=30)
-
-    query = """{
-  viewer {
-    zones(filter: {
-      zoneTag: $zoneTag
-    }) {
-      httpRequests1dGroups(
-        orderBy: [date_ASC],
-        limit: $limit,
-        filter: {
-          date_gt: $from,
-          date_leq: $to
-        }
-      ) {
-        dimensions {
-          date
-        }
-        sum {
-          bytes
-          cachedBytes
-        }
-        uniq {
-          uniques
-        }
-      }
-    }
-  }
-}
-"""
-    variables = {
-        "zoneTag": zone_id,
-        "from": last_month.astimezone(datetime.timezone.utc).strftime("%Y-%m-%d"),
-        "to": today.astimezone(datetime.timezone.utc).strftime("%Y-%m-%d"),
-        "limit": 30
-    }
-    data = {
-        "query": query,
-        "variables": variables
-    }
-    result = requests.post(
-        url="https://api.cloudflare.com/client/v4/graphql",
-        headers={
-            "Authorization": f"Bearer {token}"
-        },
-        data=json.dumps(data)
-    )
-
-    return cache_wrap(flask.jsonify(result.json()), 60)
 
 if __name__ == '__main__':
     import argparse
