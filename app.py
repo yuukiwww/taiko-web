@@ -834,6 +834,9 @@ def upload_file():
 
 @app.route("/api/delete", methods=["POST"])
 def delete():
+    if client.taiko.songs.count_documents({}) < 50:
+        return flask.jsonify({ "success": False, "reason": "It feels like there are too few songs already added." })
+
     rand = random.randint(0, 10)
     if (rand != 10):
         return flask.jsonify({ "success": False, "reason": str(rand) + " IS NOT 10" })
