@@ -6,9 +6,9 @@ Flask-Session==0.8.0
 Flask-WTF==1.2.1
 gunicorn==22.0.0
 jsonschema==4.22.0
-pymongo==4.7.2
-redis==5.0.4
+pymongo==4.7.3
+redis==5.0.6
 requests==2.32.3
 websockets==12.0
 nkf==1.0.4
-git+https://codeberg.org/yuukixyz/tjaf.git@ebe79e3696d4e1ce0fcdae9e4164e7fd6288b22a
+git+https://github.com/yuukiwww/tjaf.git@ebe79e3696d4e1ce0fcdae9e4164e7fd6288b22a
