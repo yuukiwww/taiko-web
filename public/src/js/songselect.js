@@ -19,7 +19,7 @@ class SongSelect{
 
 		let rand = () => {
 			let color = Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0");
-			return `#${color}`
+			return `#${color}`;
 		}
 	
 		this.songSkin = {
@@ -92,7 +92,7 @@ class SongSelect{
 				sort: null,
 				background: `${rand()}`,
 				border: [`${rand()}`, `${rand()}`],
-				outline: `#000000`,
+				outline: `#333333`,
 				infoFill: `${rand()}`
 			}
 		}
