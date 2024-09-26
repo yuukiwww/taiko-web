@@ -17,6 +17,11 @@ class SongSelect{
 			this.canvas.style.imageRendering = "pixelated"
 		}
 
+		let rand = () => {
+			let color = Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0");
+			return `#${color}`
+		}
+	
 		this.songSkin = {
 			"selected": {
 				background: "#ffdb2c",
@@ -85,10 +90,10 @@ class SongSelect{
                         },
 			"default": {
 				sort: null,
-				background: "rgba(0,0,0,0)",
-				border: ["rgba(255,127,212,.8)", "rgba(255,0,255,.6)"],
-				outline: "rgba(0,0,0,.4)",
-				infoFill: "rgba(0,0,0,0)"
+				background: `${rand()}`,
+				border: [`${rand()}`, `${rand()}`],
+				outline: `#000000`,
+				infoFill: `${rand()}`
 			}
 		}
 		
