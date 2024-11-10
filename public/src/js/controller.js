@@ -9,6 +9,7 @@ class Controller{
 		this.saveScore = !autoPlayEnabled
 		this.multiplayer = multiplayer
 		this.touchEnabled = touchEnabled
+		this.baisoku = baisoku
 		if(multiplayer === 2){
 			this.snd = p2.player === 2 ? "_p1" : "_p2"
 			this.don = p2.don || defaultDon
@@ -279,7 +280,7 @@ class Controller{
 					Promise.all(promises).then(resolve)
 				}
 			}).then(() => {
-				var taikoGame = new Controller(this.selectedSong, this.songData, this.autoPlayEnabled, false, this.touchEnabled)
+				var taikoGame = new Controller(this.selectedSong, this.songData, this.autoPlayEnabled, false, this.touchEnabled, this.baisoku)
 				taikoGame.run()
 			})
 		}
