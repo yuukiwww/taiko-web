@@ -2,7 +2,7 @@ function uploadFiles() {
   const form = document.querySelector("#upload-form");
   const formData = new FormData(form);
 
-  fetch("/upload", {
+  fetch("/api/upload", {
     method: "POST",
     body: formData,
   })

@@ -772,7 +772,7 @@ def send_manifest():
 def send_upload(ref):
     return cache_wrap(flask.send_from_directory("public/upload", ref), 3600)
 
-@app.route("/upload", methods=["POST"])
+@app.route("/api/upload", methods=["POST"])
 def upload_file():
     try:
         # POSTリクエストにファイルの部分がない場合
