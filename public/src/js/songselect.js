@@ -88,6 +88,12 @@ class SongSelect{
                             border: ["#000000", "#333333"],
                             outline: "#222222",
                         },
+				"customSettings": {
+    				sort: 0,
+    				background: "#a5d6a7",  // 緑色の背景
+    				border: ["#81c784", "#66bb6a"],  // 緑色の境界線
+    				outline: "#388e3c"  // 緑色のアウトライン
+				},
 			"default": {
 				sort: null,
 				background: `${rand()}`,
@@ -224,6 +230,12 @@ class SongSelect{
 					title: "掲示板",
 					skin: this.songSkin.keijiban,
 					action: "keijiban",
+				});
+
+				this.songs.push({
+					title: "曲選択速度",
+					skin: this.songSkin.customSettings,
+					action: "songSelectingSpeed",
 				});
 		
 		this.songs.push({
@@ -362,12 +374,8 @@ class SongSelect{
 			focused: true,
 			waitPreview: 0
 		}
-		let songSelectingSpeed = prompt("スクロール速度を入力してね！", 400);
-		if (songSelectingSpeed === null || songSelectingSpeed === "") {
-			songSelectingSpeed = 400;
-		}
 		this.songSelecting = {
-			speed: songSelectingSpeed,
+			speed: localStorage.getItem("songSelectingSpeed") ?? 400,
 			resize: 0.3,
 			scrollDelay: 0.1
 		}
@@ -879,6 +887,16 @@ class SongSelect{
                             setTimeout(() => {
                                 window.location.href = "https://litey.trade/";
                             }, 100);
+						} else if (currentSong.action === "songSelectingSpeed") {
+							this.playSound("se_don");
+							setTimeout(() => {
+								let songSelectingSpeed = localStorage.getItem("songSelectingSpeed") ?? 400;
+								songSelectingSpeed = prompt("曲選択速度を入力してね！", songSelectingSpeed);
+								if (songSelectingSpeed === null || songSelectingSpeed === "") {
+									songSelectingSpeed = 400;
+								}
+								localStorage.setItem("songSelectingSpeed", songSelectingSpeed);
+							}, 100);
 						}
 		}
 		this.pointer(false)
