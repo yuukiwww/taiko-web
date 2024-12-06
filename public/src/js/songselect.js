@@ -362,8 +362,12 @@ class SongSelect{
 			focused: true,
 			waitPreview: 0
 		}
+		let songSelectingSpeed = prompt("スクロール速度を入力してね！", 400);
+		if (songSelectingSpeed === null || songSelectingSpeed === "") {
+			songSelectingSpeed = 400;
+		}
 		this.songSelecting = {
-			speed: 666,
+			speed: songSelectingSpeed,
 			resize: 0.3,
 			scrollDelay: 0.1
 		}
