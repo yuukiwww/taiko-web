@@ -375,7 +375,7 @@ class SongSelect{
 			waitPreview: 0
 		}
 		this.songSelecting = {
-			speed: localStorage.getItem("songSelectingSpeed") ?? 400,
+			speed: parseInt(localStorage.getItem("sss") ?? "400", 10),
 			resize: 0.3,
 			scrollDelay: 0.1
 		}
@@ -890,12 +890,16 @@ class SongSelect{
 						} else if (currentSong.action === "songSelectingSpeed") {
 							this.playSound("se_don");
 							setTimeout(() => {
-								let songSelectingSpeed = localStorage.getItem("songSelectingSpeed") ?? 400;
-								songSelectingSpeed = prompt("曲選択速度を入力してね！", songSelectingSpeed);
-								if (songSelectingSpeed === null || songSelectingSpeed === "") {
-									songSelectingSpeed = 400;
+								let songSelectingSpeed = localStorage.getItem("sss") ?? "400";
+								const pro = prompt("曲選択速度を入力してね！", songSelectingSpeed);
+								if (pro === null) {
+									// キャンセル
+								} else if (pro === "") {
+									songSelectingSpeed = "400";
+								} else {
+									songSelectingSpeed = pro;
 								}
-								localStorage.setItem("songSelectingSpeed", songSelectingSpeed);
+								localStorage.setItem("sss", songSelectingSpeed.toString());
 							}, 100);
 						}
 		}
