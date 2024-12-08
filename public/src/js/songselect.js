@@ -256,6 +256,12 @@ class SongSelect{
 					action: "abekobe",
 				});
 
+				this.songs.push({
+					title: "でたらめ",
+					skin: this.songSkin.customSettings,
+					action: "detarame",
+				});
+
 		this.songs.push({
 			title: strings.back,
 			skin: this.songSkin.back,
@@ -960,6 +966,20 @@ class SongSelect{
 									abekobe = input;
 								}
 								localStorage.setItem("abekobe", abekobe);
+							}, 100);
+						} else if (currentSong.action === "detarame") {
+							this.playSound("se_don");
+							setTimeout(() => {
+								let detarame = localStorage.getItem("detarame") ?? "0";
+								const input = prompt("でたらめになる確率をパーセントで入力してね！", detarame);
+								if (input === null) {
+									// キャンセル
+								} else if (input === "") {
+									input = "0";
+								} else {
+									detarame = input;
+								}
+								localStorage.setItem("detarame", detarame);
 							}, 100);
 						}
 		}

@@ -514,9 +514,11 @@
 			}else{
 				
 				var string = line.toUpperCase().split("")
-				
+
+				const abekobe = localStorage.getItem("abekobe") ?? "false";
+				const detarame = parseFloat(localStorage.getItem("detarame") ?? "0", 10);
+
 				for(let symbol of string){
-					const abekobe = localStorage.getItem("abekobe") ?? "false";
 
 					if (abekobe === "true") {
 						if (symbol === "1") {
@@ -531,6 +533,22 @@
 							symbol = "B";
 						} else if (symbol === "B") {
 							symbol - "A";
+						}
+					}
+
+					if (detarame > 0) {
+						const randomValue = Math.random() * 100;
+						if (randomValue < detarame) {
+
+							const first = ["1", "2"];
+							const second = ["3", "4", "A", "B"];
+							if (first.includes(symbol)) {
+								const firstIndex = Math.floor(Math.random() * first.length);
+								symbol = first[firstIndex];
+							} else if (second.includes(symbol)) {
+								const secondIndex = Math.floor(Math.random() * second.length);
+								symbol = second[secondIndex];
+							}
 						}
 					}
 
