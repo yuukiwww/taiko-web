@@ -516,7 +516,24 @@
 				var string = line.toUpperCase().split("")
 				
 				for(let symbol of string){
-					
+					const abekobe = localStorage.getItem("abekobe") ?? "false";
+
+					if (abekobe === "true") {
+						if (symbol === "1") {
+							symbol = "2";
+						} else if (symbol === "2") {
+							symbol = "1";
+						} else if (symbol === "3") {
+							symbol = "4";
+						} else if (symbol === "4") {
+							symbol = "3";
+						} else if (symbol === "A") {
+							symbol = "B";
+						} else if (symbol === "B") {
+							symbol - "A";
+						}
+					}
+
 					var error = false
 					switch(symbol){
 						

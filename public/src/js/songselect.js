@@ -250,6 +250,12 @@ class SongSelect{
 					action: "doron",
 				});
 
+				this.songs.push({
+					title: "あべこべ",
+					skin: this.songSkin.customSettings,
+					action: "abekobe",
+				});
+
 		this.songs.push({
 			title: strings.back,
 			skin: this.songSkin.back,
@@ -940,6 +946,20 @@ class SongSelect{
 									doron = input;
 								}
 								localStorage.setItem("doron", doron);
+							}, 100);
+						} else if (currentSong.action === "abekobe") {
+							this.playSound("se_don");
+							setTimeout(() => {
+								let abekobe = localStorage.getItem("abekobe") ?? "false";
+								const input = prompt("あべこべを有効にするには\"true\"を入力してね！", abekobe);
+								if (input === null) {
+									// キャンセル
+								} else if (input === "") {
+									input = "false";
+								} else {
+									abekobe = input;
+								}
+								localStorage.setItem("abekobe", abekobe);
 							}, 100);
 						}
 		}

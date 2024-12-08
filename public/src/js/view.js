@@ -1708,7 +1708,7 @@
 
 		const doron = localStorage.getItem("doron") ?? "false";
 
-		if((!fade || fade < 1) && doron === "false"){
+		if((!fade || fade < 1) && doron !== "true"){
 			// Main circle
 			ctx.fillStyle = fill
 			ctx.beginPath()
