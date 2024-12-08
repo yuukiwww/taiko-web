@@ -238,6 +238,11 @@ class SongSelect{
 					action: "songSelectingSpeed",
 				});
 		
+				this.songs.push({
+					title: "ばいそく",
+					skin: this.songSkin.customSettings,
+					action: "baisoku",
+				});
 		this.songs.push({
 			title: strings.back,
 			skin: this.songSkin.back,
@@ -282,7 +287,7 @@ class SongSelect{
 			iconFill: "#111111",
 			letterSpacing: 4
 		}]
-		this.optionsList = [strings.none, strings.auto, strings.netplay, "ばいそく", "さんばい", "よんばい", "ばいそく＋オート", "さんばい＋オート", "よんばい＋オート"]
+		this.optionsList = [strings.none, strings.auto, strings.netplay]
 		
 		this.draw = new CanvasDraw(noSmoothing)
 		this.songTitleCache = new CanvasCache(noSmoothing)
@@ -375,7 +380,7 @@ class SongSelect{
 			waitPreview: 0
 		}
 		this.songSelecting = {
-			speed: parseInt(localStorage.getItem("sss") ?? "400", 10),
+			speed: parseFloat(localStorage.getItem("sss") ?? "400", 10),
 			resize: 0.3,
 			scrollDelay: 0.1
 		}
@@ -901,6 +906,20 @@ class SongSelect{
 								}
 								localStorage.setItem("sss", songSelectingSpeed.toString());
 							}, 100);
+						} else if (currentSong.action === "baisoku") {
+							this.playSound("se_don");
+							setTimeout(() => {
+								let baisoku = localStorage.getItem("baisoku") ?? "1";
+								const input = prompt("ばいそくの倍率を入力してね！", baisoku);
+								if (input === null) {
+									// キャンセル
+								} else if (input === "") {
+									input = "1";
+								} else {
+									baisoku = input;
+								}
+								localStorage.setItem("baisoku", baisoku.toString());
+							}, 100);
 						}
 		}
 		this.pointer(false)
@@ -953,21 +972,7 @@ class SongSelect{
 		}
 		var autoplay = false
 		var multiplayer = false
-		var baisoku = 1;
-		if (this.state.options >= 3 || this.state.options <= 8) {
-			const mapping = {
-				3: 2,
-				4: 3,
-				5: 4,
-				6: 2,
-				7: 3,
-				8: 4
-			};
-			baisoku = mapping[this.state.options];
-			if (this.state.options >= 6) {
-				autoplay = true
-			}
-		}if(p2.session || this.state.options === 2){
+		if(p2.session || this.state.options === 2){
 			multiplayer = true
 		}else if(this.state.options === 1){
 			autoplay = true
@@ -991,7 +996,7 @@ class SongSelect{
 			"stars": selectedSong.courses[diff].stars,
 			"hash": selectedSong.hash,
 			"lyrics": selectedSong.lyrics
-		}, autoplay, multiplayer, touch, baisoku)
+		}, autoplay, multiplayer, touch)
 	}
 	toOptions(moveBy){
 		if(!p2.session){

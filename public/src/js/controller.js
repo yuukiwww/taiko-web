@@ -2,14 +2,13 @@ class Controller{
 	constructor(...args){
 		this.init(...args)
 	}
-	init(selectedSong, songData, autoPlayEnabled, multiplayer, touchEnabled, baisoku = 1){
+	init(selectedSong, songData, autoPlayEnabled, multiplayer, touchEnabled){
 		this.selectedSong = selectedSong
 		this.songData = songData
 		this.autoPlayEnabled = autoPlayEnabled
 		this.saveScore = !autoPlayEnabled
 		this.multiplayer = multiplayer
 		this.touchEnabled = touchEnabled
-		this.baisoku = baisoku
 		if(multiplayer === 2){
 			this.snd = p2.player === 2 ? "_p1" : "_p2"
 			this.don = p2.don || defaultDon
@@ -83,8 +82,8 @@ class Controller{
 		}
 		
 		this.game = new Game(this, this.selectedSong, this.parsedSongData)
-		this.view = new View(this, baisoku)
-		if (this.view.baisoku > 1) {
+		this.view = new View(this)
+		if (parseFloat(localStorage.getItem("baisoku") ?? "1", 10) !== 1) {
 			this.saveScore = false;
 		}
 		this.mekadon = new Mekadon(this, this.game)
@@ -280,7 +279,7 @@ class Controller{
 					Promise.all(promises).then(resolve)
 				}
 			}).then(() => {
-				var taikoGame = new Controller(this.selectedSong, this.songData, this.autoPlayEnabled, false, this.touchEnabled, this.baisoku)
+				var taikoGame = new Controller(this.selectedSong, this.songData, this.autoPlayEnabled, false, this.touchEnabled)
 				taikoGame.run()
 			})
 		}

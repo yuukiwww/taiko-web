@@ -2,12 +2,11 @@ class LoadSong{
 	constructor(...args){
 		this.init(...args)
 	}
-	init(selectedSong, autoPlayEnabled, multiplayer, touchEnabled, baisoku = 1){
+	init(selectedSong, autoPlayEnabled, multiplayer, touchEnabled){
 		this.selectedSong = selectedSong
 		this.autoPlayEnabled = autoPlayEnabled
 		this.multiplayer = multiplayer
 		this.touchEnabled = touchEnabled
-		this.baisoku = baisoku
 		var resolution = settings.getItem("resolution")
 		this.imgScale = 1
 		if(resolution === "medium"){
@@ -319,8 +318,8 @@ class LoadSong{
 				}else if(event.type === "gamestart"){
 					this.clean()
 					p2.clearMessage("songsel")
-					var taikoGame1 = new Controller(song, this.songData, false, 1, this.touchEnabled, this.baisoku)
-					var taikoGame2 = new Controller(this.selectedSong2, this.song2Data, true, 2, this.touchEnabled, this.baisoku)
+					var taikoGame1 = new Controller(song, this.songData, false, 1, this.touchEnabled)
+					var taikoGame2 = new Controller(this.selectedSong2, this.song2Data, true, 2, this.touchEnabled)
 					taikoGame1.run(taikoGame2)
 					pageEvents.send("load-song-player2", this.selectedSong2)
 				}else if(event.type === "left" || event.type === "gameend"){
@@ -336,7 +335,7 @@ class LoadSong{
 			})
 		}else{
 			this.clean()
-			var taikoGame = new Controller(song, this.songData, this.autoPlayEnabled, false, this.touchEnabled, this.baisoku)
+			var taikoGame = new Controller(song, this.songData, this.autoPlayEnabled, false, this.touchEnabled)
 			taikoGame.run()
 		}
 	}
