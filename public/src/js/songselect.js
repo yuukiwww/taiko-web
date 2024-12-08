@@ -243,6 +243,13 @@ class SongSelect{
 					skin: this.songSkin.customSettings,
 					action: "baisoku",
 				});
+
+				this.songs.push({
+					title: "ドロン",
+					skin: this.songSkin.customSettings,
+					action: "doron",
+				});
+
 		this.songs.push({
 			title: strings.back,
 			skin: this.songSkin.back,
@@ -919,6 +926,20 @@ class SongSelect{
 									baisoku = input;
 								}
 								localStorage.setItem("baisoku", baisoku.toString());
+							}, 100);
+						} else if (currentSong.action === "doron") {
+							this.playSound("se_don");
+							setTimeout(() => {
+								let doron = localStorage.getItem("doron") ?? "false";
+								const input = prompt("ドロンを有効にするには\"true\"を入力してね！", doron);
+								if (input === null) {
+									// キャンセル
+								} else if (input === "") {
+									input = "false";
+								} else {
+									doron = input;
+								}
+								localStorage.setItem("doron", doron);
 							}, 100);
 						}
 		}
