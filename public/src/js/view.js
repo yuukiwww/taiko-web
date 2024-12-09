@@ -1631,6 +1631,8 @@
 		var drumroll = 0
 		var endX = 0
 		
+		const doron = localStorage.getItem("doron") ?? "false";
+
 		if(!circlePos){
 			circlePos = {
 				x: this.slotPos.x + this.msToPos(circleMs - ms + this.controller.videoLatency, speed),
@@ -1676,12 +1678,14 @@
 				}else if(ms > endTime + this.controller.audioLatency){
 					circlePos.x = this.slotPos.x + this.msToPos(endTime - ms + this.controller.audioLatency, speed)
 				}
-				ctx.drawImage(assets.image["balloon"],
-					circlePos.x + size - 4,
-					circlePos.y - h / 2 + 2,
-					h / 61 * 115,
-					h
-				)
+				if (doron !== "true") {
+					ctx.drawImage(assets.image["balloon"],
+						circlePos.x + size - 4,
+						circlePos.y - h / 2 + 2,
+						h / 61 * 115,
+						h
+					)
+				}
 			}
 		}else if(type === "drumroll" || type === "daiDrumroll"){
 			fill = "#f3b500"
@@ -1695,18 +1699,18 @@
 			endX = this.msToPos(endTime - circleMs, speed)
 			drumroll = endX > 50 ? 2 : 1
 			
-			ctx.fillStyle = fill
-			ctx.strokeStyle = "#000"
-			ctx.lineWidth = 3
-			ctx.beginPath()
-			ctx.moveTo(circlePos.x, circlePos.y - size + 1.5)
-			ctx.arc(circlePos.x + endX, circlePos.y, size - 1.5, Math.PI / -2, Math.PI / 2)
-			ctx.lineTo(circlePos.x, circlePos.y + size - 1.5)
-			ctx.fill()
-			ctx.stroke()
+			if (doron !== "true") {
+				ctx.fillStyle = fill
+				ctx.strokeStyle = "#000"
+				ctx.lineWidth = 3
+				ctx.beginPath()
+				ctx.moveTo(circlePos.x, circlePos.y - size + 1.5)
+				ctx.arc(circlePos.x + endX, circlePos.y, size - 1.5, Math.PI / -2, Math.PI / 2)
+				ctx.lineTo(circlePos.x, circlePos.y + size - 1.5)
+				ctx.fill()
+				ctx.stroke()
+			}
 		}
-
-		const doron = localStorage.getItem("doron") ?? "false";
 
 		if((!fade || fade < 1) && doron !== "true"){
 			// Main circle
