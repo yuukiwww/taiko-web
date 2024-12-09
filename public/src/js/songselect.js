@@ -933,7 +933,7 @@ class SongSelect{
 								if (input === null) {
 									// キャンセル
 								} else if (input === "") {
-									input = "1";
+									baisoku = "1";
 								} else {
 									baisoku = input;
 								}
@@ -947,7 +947,7 @@ class SongSelect{
 								if (input === null) {
 									// キャンセル
 								} else if (input === "") {
-									input = "false";
+									doron = "false";
 								} else {
 									doron = input;
 								}
@@ -961,7 +961,7 @@ class SongSelect{
 								if (input === null) {
 									// キャンセル
 								} else if (input === "") {
-									input = "false";
+									abekobe = "false";
 								} else {
 									abekobe = input;
 								}
@@ -975,7 +975,7 @@ class SongSelect{
 								if (input === null) {
 									// キャンセル
 								} else if (input === "") {
-									input = "0";
+									detarame = "0";
 								} else {
 									detarame = input;
 								}
