@@ -59,11 +59,12 @@ class LoadSong{
 			}
 		}
 		this.songObj = songObj
-		
 		song.songBg = this.randInt(1, 5)
 		song.songStage = this.randInt(1, 3)
 		song.donBg = this.randInt(1, 6)
-		
+		if(this.songObj && this.songObj.category_id === 9){
+			 LoadSong.insertBackgroundVideo(this.songObj.id)
+				}
 		if(song.songSkin && song.songSkin.name){
 			var imgLoad = []
 			for(var type in song.songSkin){
@@ -134,7 +135,7 @@ class LoadSong{
 			chart = chart[chartDiff]
 		}
 		if(chart){
-			this.addPromise(chart.read(song.type === "tja" ? "utf-8" : "").then(data => {
+			this.addPromise(chart.read(song.type === "tja" ? "sjis" : "").then(data => {
 				this.songData = data.replace(/\0/g, "").split("\n")
 			}), chart.url)
 		}else{
@@ -308,7 +309,7 @@ class LoadSong{
 						if(song.type === "tja" || !chart || !chart.separateDiff || !chart[chartDiff]){
 							this.startMultiplayer()
 						}else{
-							chart[chartDiff].read(song.type === "tja" ? "utf-8" : "").then(data => {
+							chart[chartDiff].read(song.type === "tja" ? "sjis" : "").then(data => {
 								this.song2Data = data.replace(/\0/g, "").split("\n")
 							}, () => {}).then(() => {
 								this.startMultiplayer()
@@ -368,10 +369,29 @@ class LoadSong{
 	clean(){
 		delete this.promises
 		delete this.songObj
+        delete this.videoElement
 		pageEvents.remove(p2, "message")
 		if(this.cancelButton){
 			pageEvents.remove(this.cancelButton, ["mousedown", "touchstart"])
 			delete this.cancelButton
 		}
 	}
+	
+	static insertBackgroundVideo(songId) {
+        const video = document.createElement("video");
+        video.src = `songs/${songId}/main.mp4`; 
+        video.autoplay = true;
+        video.muted = true;  // 可选：静音
+        video.style.objectFit = 'cover';
+        video.style.position = 'fixed';
+        video.style.top = "0";
+        video.style.left = "0";
+        video.style.zIndex = "0";  // 背景视频
+        video.style.width = "100vw";
+        video.style.height = "100vh";
+        document.body.appendChild(video);
+        window.videoElement = video;
+    }
+
+	
 }
