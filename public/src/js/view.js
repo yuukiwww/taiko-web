@@ -1877,35 +1877,37 @@
 			})
 		}
 	}
-	toggleGogoTime(circle){
-		var startMS = circle.ms + this.controller.audioLatency
-		this.gogoTime = circle.gogoTime
-		if(circle.gogoTime || this.gogoTimeStarted !== -Infinity){
-			this.gogoTimeStarted = startMS
-		}
-		
-		if(this.gogoTime){
-			this.assets.fireworks.forEach(fireworksAsset => {
-			    fireworksAsset.z-index=1
-			    fireworksAsset.position='absolute'
-				fireworksAsset.setAnimation("normal")
-				fireworksAsset.setAnimationStart(startMS)
-				var length = fireworksAsset.getAnimationLength("normal")
-				fireworksAsset.setAnimationEnd(length, () => {
-					fireworksAsset.setAnimation(false)
-				})
-			})
-			this.assets.fire.setAnimation("normal")
-			var don = this.assets.don
-			don.setAnimation("gogostart")
-			var length = don.getAnimationLength("gogo")
-			don.setUpdateSpeed(4 / length)
-			var start = startMS - (startMS % this.beatInterval)
-			don.setAnimationStart(start)
-			var length = don.getAnimationLength("gogostart")
-			don.setAnimationEnd(length, don.normalAnimation)
-		}
-	}
+	toggleGogoTime(circle) {
+    var startMS = circle.ms + this.controller.audioLatency;
+    this.gogoTime = circle.gogoTime;
+    if (circle.gogoTime || this.gogoTimeStarted !== -Infinity) {
+        this.gogoTimeStarted = startMS;
+    }
+
+    if (this.gogoTime) {
+        this.assets.fireworks.forEach(fireworksAsset => {
+            fireworksAsset.zIndex = 10; 
+            fireworksAsset.setAnimation("normal");
+            fireworksAsset.setAnimationStart(startMS);
+            var length = fireworksAsset.getAnimationLength("normal");
+            fireworksAsset.setAnimationEnd(length, () => {
+                fireworksAsset.setAnimation(false);
+            });
+        });
+
+        this.assets.fireworks.sort((a, b) => a.zIndex - b.zIndex);
+
+        this.assets.fire.setAnimation("normal");
+        var don = this.assets.don;
+        don.setAnimation("gogostart");
+        var length = don.getAnimationLength("gogo");
+        don.setUpdateSpeed(4 / length);
+        var start = startMS - (startMS % this.beatInterval);
+        don.setAnimationStart(start);
+        var length = don.getAnimationLength("gogostart");
+        don.setAnimationEnd(length, don.normalAnimation);
+    }
+}
 	drawGogoTime(){
 		var ms = this.getMS()
 		
