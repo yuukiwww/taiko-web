@@ -83,9 +83,6 @@ class Controller{
 		
 		this.game = new Game(this, this.selectedSong, this.parsedSongData)
 		this.view = new View(this)
-		if (parseFloat(localStorage.getItem("baisoku") ?? "1", 10) !== 1) {
-			this.saveScore = false;
-		}
 		this.mekadon = new Mekadon(this, this.game)
 		this.keyboard = new GameInput(this)
 		if(!autoPlayEnabled && this.multiplayer !== 2){
@@ -123,6 +120,7 @@ class Controller{
 	}
 	startMainLoop(){
 		this.mainLoopRunning = true
+		window.gamestatus = 'start'
 		this.gameLoop()
 		this.viewLoop()
 		if(this.multiplayer !== 2){
@@ -137,6 +135,20 @@ class Controller{
 	}
 	stopMainLoop(){
 		this.mainLoopRunning = false
+		window.gamestatus = 'stop'
+		
+		if (window.videoElement) {
+        // 停止视频播放
+        window.videoElement.pause();
+        
+        // 移除视频元素
+        document.body.removeChild(window.videoElement);
+        
+        // 解除引用，允许垃圾回收
+        window.videoElement = null;
+    }
+		
+		
 		if(this.game.mainAsset){
 			this.game.mainAsset.stop()
 		}
@@ -266,7 +278,7 @@ class Controller{
 							var chartDiff = this.selectedSong.difficulty
 							chart = chart[chartDiff]
 						}
-						this.addPromise(promises, chart.read(this.selectedSong.type === "tja" ? "utf-8" : undefined).then(data => {
+						this.addPromise(promises, chart.read(this.selectedSong.type === "tja" ? "sjis" : undefined).then(data => {
 							this.songData = data.replace(/\0/g, "").split("\n")
 							return Promise.resolve()
 						}), chart.url)
@@ -275,6 +287,9 @@ class Controller{
 						this.addPromise(promises, songObj.lyricsFile.read().then(result => {
 							songObj.lyricsData = result
 						}, () => Promise.resolve()), songObj.lyricsFile.url)
+					}
+					if(songObj && songObj.category_id === 9){
+					    LoadSong.insertBackgroundVideo(songObj.id)
 					}
 					Promise.all(promises).then(resolve)
 				}
@@ -325,6 +340,8 @@ class Controller{
 			this.syncWith.game.togglePause(forcePause, pauseMove, noSound)
 		}
 		this.game.togglePause(forcePause, pauseMove, noSound)
+		
+		
 	}
 	getKeys(){
 		return this.keyboard.getKeys()

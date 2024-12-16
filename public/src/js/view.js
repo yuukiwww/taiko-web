@@ -1487,11 +1487,11 @@
 		var measureH = 130 * mul
 		
 		measures.forEach(measure => {
-			var timeForDistance = this.posToMs(distanceForCircle, measure.speed * parseFloat(localStorage.getItem("baisoku") ?? "1", 10))
+			var timeForDistance = this.posToMs(distanceForCircle, measure.speed)
 			var startingTime = measure.ms - timeForDistance + this.controller.videoLatency
-			var finishTime = measure.ms + this.posToMs(this.slotPos.x - this.slotPos.paddingLeft + 3, measure.speed * parseFloat(localStorage.getItem("baisoku") ?? "1", 10)) + this.controller.videoLatency
+			var finishTime = measure.ms + this.posToMs(this.slotPos.x - this.slotPos.paddingLeft + 3, measure.speed) + this.controller.videoLatency
 			if(measure.visible && (!measure.branch || measure.branch.active) && ms >= startingTime && ms <= finishTime){
-				var measureX = this.slotPos.x + this.msToPos(measure.ms - ms + this.controller.videoLatency, measure.speed * parseFloat(localStorage.getItem("baisoku") ?? "1", 10))
+				var measureX = this.slotPos.x + this.msToPos(measure.ms - ms + this.controller.videoLatency, measure.speed)
 				this.ctx.strokeStyle = measure.branchFirst ? "#ff0" : "#bdbdbd"
 				this.ctx.lineWidth = 3
 				this.ctx.beginPath()
@@ -1537,7 +1537,7 @@
 		
 		for(var i = circles.length; i--;){
 			var circle = circles[i]
-			var speed = circle.speed * parseFloat(localStorage.getItem("baisoku") ?? "1", 10)
+			var speed = circle.speed
 			
 			var timeForDistance = this.posToMs(distanceForCircle + this.slotPos.size / 2, speed)
 			var startingTime = circle.ms - timeForDistance + this.controller.videoLatency
@@ -1626,13 +1626,11 @@
 		var circleMs = circle.ms
 		var endTime = circle.endTime
 		var animated = circle.animating
-		var speed = circle.speed * parseFloat(localStorage.getItem("baisoku") ?? "1", 10)
+		var speed = circle.speed
 		var played = circle.isPlayed
 		var drumroll = 0
 		var endX = 0
 		
-		const doron = localStorage.getItem("doron") ?? "false";
-
 		if(!circlePos){
 			circlePos = {
 				x: this.slotPos.x + this.msToPos(circleMs - ms + this.controller.videoLatency, speed),
@@ -1678,14 +1676,12 @@
 				}else if(ms > endTime + this.controller.audioLatency){
 					circlePos.x = this.slotPos.x + this.msToPos(endTime - ms + this.controller.audioLatency, speed)
 				}
-				if (doron !== "true") {
-					ctx.drawImage(assets.image["balloon"],
-						circlePos.x + size - 4,
-						circlePos.y - h / 2 + 2,
-						h / 61 * 115,
-						h
-					)
-				}
+				ctx.drawImage(assets.image["balloon"],
+					circlePos.x + size - 4,
+					circlePos.y - h / 2 + 2,
+					h / 61 * 115,
+					h
+				)
 			}
 		}else if(type === "drumroll" || type === "daiDrumroll"){
 			fill = "#f3b500"
@@ -1699,20 +1695,17 @@
 			endX = this.msToPos(endTime - circleMs, speed)
 			drumroll = endX > 50 ? 2 : 1
 			
-			if (doron !== "true") {
-				ctx.fillStyle = fill
-				ctx.strokeStyle = "#000"
-				ctx.lineWidth = 3
-				ctx.beginPath()
-				ctx.moveTo(circlePos.x, circlePos.y - size + 1.5)
-				ctx.arc(circlePos.x + endX, circlePos.y, size - 1.5, Math.PI / -2, Math.PI / 2)
-				ctx.lineTo(circlePos.x, circlePos.y + size - 1.5)
-				ctx.fill()
-				ctx.stroke()
-			}
+			ctx.fillStyle = fill
+			ctx.strokeStyle = "#000"
+			ctx.lineWidth = 3
+			ctx.beginPath()
+			ctx.moveTo(circlePos.x, circlePos.y - size + 1.5)
+			ctx.arc(circlePos.x + endX, circlePos.y, size - 1.5, Math.PI / -2, Math.PI / 2)
+			ctx.lineTo(circlePos.x, circlePos.y + size - 1.5)
+			ctx.fill()
+			ctx.stroke()
 		}
-
-		if((!fade || fade < 1) && doron !== "true"){
+		if(!fade || fade < 1){
 			// Main circle
 			ctx.fillStyle = fill
 			ctx.beginPath()
@@ -1884,33 +1877,37 @@
 			})
 		}
 	}
-	toggleGogoTime(circle){
-		var startMS = circle.ms + this.controller.audioLatency
-		this.gogoTime = circle.gogoTime
-		if(circle.gogoTime || this.gogoTimeStarted !== -Infinity){
-			this.gogoTimeStarted = startMS
-		}
-		
-		if(this.gogoTime){
-			this.assets.fireworks.forEach(fireworksAsset => {
-				fireworksAsset.setAnimation("normal")
-				fireworksAsset.setAnimationStart(startMS)
-				var length = fireworksAsset.getAnimationLength("normal")
-				fireworksAsset.setAnimationEnd(length, () => {
-					fireworksAsset.setAnimation(false)
-				})
-			})
-			this.assets.fire.setAnimation("normal")
-			var don = this.assets.don
-			don.setAnimation("gogostart")
-			var length = don.getAnimationLength("gogo")
-			don.setUpdateSpeed(4 / length)
-			var start = startMS - (startMS % this.beatInterval)
-			don.setAnimationStart(start)
-			var length = don.getAnimationLength("gogostart")
-			don.setAnimationEnd(length, don.normalAnimation)
-		}
-	}
+	toggleGogoTime(circle) {
+    var startMS = circle.ms + this.controller.audioLatency;
+    this.gogoTime = circle.gogoTime;
+    if (circle.gogoTime || this.gogoTimeStarted !== -Infinity) {
+        this.gogoTimeStarted = startMS;
+    }
+
+    if (this.gogoTime) {
+        this.assets.fireworks.forEach(fireworksAsset => {
+            fireworksAsset.zIndex = 10; 
+            fireworksAsset.setAnimation("normal");
+            fireworksAsset.setAnimationStart(startMS);
+            var length = fireworksAsset.getAnimationLength("normal");
+            fireworksAsset.setAnimationEnd(length, () => {
+                fireworksAsset.setAnimation(false);
+            });
+        });
+
+        this.assets.fireworks.sort((a, b) => a.zIndex - b.zIndex);
+
+        this.assets.fire.setAnimation("normal");
+        var don = this.assets.don;
+        don.setAnimation("gogostart");
+        var length = don.getAnimationLength("gogo");
+        don.setUpdateSpeed(4 / length);
+        var start = startMS - (startMS % this.beatInterval);
+        don.setAnimationStart(start);
+        var length = don.getAnimationLength("gogostart");
+        don.setAnimationEnd(length, don.normalAnimation);
+    }
+}
 	drawGogoTime(){
 		var ms = this.getMS()
 		
