@@ -833,7 +833,7 @@ def delete():
 
     parent_dir = pathlib.Path(os.getenv("TAIKO_WEB_SONGS_DIR", "public/songs"))
     target_dir = parent_dir / id
-    if target_dir.resolve().relative_to(parent_dir.resolve()) == pathlib.Path("."):
+    if not (target_dir.resolve().parents and parent_dir.resolve() in target_dir.resolve().parents):
         return flask.jsonify({ "success": False, "reason": "PARENT IS NOT ALLOWED" })
 
     shutil.rmtree(target_dir)
