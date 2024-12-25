@@ -1487,11 +1487,11 @@
 		var measureH = 130 * mul
 		
 		measures.forEach(measure => {
-			var timeForDistance = this.posToMs(distanceForCircle, measure.speed)
+			var timeForDistance = this.posToMs(distanceForCircle, measure.speed * parseFloat(localStorage.getItem("baisoku") ?? "1", 10))
 			var startingTime = measure.ms - timeForDistance + this.controller.videoLatency
-			var finishTime = measure.ms + this.posToMs(this.slotPos.x - this.slotPos.paddingLeft + 3, measure.speed) + this.controller.videoLatency
+			var finishTime = measure.ms + this.posToMs(this.slotPos.x - this.slotPos.paddingLeft + 3, measure.speed * parseFloat(localStorage.getItem("baisoku") ?? "1", 10)) + this.controller.videoLatency
 			if(measure.visible && (!measure.branch || measure.branch.active) && ms >= startingTime && ms <= finishTime){
-				var measureX = this.slotPos.x + this.msToPos(measure.ms - ms + this.controller.videoLatency, measure.speed)
+				var measureX = this.slotPos.x + this.msToPos(measure.ms - ms + this.controller.videoLatency, measure.speed * parseFloat(localStorage.getItem("baisoku") ?? "1", 10))
 				this.ctx.strokeStyle = measure.branchFirst ? "#ff0" : "#bdbdbd"
 				this.ctx.lineWidth = 3
 				this.ctx.beginPath()
@@ -1537,7 +1537,7 @@
 		
 		for(var i = circles.length; i--;){
 			var circle = circles[i]
-			var speed = circle.speed
+			var speed = circle.speed * parseFloat(localStorage.getItem("baisoku") ?? "1", 10)
 			
 			var timeForDistance = this.posToMs(distanceForCircle + this.slotPos.size / 2, speed)
 			var startingTime = circle.ms - timeForDistance + this.controller.videoLatency
@@ -1626,11 +1626,13 @@
 		var circleMs = circle.ms
 		var endTime = circle.endTime
 		var animated = circle.animating
-		var speed = circle.speed
+		var speed = circle.speed * parseFloat(localStorage.getItem("baisoku") ?? "1", 10)
 		var played = circle.isPlayed
 		var drumroll = 0
 		var endX = 0
 		
+		const doron = localStorage.getItem("doron") ?? "false";
+
 		if(!circlePos){
 			circlePos = {
 				x: this.slotPos.x + this.msToPos(circleMs - ms + this.controller.videoLatency, speed),
@@ -1676,12 +1678,14 @@
 				}else if(ms > endTime + this.controller.audioLatency){
 					circlePos.x = this.slotPos.x + this.msToPos(endTime - ms + this.controller.audioLatency, speed)
 				}
-				ctx.drawImage(assets.image["balloon"],
-					circlePos.x + size - 4,
-					circlePos.y - h / 2 + 2,
-					h / 61 * 115,
-					h
-				)
+				if (doron !== "true") {
+					ctx.drawImage(assets.image["balloon"],
+						circlePos.x + size - 4,
+						circlePos.y - h / 2 + 2,
+						h / 61 * 115,
+						h
+					)
+				}
 			}
 		}else if(type === "drumroll" || type === "daiDrumroll"){
 			fill = "#f3b500"
@@ -1695,17 +1699,20 @@
 			endX = this.msToPos(endTime - circleMs, speed)
 			drumroll = endX > 50 ? 2 : 1
 			
-			ctx.fillStyle = fill
-			ctx.strokeStyle = "#000"
-			ctx.lineWidth = 3
-			ctx.beginPath()
-			ctx.moveTo(circlePos.x, circlePos.y - size + 1.5)
-			ctx.arc(circlePos.x + endX, circlePos.y, size - 1.5, Math.PI / -2, Math.PI / 2)
-			ctx.lineTo(circlePos.x, circlePos.y + size - 1.5)
-			ctx.fill()
-			ctx.stroke()
+			if (doron !== "true") {
+				ctx.fillStyle = fill
+				ctx.strokeStyle = "#000"
+				ctx.lineWidth = 3
+				ctx.beginPath()
+				ctx.moveTo(circlePos.x, circlePos.y - size + 1.5)
+				ctx.arc(circlePos.x + endX, circlePos.y, size - 1.5, Math.PI / -2, Math.PI / 2)
+				ctx.lineTo(circlePos.x, circlePos.y + size - 1.5)
+				ctx.fill()
+				ctx.stroke()
+			}
 		}
-		if(!fade || fade < 1){
+
+		if((!fade || fade < 1) && doron !== "true"){
 			// Main circle
 			ctx.fillStyle = fill
 			ctx.beginPath()

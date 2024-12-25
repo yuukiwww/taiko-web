@@ -83,6 +83,9 @@ class Controller{
 		
 		this.game = new Game(this, this.selectedSong, this.parsedSongData)
 		this.view = new View(this)
+		if (parseFloat(localStorage.getItem("baisoku") ?? "1", 10) !== 1) {
+			this.saveScore = false;
+		}
 		this.mekadon = new Mekadon(this, this.game)
 		this.keyboard = new GameInput(this)
 		if(!autoPlayEnabled && this.multiplayer !== 2){
@@ -278,7 +281,7 @@ class Controller{
 							var chartDiff = this.selectedSong.difficulty
 							chart = chart[chartDiff]
 						}
-						this.addPromise(promises, chart.read(this.selectedSong.type === "tja" ? "sjis" : undefined).then(data => {
+						this.addPromise(promises, chart.read(this.selectedSong.type === "tja" ? "utf-8" : undefined).then(data => {
 							this.songData = data.replace(/\0/g, "").split("\n")
 							return Promise.resolve()
 						}), chart.url)

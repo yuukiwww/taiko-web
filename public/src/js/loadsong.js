@@ -135,7 +135,7 @@ class LoadSong{
 			chart = chart[chartDiff]
 		}
 		if(chart){
-			this.addPromise(chart.read(song.type === "tja" ? "sjis" : "").then(data => {
+			this.addPromise(chart.read(song.type === "tja" ? "utf-8" : "").then(data => {
 				this.songData = data.replace(/\0/g, "").split("\n")
 			}), chart.url)
 		}else{
@@ -309,7 +309,7 @@ class LoadSong{
 						if(song.type === "tja" || !chart || !chart.separateDiff || !chart[chartDiff]){
 							this.startMultiplayer()
 						}else{
-							chart[chartDiff].read(song.type === "tja" ? "sjis" : "").then(data => {
+							chart[chartDiff].read(song.type === "tja" ? "utf-8" : "").then(data => {
 								this.song2Data = data.replace(/\0/g, "").split("\n")
 							}, () => {}).then(() => {
 								this.startMultiplayer()
