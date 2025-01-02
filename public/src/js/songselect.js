@@ -1056,7 +1056,8 @@ class SongSelect{
 			"songSkin": selectedSong.songSkin,
 			"stars": selectedSong.courses[diff].stars,
 			"hash": selectedSong.hash,
-			"lyrics": selectedSong.lyrics
+			"lyrics": selectedSong.lyrics,
+			"video": selectedSong.video,
 		}, autoplay, multiplayer, touch)
 	}
 	toOptions(moveBy){
