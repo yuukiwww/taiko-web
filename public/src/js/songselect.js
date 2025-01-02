@@ -1056,7 +1056,8 @@ class SongSelect{
 			"songSkin": selectedSong.songSkin,
 			"stars": selectedSong.courses[diff].stars,
 			"hash": selectedSong.hash,
-			"lyrics": selectedSong.lyrics
+			"lyrics": selectedSong.lyrics,
+			"video": selectedSong.video,
 		}, autoplay, multiplayer, touch)
 	}
 	toOptions(moveBy){
@@ -2029,6 +2030,7 @@ class SongSelect{
 				}
 				
 				var hasMaker = currentSong.maker || currentSong.maker === 0
+				var hasVideo = currentSong.video || currentSong.video === 0
 				if(hasMaker || currentSong.lyrics){
 					if (songSel) {
 						var _x = x + 38
@@ -2181,7 +2183,54 @@ class SongSelect{
 					ctx.lineTo(_x - 35, _y + 25)
 					ctx.fill()
 				}
-				
+				if (songSel && hasVideo) {
+					var _x = x + 230;
+					var _y = y - 13;
+
+					// Icon dimensions and positions
+					const rectX = _x - 10;
+					const rectY = _y + 23;
+					const rectWidth = 30;  // Adjust width
+					const rectHeight = 30; // Adjust height
+					const rectRadius = 5; // Rounded corners
+
+					// Draw the outer rectangle (film strip body)
+					ctx.beginPath();
+					ctx.moveTo(rectX + rectRadius, rectY);
+					ctx.arcTo(rectX + rectWidth, rectY, rectX + rectWidth, rectY + rectHeight, rectRadius);
+					ctx.arcTo(rectX + rectWidth, rectY + rectHeight, rectX, rectY + rectHeight, rectRadius);
+					ctx.arcTo(rectX, rectY + rectHeight, rectX, rectY, rectRadius);
+					ctx.arcTo(rectX, rectY, rectX + rectWidth, rectY, rectRadius);
+					ctx.closePath();
+					ctx.fillStyle = "#000"; // Black fill
+					ctx.fill();
+					ctx.strokeStyle = "#fff"; // White border
+					ctx.lineWidth = 2;
+					ctx.stroke();
+
+					// Draw the "holes" for the film strip
+					ctx.fillStyle = "#000"; // White for the holes
+					const holeSize = 3;
+					const holeSpacing = 5;
+					for (let i = 0; i < 4; i++) {
+						// Left side holes
+						ctx.fillRect(rectX - holeSize - 2, rectY + 5 + i * holeSpacing, holeSize, holeSize);
+						// Right side holes
+						ctx.fillRect(rectX + rectWidth + 2, rectY + 5 + i * holeSpacing, holeSize, holeSize);
+					}
+
+					// Draw the play button (triangle)
+					const centerX = rectX + rectWidth / 2;
+					const centerY = rectY + rectHeight / 2;
+					const triangleSize = 12;
+					ctx.beginPath();
+					ctx.moveTo(centerX - triangleSize / 2, centerY - triangleSize);
+					ctx.lineTo(centerX + triangleSize, centerY);
+					ctx.lineTo(centerX - triangleSize / 2, centerY + triangleSize);
+					ctx.closePath();
+					ctx.fillStyle = "#fff"; // White triangle
+					ctx.fill();
+				}
 				ctx.globalAlpha = 1 - Math.max(0, opened - 0.5) * 2
 				ctx.fillStyle = selectedSkin.background
 				ctx.fillRect(x, y, w, h)
